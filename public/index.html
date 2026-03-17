@@ -2,135 +2,178 @@
 <html lang="so">
 <head>
     <meta charset="UTF-8">
-    <title>Nawawi School System</title>
+    <title>Nawawi School Management | PRO</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --nav: #0f172a; --blue: #2563eb; --bg: #f8fafc; }
-        body { font-family: sans-serif; margin: 0; display: flex; background: var(--bg); }
-        .sidebar { width: 260px; background: var(--nav); color: white; height: 100vh; position: fixed; padding: 20px; }
-        .sidebar h2 { color: var(--blue); text-align: center; }
-        .sidebar button { width: 100%; padding: 12px; margin-bottom: 10px; border: none; background: none; color: #94a3b8; text-align: left; cursor: pointer; border-radius: 8px; font-size: 16px; }
+        :root { --nav: #0f172a; --blue: #2563eb; --bg: #f1f5f9; --white: #ffffff; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; background: var(--bg); }
+        .sidebar { width: 280px; background: var(--nav); color: white; height: 100vh; position: fixed; padding: 25px; box-sizing: border-box; }
+        .sidebar h2 { color: var(--blue); text-align: center; margin-bottom: 40px; }
+        .sidebar button { width: 100%; padding: 15px; background: none; border: none; color: #94a3b8; text-align: left; cursor: pointer; border-radius: 10px; margin-bottom: 10px; font-size: 16px; transition: 0.3s; }
         .sidebar button:hover, .sidebar button.active { background: var(--blue); color: white; }
-        .main { margin-left: 260px; flex: 1; padding: 30px; }
-        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        input, select { width: 100%; padding: 12px; margin-top: 10px; border: 1px solid #ddd; border-radius: 8px; }
-        .btn-p { background: var(--blue); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 15px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; }
+        .main { margin-left: 280px; flex: 1; padding: 40px; box-sizing: border-box; }
+        .card { background: var(--white); padding: 30px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 25px; }
+        input, select { width: 100%; padding: 14px; margin-top: 10px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 15px; outline: none; }
+        .btn-main { background: var(--blue); color: white; border: none; padding: 16px; border-radius: 10px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 20px; font-size: 16px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 25px; }
+        th, td { padding: 15px; border-bottom: 1px solid #f1f5f9; text-align: left; }
+        .badge { padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; }
+        #loginOverlay { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 99999; }
     </style>
 </head>
 <body>
 
-<div id="loginBox" style="position:fixed; inset:0; background:var(--bg); z-index:9999; display:flex; align-items:center; justify-content:center;">
-    <div class="card" style="width:350px; text-align:center;">
-        <h2>NBS SYSTEM</h2>
-        <input id="uID" placeholder="ID (nawawi_admin)">
-        <input id="uPass" type="password" placeholder="Password (7209379)">
-        <button class="btn-p" onclick="handleLogin()">Login</button>
+<div id="loginOverlay">
+    <div class="card" style="width:380px; text-align:center;">
+        <h2 style="color:var(--nav)">NBS MANAGEMENT</h2>
+        <p>Geli macluumaadkaaga si aad u gashid</p>
+        <select id="lRole"><option value="admin">Maamule (Admin)</option><option value="student">Arday (Student)</option></select>
+        <input id="lID" placeholder="ID Number / NBS Code">
+        <input id="lPass" type="password" placeholder="Password">
+        <button class="btn-main" onclick="processLogin()">Login Dashboard</button>
     </div>
 </div>
 
-<div class="sidebar">
-    <h2>NBS PRO</h2>
-    <button onclick="showNav('attendance')"><i class="fas fa-check-circle"></i> Attendance</button>
-    <button onclick="showNav('exam')"><i class="fas fa-file-alt"></i> 12 Subjects</button>
-    <button onclick="showNav('fee')"><i class="fas fa-money-bill"></i> Fee Management</button>
-    <button onclick="showNav('add')"><i class="fas fa-user-plus"></i> Add Student</button>
-    <button onclick="location.reload()" style="color:red; margin-top:50px;"><i class="fas fa-sign-out-alt"></i> Logout</button>
+<div id="sideMenu" class="sidebar" style="display:none">
+    <h2>NAWAWI PRO</h2>
+    <button onclick="changeTab('attendance')" id="tab-att"><i class="fas fa-calendar-check"></i> Attendance (Sax/Khlad)</button>
+    <button onclick="changeTab('exam')" id="tab-exam"><i class="fas fa-edit"></i> 12 Subjects (Marks)</button>
+    <button onclick="changeTab('fee')" id="tab-fee"><i class="fas fa-money-check-alt"></i> Fee Management</button>
+    <button onclick="openAddForm()" id="tab-add"><i class="fas fa-user-plus"></i> Add New Student</button>
+    <button onclick="location.reload()" style="color:#ef4444; margin-top:100px;"><i class="fas fa-power-off"></i> Logout</button>
 </div>
 
-<div class="main">
-    <div id="app"></div>
+<div id="mainArea" class="main" style="display:none">
+    <div id="dynamicView"></div>
 </div>
 
 <script>
-    const subjs = ["Math", "English", "Arabic", "Islamic", "Physics", "Chemistry", "Biology", "History", "Geography", "Somali", "ICT", "Business"];
+    const allSubjects = ["Math", "English", "Arabic", "Islamic", "Physics", "Chemistry", "Biology", "History", "Geography", "Somali", "ICT", "Business"];
 
-    async function handleLogin() {
-        if(uID.value === 'nawawi_admin' && uPass.value === '7209379') {
-            document.getElementById('loginBox').style.display='none';
-            showNav('attendance');
-        } else { alert("Khlad!"); }
-    }
-
-    function showNav(page) {
-        let html = `<div class="card"><h3>${page.toUpperCase()} PANEL</h3>`;
-        if(page === 'add') {
-            html += `<input id="nID" placeholder="NBS Code"><input id="nName" placeholder="Full Name">
-                     <select id="nCl"><option value="9aad">9aad</option><option value="12aad">12aad</option></select>
-                     <button class="btn-p" onclick="saveNew()">Register Student</button>`;
-        } else {
-            html += `<div style="display:flex; gap:10px;">
-                        <select id="fC"><option value="9aad">9aad</option><option value="12aad">12aad</option></select>
-                        <select id="fS"><option value="A">A</option><option value="B">B</option></select>
-                        <button class="btn-p" style="margin:0; width:150px" onclick="loadList('${page}')">Fetch</button>
-                     </div>`;
-        }
-        document.getElementById('app').innerHTML = html + `</div><div id="listArea"></div>`;
-    }
-
-    async function saveNew() {
-        await fetch('/api/admin/save', {
+    async function processLogin() {
+        const res = await fetch('/api/login', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ nbsCode: nID.value, fullName: nName.value, class: nCl.value, section: "A" })
+            body: JSON.stringify({role: lRole.value, id: lID.value, pass: lPass.value})
         });
-        alert("Ardayga waa la keydiyey!");
+        const data = await res.json();
+        if(data.success) {
+            document.getElementById('loginOverlay').style.display = 'none';
+            document.getElementById('sideMenu').style.display = 'block';
+            document.getElementById('mainArea').style.display = 'block';
+            if(data.role === 'admin') changeTab('attendance'); else showStudentProfile(data.data);
+        } else alert("Cilad: ID ama Password ayaa khaldan!");
     }
 
-    async function loadList(type) {
-        const res = await fetch(`/api/students/${fC.value}/${fS.value}`);
+    function changeTab(type) {
+        document.getElementById('dynamicView').innerHTML = `
+            <div class="card">
+                <h3>Nidaamka Maamulka: ${type.toUpperCase()}</h3>
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:20px;">
+                    <div>Fasalka: <select id="selC"><option value="9aad">9aad</option><option value="10aad">10aad</option><option value="11aad">11aad</option><option value="12aad">12aad</option></select></div>
+                    <div>Section: <select id="selS"><option value="A">A</option><option value="B">B</option><option value="C">C</option></select></div>
+                    <button class="btn-main" style="margin-top:25px" onclick="fetchList('${type}')">Show Students</button>
+                </div>
+            </div>
+            <div id="listContainer"></div>`;
+    }
+
+    async function fetchList(type) {
+        const res = await fetch(`/api/students/${selC.value}/${selS.value}`);
         const students = await res.json();
-        const area = document.getElementById('listArea');
-        
+        const container = document.getElementById('listContainer');
+
         if(students.length === 0) {
-            area.innerHTML = `<div class="card" style="color:red">Arday lama helin! Isticmaal 'Add Student'.</div>`;
+            container.innerHTML = `<div class="card" style="color:#ef4444; text-align:center">Arday lagama helin fasalkan! Fadlan marka hore ku dar arday adigoo isticmaalaya 'Add New Student'.</div>`;
             return;
         }
 
-        let table = `<div class="card"><table><tr><th>Student</th><th>Action</th></tr>`;
+        let table = `<div class="card"><table><tr><th>Student Name</th><th>NBS Code</th><th>Action</th></tr>`;
         students.forEach(s => {
-            table += `<tr><td>${s.fullName}</td><td>`;
+            table += `<tr><td>${s.fullName}</td><td>${s.nbsCode}</td><td>`;
             if(type === 'attendance') {
-                table += `<button onclick="quickSave('${s.nbsCode}','P')" style="background:green; color:white; padding:5px; border:none; border-radius:4px; cursor:pointer">P</button> 
-                          <button onclick="quickSave('${s.nbsCode}','A')" style="background:red; color:white; padding:5px; border:none; border-radius:4px; cursor:pointer">A</button>`;
+                table += `<button onclick="updateData('${s.nbsCode}', 'P')" style="background:#22c55e; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer; margin-right:5px">Sax ✅</button> 
+                         <button onclick="updateData('${s.nbsCode}', 'A')" style="background:#ef4444; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer">Khlad ❌</button>`;
             } else if(type === 'exam') {
-                table += `<button class="btn-p" style="margin:0; width:auto; padding:5px 10px;" onclick="openExam('${s.nbsCode}')">Marks</button>`;
-            } else {
-                table += `Paid: $${s.fees.paid} | <button onclick="quickSave('${s.nbsCode}','fee')">Update</button>`;
+                table += `<button onclick="enterMarks('${s.nbsCode}')" class="btn-main" style="margin:0; width:auto; padding:8px 20px;">Enter 12 Subjects</button>`;
+            } else if(type === 'fee') {
+                table += `Paid: $${s.fees.paid} / $1200 | <button onclick="updateData('${s.nbsCode}', 'fee')" style="padding:5px">Update</button>`;
             }
             table += `</td></tr>`;
         });
-        area.innerHTML = table + `</table></div>`;
+        container.innerHTML = table + `</table></div>`;
     }
 
-    async function quickSave(id, val) {
+    async function updateData(id, mode) {
         let payload = { nbsCode: id };
-        if(val === 'P' || val === 'A') payload.attendance = [{ date: new Date().toLocaleDateString(), status: val }];
-        if(val === 'fee') payload.fees = { paid: Number(prompt("Geli lacagta:")) };
-        
+        if(mode === 'P' || mode === 'A') payload.attendance = [{ date: new Date().toLocaleDateString(), status: mode }];
+        if(mode === 'fee') {
+            const val = prompt("Geli lacagta hadda la bixiyey ($):");
+            if(!val) return;
+            payload.fees = { paid: Number(val) };
+        }
         await fetch('/api/admin/save', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
-        alert("Success!");
+        alert("Waa la keydiyey!");
     }
 
-    async function openExam(id) {
-        let html = `<div class="card"><h3>Enter 12 Subjects Marks</h3><div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">`;
-        subjs.forEach((m, i) => html += `<div>${m}: <input id="m-${i}" type="number" value="0"></div>`);
-        html += `</div><button class="btn-p" onclick="saveMarks('${id}')">Save All Marks</button></div>`;
-        document.getElementById('listArea').innerHTML = html;
+    async function enterMarks(id) {
+        const res = await fetch(`/api/students/any/any`); 
+        const s = (await res.json()).find(x => x.nbsCode === id);
+        let inputs = allSubjects.map((name, i) => {
+            let score = (s.exam.subjects.find(x => x.name === name) || {score:0}).score;
+            return `<div style="margin-bottom:15px"><b>${name}:</b> <input id="subj-${i}" type="number" value="${score}" max="100"></div>`;
+        }).join('');
+        
+        document.getElementById('listContainer').innerHTML = `
+            <div class="card">
+                <h3>Update Exam Results: ${s.fullName}</h3>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:25px">${inputs}</div>
+                <button class="btn-main" onclick="finalizeMarks('${id}')">Save All 12 Subjects & Calculate Average</button>
+            </div>`;
     }
 
-    async function saveMarks(id) {
-        let marks = subjs.map((n, i) => ({ name: n, score: Number(document.getElementById(`m-${i}`).value) }));
-        let avg = (marks.reduce((a, b) => a + b.score, 0) / 12).toFixed(2);
-        await fetch('/api/admin/save', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ nbsCode: id, exam: { subjects: marks, average: avg } })
+    async function finalizeMarks(id) {
+        let scores = allSubjects.map((name, i) => ({ name, score: Number(document.getElementById(`subj-${i}`).value) }));
+        let avg = (scores.reduce((a,b) => a + b.score, 0) / 12).toFixed(2);
+        await fetch('/api/admin/save', { 
+            method: 'POST', 
+            headers: {'Content-Type': 'application/json'}, 
+            body: JSON.stringify({ nbsCode: id, exam: { subjects: scores, average: avg } }) 
         });
-        alert("Marks Saved! Average: " + avg);
-        showNav('exam');
+        alert("Natiijada waa la keydiyey! Celcelisku waa: " + avg + "%");
+        changeTab('exam');
     }
-</script>
-</body>
-</html>
+
+    function openAddForm() {
+        document.getElementById('dynamicView').innerHTML = `
+            <div class="card" style="max-width:500px; margin:auto">
+                <h3 style="text-align:center">Diiwaangeli Arday Cusub</h3>
+                <label>NBS Code:</label><input id="regID" placeholder="Tusaale: 1001">
+                <label>Magaca oo Buuxa:</label><input id="regName" placeholder="Tusaale: Ahmed Ali">
+                <label>Fasalka:</label><select id="regCl"><option value="9aad">9aad</option><option value="12aad">12aad</option></select>
+                <label>Section:</label><select id="regSc"><option value="A">A</option><option value="B">B</option></select>
+                <button class="btn-main" onclick="submitStudent()">Save to Database</button>
+            </div>`;
+    }
+
+    async function submitStudent() {
+        if(!regID.value || !regName.value) return alert("Fadlan buuxi meelaha bannaan!");
+        await fetch('/api/admin/save', { 
+            method: 'POST', 
+            headers: {'Content-Type': 'application/json'}, 
+            body: JSON.stringify({ nbsCode: regID.value, fullName: regName.value, class: regCl.value, section: regSc.value }) 
+        });
+        alert("Ardayga waa la keydiyey!");
+        changeTab('attendance');
+    }
+
+    function showStudentProfile(s) {
+        let attList = (s.attendance || []).reverse().map(a => `<tr><td>${a.date}</td><td><span class="badge ${a.status==='P'?'bg-green':'bg-red'}">${a.status==='P'?'Joogay':'Ma Joogin'}</span></td></tr>`).join('');
+        let examList = (s.exam.subjects || []).map(sub => `<tr><td>${sub.name}</td><td><b>${sub.score}</b></td></tr>`).join('');
+        document.getElementById('dynamicView').innerHTML = `
+            <div class="card" style="background:var(--nav); color:white"><h2>Ku soo dhowaw, ${s.fullName}</h2><p>NBS-ID: ${s.nbsCode} | Fasal: ${s.class} (${s.section})</p></div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:30px">
+                <div class="card"><h3>Natiijada Imtixaanka</h3><table>${examList}</table><h4 style="text-align:right">Average: ${s.exam.average}%</h4></div>
+                <div class="card"><h3>Attendance-kaaga</h3><table>${attList}</table></div>
+            </div>`;
+    }
