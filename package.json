@@ -1,15 +1,12 @@
 {
-  "name": "nawawi-nbs-system-v4",
-  "version": "4.0.0",
-  "description": "Nawawi School Management System - Professional NBS Portal",
+  "name": "nawawi-nbs-pro-v8",
+  "version": "8.0.0",
+  "description": "Nawawi School Management System - Ultimate Full Edition",
   "main": "index.js",
-  "scripts": {
-    "start": "node index.js"
-  },
+  "scripts": { "start": "node index.js" },
   "dependencies": {
     "express": "^4.18.2",
     "mongoose": "^8.2.0",
-    "cors": "^2.8.5",
-    "path": "^0.12.7"
+    "cors": "^2.8.5"
   }
 }
