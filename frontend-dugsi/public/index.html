@@ -3,90 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nawawi School System</title>
+    <title>Nawawi School Management</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; max-width: 450px; margin-bottom: 25px; }
-        h2 { text-align: center; color: #1a73e8; margin-top: 0; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: #1a73e8; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; }
-        button:hover { background: #1557b0; }
-        table { width: 100%; max-width: 600px; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
-        th { background: #1a73e8; color: white; }
-        .delete-btn { background: #dc3545; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; }
-        #status { text-align: center; margin-top: 10px; font-weight: bold; }
+        body { font-family: sans-serif; background: #f4f7f6; padding: 20px; }
+        .section { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); max-width: 600px; margin-left: auto; margin-right: auto; }
+        h2 { color: #1a73e8; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        input, select, button { width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: 1px solid #ddd; }
+        button { background: #1a73e8; color: white; border: none; font-weight: bold; cursor: pointer; }
+        .list-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
+        .present { color: green; font-weight: bold; }
+        .absent { color: red; font-weight: bold; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h2>Nawawi School</h2>
-        <form id="studentForm">
-            <input type="text" id="name" placeholder="Magaca Ardayga" required>
-            <input type="text" id="class" placeholder="Fasalka (e.g. Form 4)" required>
-            <button type="submit">Keydi Xogta</button>
-        </form>
-        <div id="status"></div>
+
+    <div class="section">
+        <h2>Diiwaangelinta Ardayda</h2>
+        <input type="text" id="stdName" placeholder="Magaca Ardayga">
+        <input type="text" id="stdClass" placeholder="Fasalka (e.g. Form 4)">
+        <button onclick="addStudent()">Keydi Ardayga</button>
     </div>
 
-    <h3>Ardayda Diiwaangashan</h3>
-    <table id="studentTable">
-        <thead>
-            <tr>
-                <th>Magaca</th>
-                <th>Fasalka</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+    <div class="section">
+        <h2>Attendance-ka Maanta</h2>
+        <div id="attendanceList">Loading students...</div>
+    </div>
 
     <script>
-        const status = document.getElementById('status');
-
-        async function loadStudents() {
+        async function loadData() {
             const res = await fetch('/api/students');
             const students = await res.json();
-            const tbody = document.querySelector('#studentTable tbody');
-            tbody.innerHTML = '';
+            const list = document.getElementById('attendanceList');
+            list.innerHTML = '';
+            
             students.forEach(s => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${s.name}</td>
-                        <td>${s.class}</td>
-                        <td><button class="delete-btn" onclick="deleteStudent('${s._id}')">Tirtir</button></td>
-                    </tr>`;
+                list.innerHTML += `
+                    <div class="list-item">
+                        <span>${s.name} (${s.class})</span>
+                        <div>
+                            <button style="width:70px; background:green;" onclick="mark('${s._id}', 'Present')">P</button>
+                            <button style="width:70px; background:red;" onclick="mark('${s._id}', 'Absent')">A</button>
+                        </div>
+                    </div>`;
             });
         }
 
-        document.getElementById('studentForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const data = {
-                name: document.getElementById('name').value,
-                class: document.getElementById('class').value
-            };
-            status.innerText = "Gelinayaa...";
-            const response = await fetch('/api/students', {
+        async function addStudent() {
+            const name = document.getElementById('stdName').value;
+            const className = document.getElementById('stdClass').value;
+            await fetch('/api/students', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({name, class: className})
             });
-            if (response.ok) {
-                status.style.color = "green";
-                status.innerText = "✅ Ardayga waa la keydiyey!";
-                document.getElementById('studentForm').reset();
-                loadStudents();
-            }
-        });
-
-        async function deleteStudent(id) {
-            if (confirm('Ma hubtaa inaad tirtirto?')) {
-                await fetch(`/api/students/${id}`, { method: 'DELETE' });
-                loadStudents();
-            }
+            location.reload();
         }
 
-        loadStudents();
+        async function mark(id, status) {
+            await fetch('/api/attendance', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({studentId: id, status: status})
+            });
+            alert(`Calaamadda ${status} waa la keydiyey!`);
+        }
+
+        loadData();
     </script>
 </body>
 </html>
