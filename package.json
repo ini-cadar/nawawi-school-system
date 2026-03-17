@@ -1,7 +1,7 @@
 {
-  "name": "dugsi_system",
+  "name": "nawawi-school-system",
   "version": "1.0.0",
-  "description": "Nawawi School System",
+  "description": "Nawawi School Management System",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
