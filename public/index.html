@@ -86,24 +86,32 @@
             <div id="listArea"></div>`;
     }
 
-    async function loadList(type) {
-        const res = await fetch(`/api/students/${fC.value}/${fS.value}`);
-        const students = await res.json();
-        let html = `<div class="card"><table><tr><th>Magaca</th><th>Action</th></tr>`;
-        students.forEach(s => {
-            html += `<tr><td>${s.fullName}</td><td>`;
-            if(type === 'attendance') {
-                html += `<button onclick="saveAdminData('${s.nbsCode}', 'P')" style="background:var(--green); color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer">Sax ✅</button> 
-                         <button onclick="saveAdminData('${s.nbsCode}', 'A')" style="background:var(--red); color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer">Khlad ❌</button>`;
-            } else if(type === 'fee') {
-                html += `$${s.fees.paid} Paid | <button onclick="saveAdminData('${s.nbsCode}', 'fee')">Update</button>`;
-            } else if(type === 'exam') {
-                html += `${s.exam.average || 0}% | <button onclick="editExam('${s.nbsCode}')">Edit 12 Subjects</button>`;
-            }
-            html += `</td></tr>`;
-        });
-        document.getElementById('listArea').innerHTML = html + `</table></div>`;
+    // Qaybtan ku beddel loadList() koodhkaaga ku jirta
+async function loadList(type) {
+    const listDiv = document.getElementById('listArea');
+    listDiv.innerHTML = "Waa la raadinayaa..."; // Marka uu raadinayo
+
+    const res = await fetch(`/api/students/${document.getElementById('fC').value}/${document.getElementById('fS').value}`);
+    const students = await res.json();
+    
+    if (students.length === 0) {
+        listDiv.innerHTML = "<p style='color:red'>Arday lama helin fasalkan!</p>";
+        return;
     }
+
+    let html = `<div class="card"><table><tr><th>Ardayga</th><th>Action</th></tr>`;
+    students.forEach(s => {
+        html += `<tr><td>${s.fullName}</td><td>`;
+        if (type === 'attendance') {
+            html += `<button onclick="saveAdminData('${s.nbsCode}', 'P')" style="background:green; color:white">Sax ✅</button>
+                     <button onclick="saveAdminData('${s.nbsCode}', 'A')" style="background:red; color:white">Khlad ❌</button>`;
+        } else if (type === 'exam') {
+            html += `<button onclick="editExam('${s.nbsCode}')">Geli 12 Maado</button>`;
+        }
+        html += `</td></tr>`;
+    });
+    listDiv.innerHTML = html + `</table></div>`;
+}
 
     async function saveAdminData(id, modeOrStatus) {
         let payload = { nbsCode: id };
