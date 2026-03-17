@@ -1,50 +1,48 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const path = require('path'); // Tan waa muhiim si bogga loo arko
+const path = require('path');
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-// 1. ISKU XIDHKA DATABASE-KA
-// FIIRO GAAR AH: localhost halkan kama shaqaynayo. 
-// Waxaad u baahan tahay inaad MongoDB Atlas isticmaasho mustaqbalka.
-const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/nawawi_db';
+// 1. ISKU XIDHKA DATABASE-KA (MongoDB Atlas)
+const mongoURI = 'mongodb+srv://ayrax_db_user:keWCHJqKZI9D7W6Y@cluster0.mongodb.net/nawawi_db?retryWrites=true&w=majority';
 
 mongoose.connect(mongoURI)
-  .then(() => console.log("✅ Database-kii waa diyaar!"))
+  .then(() => console.log("✅ Database-kii MongoDB Atlas waa diyaar!"))
   .catch(err => console.log("❌ Database Error:", err));
 
 // 2. QAABKA XOGTA (Student Schema)
 const studentSchema = new mongoose.Schema({
-  id: { type: String, unique: true },
+  id: { type: String, unique: true, required: true },
   pass: { type: String, default: "123" },
-  magaca: String,
+  magaca: { type: String, required: true },
   meel: String,
   aaboTel: String,
   hooyoTel: String,
   fasalka: String,
   fee: { type: String, default: "Ma bixin" },
   exams: { type: Object, default: {} },
-  att: { type: Object, default: {} }
+  att: { type: Object, default: {} } // Tusaale: {"Sabti": "√", "Axad": "X"}
 });
 
 const Student = mongoose.model('Student', studentSchema);
 
-// 3. U ADEEGIDDA FAYLASHA FRONT-END (Waxa bogga cad xallinaya)
-// Tan ayaa u sheegaysa Render halka uu koodhka HTML-ka u yaallo
-app.use(express.static(path.join(__dirname, 'frontend-dugsi')));
-
-// 4. API-YADA (Endpoints)
+// 3. API-YADA (Endpoints)
 app.post('/api/login', async (req, res) => {
   const { id, pass } = req.body;
-  if (id === "admin" && pass === "admin1234") return res.json({ role: 'admin', magaca: "Maamulaha Nawawi" });
+  // Admin Login
+  if (id === "admin" && pass === "admin1234") {
+    return res.json({ role: 'admin', magaca: "Maamulaha Nawawi" });
+  }
+  // Student Login
   try {
     const s = await Student.findOne({ id, pass });
     if (s) return res.json({ ...s._doc, role: 'student' });
-    res.status(401).send("Khalad!");
-  } catch (e) { res.status(500).send("Error"); }
+    res.status(401).send("ID ama Password khaldan!");
+  } catch (e) { res.status(500).send("Server Error"); }
 });
 
 app.get('/api/data', async (req, res) => {
@@ -53,8 +51,10 @@ app.get('/api/data', async (req, res) => {
 });
 
 app.post('/api/update-student', async (req, res) => {
-  await Student.findOneAndUpdate({ id: req.body.id }, req.body, { upsert: true });
-  res.json({ ok: true });
+  try {
+    await Student.findOneAndUpdate({ id: req.body.id }, req.body, { upsert: true, new: true });
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 app.delete('/api/student/:id', async (req, res) => {
@@ -62,11 +62,12 @@ app.delete('/api/student/:id', async (req, res) => {
   res.json({ ok: true });
 });
 
-// Bog kasta oo kale oo la furo, u dir index.html-ka u dambeeya
+// 4. U ADEEGIDDA FRONT-END (Wixii Render loogu talagalay)
+app.use(express.static(path.join(__dirname, 'frontend-dugsi/build')));
+
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend-dugsi', 'index.html'));
+  res.sendFile(path.join(__dirname, 'frontend-dugsi/build', 'index.html'));
 });
 
-// 5. PORT-KA SAXDAN EE RENDER
 const PORT = process.env.PORT || 3000; 
 app.listen(PORT, () => console.log(`🚀 Server-ku wuxuu ku shaqaynayaa Port ${PORT}`));

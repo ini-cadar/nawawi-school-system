@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const API = "http://localhost:3000/api";
+// Markaad Render saarayso, tani waxay ka dhigaysaa mid toos u shaqaysa
+const API = window.location.hostname === "localhost" ? "http://localhost:3000/api" : "/api";
+
 const FASALLADA = ["Xadaano", "1aad", "2aad", "3aad", "4aad", "5aad", "6aad", "7aad", "8aad", "9aad", "10aad", "11aad", "12aad"];
 const WEEK_DAYS = ["Sabti", "Axad", "Isniin", "Talaado", "Arbaco", "Khamiis"];
 
@@ -22,33 +24,37 @@ export default function App() {
   const [search, setSearch] = useState("");
   const [showAttButtons, setShowAttButtons] = useState(false);
 
-  useEffect(() => { if (user?.role === 'admin') load(); }, [user]);
-  const load = () => axios.get(`${API}/data`).then(res => setAllStudents(res.data));
+  useEffect(() => { 
+    if (user?.role === 'admin') load(); 
+  }, [user]);
+
+  const load = () => {
+    axios.get(`${API}/data`).then(res => setAllStudents(res.data));
+  };
 
   const login = () => {
-    axios.post(`${API}/login`, form).then(res => setUser(res.data)).catch(() => alert("ID ama Pass khaldan!"));
+    axios.post(`${API}/login`, form)
+      .then(res => setUser(res.data))
+      .catch(() => alert("ID ama Pass khaldan!"));
   };
 
   const saveChange = async (student) => {
     await axios.post(`${API}/update-student`, student);
-    load();
+    if (user.role === 'admin') load();
   };
 
   const addStudent = (f) => {
     const n = prompt("Magaca Saddexan:");
-    const meel = prompt("Ku dhashay:");
-    const aTel = prompt("Tel Aabaha:");
-    const hTel = prompt("Tel Hooyada:");
     const id = prompt("ID-ga Ardayga:");
     if(n && id) {
-      const s = { id, pass: "123", magaca: n, meel, aaboTel: aTel, hooyoTel: hTel, fasalka: f, exams: {}, att: {}, fee: "Ma bixin" };
+      const s = { id, pass: "123", magaca: n, fasalka: f, exams: {}, att: {}, fee: "Ma bixin" };
       saveChange(s);
     }
   };
 
   const getSubs = (f) => {
     if (f === "Xadaano") return SUBJECTS["Xadaano"];
-    if (parseInt(f) <= 8) return SUBJECTS["Primary"];
+    if (["1aad", "2aad", "3aad", "4aad", "5aad", "6aad", "7aad", "8aad"].includes(f)) return SUBJECTS["Primary"];
     return SUBJECTS["Secondary"];
   };
 
@@ -63,7 +69,7 @@ export default function App() {
 
   return (
     <div style={{display:'flex', height:'100vh', background:'#f8f9fa'}}>
-      {/* SIDEBAR */}
+      {/* SIDEBAR - Midig ayay ku fiican tahay haddii Af-Somali yahay laakiin bidix aan ku deyno */}
       <div style={st.sidebar}>
         <div style={st.profile}><h2>NAWAWI</h2><p>{user.magaca}</p></div>
         <div style={st.nav}>
@@ -104,7 +110,7 @@ export default function App() {
                 <input style={st.search} placeholder="Raadi ardayga..." onChange={e => setSearch(e.target.value)} />
                 {adminTab === "attendance" && (
                   <button onClick={() => setShowAttButtons(!showAttButtons)} style={st.toggleBtn}>
-                    {showAttButtons ? "Close Attendance" : "Open Attendance Mode"}
+                    {showAttButtons ? "Xidha Attendance" : "Fura Attendance"}
                   </button>
                 )}
               </div>
@@ -131,7 +137,7 @@ export default function App() {
                             </div>
                           )}
                           {adminTab === "fees" && <select value={s.fee} onChange={(e) => { s.fee = e.target.value; saveChange(s); }}><option>Ma bixin</option><option>Bixiyey</option></select>}
-                          <button onClick={async () => { if(window.confirm('Delete?')) { await axios.delete(`${API}/student/${s.id}`); load(); } }} style={st.del}>Tirtir</button>
+                          <button onClick={async () => { if(window.confirm('Ma tirtirtaa?')) { await axios.delete(`${API}/student/${s.id}`); load(); } }} style={st.del}>Tirtir</button>
                         </td>
                       )}
                     </tr>
@@ -144,7 +150,7 @@ export default function App() {
           /* STUDENT VIEW */
           <div style={st.stuCard}>
             <h1 style={{color:'#1a2a6c'}}>Nawawi Portal: {user.magaca}</h1>
-            <p><strong>Fasalka:</strong> {user.fasalka} | <strong>Aabo Tel:</strong> {user.aaboTel}</p>
+            <p><strong>Fasalka:</strong> {user.fasalka}</p>
             {studentTab === "exam" && (
               <div style={st.markGrid}>
                 {getSubs(user.fasalka).map(m => (
@@ -168,33 +174,33 @@ export default function App() {
   );
 }
 
+// Styling-ku sidii buu u yahay...
 const st = {
-  loginBg: { height:'100vh', display:'flex', justifyContent:'center', alignItems:'center', background:'#1a2a6c' },
-  card: { background:'white', padding:'40px', borderRadius:'15px', textAlign:'center', width:'350px' },
-  in: { display:'block', width:'100%', padding:'12px', margin:'10px 0', borderRadius:'8px', border:'1px solid #ddd' },
-  btn: { width:'100%', padding:'12px', background:'#1a2a6c', color:'white', border:'none', borderRadius:'8px', cursor:'pointer', fontWeight:'bold' },
-  sidebar: { width:'240px', background:'#1c2833', color:'white', padding:'30px' },
-  profile: { textAlign:'center', marginBottom:'40px', borderBottom:'1px solid #2c3e50', paddingBottom:'20px' },
-  navBtn: { display:'block', width:'100%', padding:'15px', background:'transparent', border:'none', color:'#bdc3c7', textAlign:'left', cursor:'pointer' },
-  grid: { display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(180px, 1fr))', gap:'20px' },
-  classBox: { background:'white', padding:'25px', borderRadius:'15px', textAlign:'center', cursor:'pointer', borderBottom:'5px solid #1a2a6c' },
-  addBtn: { background:'#f39c12', color:'white', border:'none', padding:'5px 10px', borderRadius:'5px', marginTop:'10px', fontSize:'11px' },
-  whiteCard: { background:'white', padding:'40px', borderRadius:'15px' },
-  table: { width:'100%', borderCollapse:'collapse', marginTop:'20px' },
-  thead: { background:'#f8f9fa', height:'45px' },
-  tr: { borderBottom:'1px solid #eee', height:'60px', textAlign:'center' },
-  markIn: { width:'40px', padding:'5px', textAlign:'center' },
-  search: { padding:'10px', width:'250px', borderRadius:'8px', border:'1px solid #ddd' },
-  toggleBtn: { background:'#27ae60', color:'white', border:'none', padding:'10px 15px', borderRadius:'8px', cursor:'pointer' },
-  pBtn: { background:'#2ecc71', color:'white', border:'none', padding:'5px 10px', borderRadius:'4px' },
-  aBtn: { background:'#e74c3c', color:'white', border:'none', padding:'5px 10px', borderRadius:'4px' },
-  stuCard: { background:'white', padding:'40px', borderRadius:'20px' },
-  markGrid: { display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:'15px', marginTop:'20px' },
-  markBox: { background:'#f8f9fa', padding:'15px', borderRadius:'10px', textAlign:'center', border:'1px solid #eee' },
-  attGrid: { display:'grid', gridTemplateColumns:'repeat(6, 1fr)', gap:'10px', marginTop:'20px' },
-  dayBox: { padding:'15px 5px', textAlign:'center', borderRadius:'10px', border:'1px solid #eee' },
-  out: { padding:'12px', background:'#e74c3c', color:'white', border:'none', borderRadius:'8px', width:'100%', marginTop:'20px' },
-  backBtn: { padding:'8px 15px', background:'#eee', border:'none', borderRadius:'5px', cursor:'pointer' },
-  del: { color:'red', border:'none', background:'none', cursor:'pointer', marginLeft:'10px' }
-};
-
+    loginBg: { height:'100vh', display:'flex', justifyContent:'center', alignItems:'center', background:'#1a2a6c' },
+    card: { background:'white', padding:'40px', borderRadius:'15px', textAlign:'center', width:'350px' },
+    in: { display:'block', width:'100%', padding:'12px', margin:'10px 0', borderRadius:'8px', border:'1px solid #ddd' },
+    btn: { width:'100%', padding:'12px', background:'#1a2a6c', color:'white', border:'none', borderRadius:'8px', cursor:'pointer', fontWeight:'bold' },
+    sidebar: { width:'240px', background:'#1c2833', color:'white', padding:'30px' },
+    profile: { textAlign:'center', marginBottom:'40px', borderBottom:'1px solid #2c3e50', paddingBottom:'20px' },
+    navBtn: { display:'block', width:'100%', padding:'15px', background:'transparent', border:'none', color:'#bdc3c7', textAlign:'left', cursor:'pointer' },
+    grid: { display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(180px, 1fr))', gap:'20px' },
+    classBox: { background:'white', padding:'25px', borderRadius:'15px', textAlign:'center', cursor:'pointer', borderBottom:'5px solid #1a2a6c' },
+    addBtn: { background:'#f39c12', color:'white', border:'none', padding:'5px 10px', borderRadius:'5px', marginTop:'10px', fontSize:'11px' },
+    whiteCard: { background:'white', padding:'40px', borderRadius:'15px' },
+    table: { width:'100%', borderCollapse:'collapse', marginTop:'20px' },
+    thead: { background:'#f8f9fa', height:'45px' },
+    tr: { borderBottom:'1px solid #eee', height:'60px', textAlign:'center' },
+    markIn: { width:'40px', padding:'5px', textAlign:'center' },
+    search: { padding:'10px', width:'250px', borderRadius:'8px', border:'1px solid #ddd' },
+    toggleBtn: { background:'#27ae60', color:'white', border:'none', padding:'10px 15px', borderRadius:'8px', cursor:'pointer' },
+    pBtn: { background:'#2ecc71', color:'white', border:'none', padding:'5px 10px', borderRadius:'4px' },
+    aBtn: { background:'#e74c3c', color:'white', border:'none', padding:'5px 10px', borderRadius:'4px' },
+    stuCard: { background:'white', padding:'40px', borderRadius:'20px' },
+    markGrid: { display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:'15px', marginTop:'20px' },
+    markBox: { background:'#f8f9fa', padding:'15px', borderRadius:'10px', textAlign:'center', border:'1px solid #eee' },
+    attGrid: { display:'grid', gridTemplateColumns:'repeat(6, 1fr)', gap:'10px', marginTop:'20px' },
+    dayBox: { padding:'15px 5px', textAlign:'center', borderRadius:'10px', border:'1px solid #eee' },
+    out: { padding:'12px', background:'#e74c3c', color:'white', border:'none', borderRadius:'8px', width:'100%', marginTop:'20px' },
+    backBtn: { padding:'8px 15px', background:'#eee', border:'none', borderRadius:'5px', cursor:'pointer' },
+    del: { color:'red', border:'none', background:'none', cursor:'pointer', marginLeft:'10px' }
+  };
