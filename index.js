@@ -9,58 +9,25 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// 1. Tani waa midda muhiimka ah: Hubi in magaca folder-ka uu yahay 'public'
 app.use(express.static(path.join(__dirname, 'public')));
 
-// 1. Isku xidhka MongoDB
-const uri = process.env.MONGODB_URI;
+// 2. MongoDB Connection (Password-kaadi waa sax)
+const uri = "mongodb+srv://raaziwayrax_db_user:raasi1234@cluster0.cvcctca.mongodb.net/NawawiDB?retryWrites=true&w=majority";
+
 mongoose.connect(uri)
-  .then(() => console.log("✅ MongoDB Connected"))
-  .catch(err => console.error("❌ MongoDB Error:", err));
+  .then(() => console.log("✅ Database Connected"))
+  .catch(err => console.error("❌ Database Error:", err));
 
-// 2. Database Schemas
-// Schema-ka Ardayda
-const studentSchema = new mongoose.Schema({
-    name: { type: String, required: true },
-    class: { type: String, required: true }
-});
-const Student = mongoose.model('Student', studentSchema);
+// 3. API Routes (Students & Attendance)
+// ... (Halkan ku dar koodhkii API-yada ee hore)
 
-// Schema-ka Attendance-ka
-const attendanceSchema = new mongoose.Schema({
-    studentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Student' },
-    status: { type: String, enum: ['Present', 'Absent'], required: true },
-    date: { type: Date, default: Date.now }
-});
-const Attendance = mongoose.model('Attendance', attendanceSchema);
-
-// 3. API Routes
-// Diiwaangelinta Ardayda
-app.post('/api/students', async (req, res) => {
-    try {
-        const newStudent = new Student(req.body);
-        await newStudent.save();
-        res.status(201).json({ message: "Success" });
-    } catch (err) { res.status(500).json({ error: err.message }); }
-});
-
-app.get('/api/students', async (req, res) => {
-    const students = await Student.find();
-    res.json(students);
-});
-
-// Maamulka Attendance-ka
-app.post('/api/attendance', async (req, res) => {
-    try {
-        const record = new Attendance(req.body);
-        await record.save();
-        res.status(201).json({ message: "Attendance Saved" });
-    } catch (err) { res.status(500).json({ error: err.message }); }
-});
-
-// 4. Xalka "Not Found"
+// 4. XALKA "NOT FOUND":
+// Haddii wax walba fashilmaan, kani wuxuu si khasab ah u furayaa index.html
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 Server on port ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Server is running`));
