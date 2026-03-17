@@ -2,43 +2,48 @@
 <html lang="so">
 <head>
     <meta charset="UTF-8">
-    <title>Nawawi School System | Pro v3.0</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nawawi School System | Pro v7.0</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --nav: #0f172a; --accent: #2563eb; --bg: #f1f5f9; }
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; background: var(--bg); }
+        :root { --nav: #0f172a; --accent: #2563eb; --bg: #f8fafc; --green: #22c55e; --red: #ef4444; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; background: var(--bg); color: #334155; }
         .sidebar { width: 260px; background: var(--nav); color: white; height: 100vh; position: fixed; padding: 20px; box-sizing: border-box; }
         .sidebar h2 { color: var(--accent); text-align: center; margin-bottom: 30px; }
-        .sidebar button { width: 100%; padding: 13px; background: none; border: none; color: #94a3b8; text-align: left; cursor: pointer; border-radius: 8px; margin-bottom: 8px; font-size: 15px; display: flex; align-items: center; gap: 10px; }
+        .sidebar button { width: 100%; padding: 13px; background: none; border: none; color: #94a3b8; text-align: left; cursor: pointer; border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; font-size: 15px; }
         .sidebar button:hover { background: var(--accent); color: white; }
-        .main { margin-left: 260px; flex: 1; padding: 40px; }
-        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        input, select { width: 100%; padding: 12px; margin-top: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
-        .btn-p { background: var(--accent); color: white; border: none; padding: 14px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 15px; }
+        .main { margin-left: 260px; flex: 1; padding: 40px; box-sizing: border-box; }
+        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 25px; }
+        input, select { width: 100%; padding: 12px; margin-top: 10px; border: 1px solid #e2e8f0; border-radius: 8px; outline: none; }
+        .btn-p { background: var(--accent); color: white; border: none; padding: 14px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 20px; font-size: 16px; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 14px; border-bottom: 1px solid #eee; text-align: left; }
+        th, td { padding: 14px; border-bottom: 1px solid #f1f5f9; text-align: left; }
+        .badge-present { background: #dcfce7; color: var(--green); padding: 5px 10px; border-radius: 6px; font-weight: bold; font-size: 13px; }
+        .badge-absent { background: #fee2e2; color: var(--red); padding: 5px 10px; border-radius: 6px; font-weight: bold; font-size: 13px; }
         #loginPortal { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 10000; }
     </style>
 </head>
 <body>
 
 <div id="loginPortal">
-    <div class="card" style="width:350px; text-align:center;">
-        <h2 style="margin:0 0 20px 0">NBS LOGIN</h2>
-        <select id="role"><option value="admin">Admin Portal</option><option value="student">Student Portal</option></select>
-        <input id="uID" placeholder="NBS Code ama Admin ID">
+    <div class="card" style="width:360px; text-align:center;">
+        <h2 style="margin-bottom:25px;">Nawawi MANAGEMENT</h2>
+        <select id="role"><option value="admin">Admin Dashboard</option><option value="student">Student Portal</option></select>
+        <input id="uID" placeholder="NBS Code">
         <input id="uPass" type="password" placeholder="Password">
-        <button class="btn-p" onclick="handleLogin()">Giri Dashboard-ka</button>
+        <button class="btn-p" onclick="handleLogin()">Sign In</button>
     </div>
 </div>
 
 <div id="sideNav" class="sidebar" style="display:none">
     <h2>NAWAWI PRO</h2>
-    <button onclick="nav('attendance')"><i class="fas fa-calendar-check"></i> Attendance</button>
-    <button onclick="nav('fee')"><i class="fas fa-money-check-alt"></i> Fee Management</button>
-    <button onclick="nav('exam')"><i class="fas fa-chart-bar"></i> Exam & Ranking</button>
-    <button onclick="showAddForm()"><i class="fas fa-user-plus"></i> Register Student</button>
-    <button onclick="location.reload()" style="color:#ef4444; margin-top:80px;"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    <div id="adminMenu">
+        <button onclick="nav('attendance')"><i class="fas fa-calendar-check"></i> Attendance (Sax/Khlad)</button>
+        <button onclick="nav('fee')"><i class="fas fa-hand-holding-usd"></i> Fee Management</button>
+        <button onclick="nav('exam')"><i class="fas fa-graduation-cap"></i> Exam & 12 Subjects</button>
+        <button onclick="showAddForm()"><i class="fas fa-user-plus"></i>  Arday geli </button>
+    </div>
+    <button onclick="location.reload()" style="color:var(--red); margin-top:100px;"><i class="fas fa-power-off"></i> Sign Out</button>
 </div>
 
 <div id="mainView" class="main" style="display:none">
@@ -46,7 +51,8 @@
 </div>
 
 <script>
-    let activeRole = '';
+    const subjectsList = ["Math", "English", "Arabic", "Islamic", "Physics", "Chemistry", "Biology", "History", "Geography", "Somali", "ICT", "Business"];
+    let loggedUser = null;
 
     async function handleLogin() {
         const res = await fetch('/api/login', {
@@ -56,58 +62,56 @@
         });
         const data = await res.json();
         if(data.success) {
-            activeRole = data.role;
             document.getElementById('loginPortal').style.display = 'none';
             document.getElementById('sideNav').style.display = 'block';
             document.getElementById('mainView').style.display = 'block';
-            if(activeRole === 'admin') nav('attendance'); else showStudentDashboard(data.data);
-        } else alert("Invalid Login Details!");
+            if(data.role === 'admin') {
+                document.getElementById('adminMenu').style.display = 'block';
+                nav('attendance');
+            } else {
+                document.getElementById('adminMenu').style.display = 'none';
+                showStudentDashboard(data.data);
+            }
+        } else alert("Invalid Credentials!");
     }
 
     function nav(type) {
         document.getElementById('dynamicContent').innerHTML = `
             <div class="card">
-                <h3>System Management: ${type.toUpperCase()}</h3>
-                <div style="display:flex; gap:10px; align-items:end;">
+                <h3>System Panel: ${type.toUpperCase()}</h3>
+                <div style="display:flex; gap:15px; align-items:end;">
                     <div style="flex:1">Fasalka: 
                         <select id="fC">
-                            <option value="9">Fasalka 9aad</option><option value="10">Fasalka 10aad</option>
-                            <option value="11">Fasalka 11aad</option><option value="12">Fasalka 12aad</option>
+                            <option value="9">9aad</option><option value="10">10aad</option>
+                            <option value="11">11aad</option><option value="12">12aad</option>
                         </select>
                     </div>
                     <div style="flex:1">Section: 
                         <select id="fS"><option value="A">A</option><option value="B">B</option><option value="C">C</option></select>
                     </div>
-                    <button class="btn-p" style="width:auto; margin:0; padding:12px 25px" onclick="loadList('${type}')">Show List</button>
+                    <button class="btn-p" style="width:150px; margin:0" onclick="loadList('${type}')">Get Students</button>
                 </div>
             </div>
-            <div id="listArea"></div>
-        `;
+            <div id="listArea"></div>`;
     }
 
     async function loadList(type) {
         const res = await fetch(`/api/students/${fC.value}/${fS.value}`);
         const students = await res.json();
-        let html = `<div class="card"><table><tr><th>Magaca Ardayga</th>`;
+        let html = `<div class="card"><table><tr><th>Ardayga</th><th>Action</th></tr>`;
         
-        if(type === 'attendance') {
-            html += `<th>Status</th><th>Action</th></tr>`;
-            students.forEach(s => {
-                html += `<tr><td>${s.fullName}</td><td><select id="at-${s.nbsCode}"><option value="P">P (Present)</option><option value="A">A (Absent)</option></select></td>
-                <td><button onclick="saveAdminData('${s.nbsCode}', 'att')">Save</button></td></tr>`;
-            });
-        } else if(type === 'fee') {
-            html += `<th>Paid ($)</th><th>Balance</th><th>Action</th></tr>`;
-            students.forEach(s => {
-                html += `<tr><td>${s.fullName}</td><td>$${s.fees.paid}</td><td>$${1200 - s.fees.paid}</td><td><button onclick="saveAdminData('${s.nbsCode}', 'fee')">Update</button></td></tr>`;
-            });
-        } else if(type === 'exam') {
-            html += `<th>Avg %</th><th>Rank</th><th>Action</th></tr>`;
-            students.sort((a,b) => (b.exam.average || 0) - (a.exam.average || 0));
-            students.forEach((s, i) => {
-                html += `<tr><td>${s.fullName}</td><td>${s.exam.average || 0}%</td><td>#${i+1}</td><td><button onclick="editExam('${s.nbsCode}')">Edit 12 Subjects</button></td></tr>`;
-            });
-        }
+        students.forEach(s => {
+            html += `<tr><td>${s.fullName}</td><td>`;
+            if(type === 'attendance') {
+                html += `<select id="at-${s.nbsCode}" style="width:auto; margin:0"><option value="P">Sax ✅</option><option value="A">Khlad ❌</option></select> 
+                         <button onclick="saveAdminData('${s.nbsCode}', 'att')" style="padding:6px 12px; cursor:pointer">Save</button>`;
+            } else if(type === 'fee') {
+                html += `$${s.fees.paid} Paid | <button onclick="saveAdminData('${s.nbsCode}', 'fee')">Edit Fee</button>`;
+            } else if(type === 'exam') {
+                html += `${s.exam.average || 0}% | <button onclick="editExam('${s.nbsCode}')">Edit 12 Subjects</button>`;
+            }
+            html += `</td></tr>`;
+        });
         document.getElementById('listArea').innerHTML = html + `</table></div>`;
     }
 
@@ -120,20 +124,68 @@
             if(!amount) return;
             payload.fees = { paid: Number(amount) };
         }
-        await fetch('/api/admin/save', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(payload)
+        await fetch('/api/admin/save', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
+        alert("Action Completed Successfully!");
+    }
+
+    async function editExam(id) {
+        const res = await fetch(`/api/student/${id}`);
+        const s = await res.json();
+        let inputs = subjectsList.map((name, i) => {
+            let score = (s.exam.subjects.find(x => x.name === name) || {score: 0}).score;
+            return `<div>${name}: <input id="s-${i}" type="number" value="${score}"></div>`;
+        }).join('');
+        document.getElementById('dynamicContent').innerHTML = `
+            <div class="card">
+                <h3>Geli Natiijada: ${s.fullName}</h3>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px">${inputs}</div>
+                <button class="btn-p" onclick="saveScores('${id}')">Save All 12 Subjects</button>
+            </div>`;
+    }
+
+    async function saveScores(id) {
+        let scores = subjectsList.map((name, i) => ({ name, score: Number(document.getElementById(`s-${i}`).value) }));
+        let avg = (scores.reduce((a,b) => a + b.score, 0) / 12).toFixed(2);
+        await fetch('/api/admin/save', { 
+            method: 'POST', 
+            headers: {'Content-Type': 'application/json'}, 
+            body: JSON.stringify({ nbsCode: id, exam: { subjects: scores, average: avg } }) 
         });
-        alert("Success!");
-        if(mode === 'fee') loadList('fee');
+        alert("Grades Updated!"); nav('exam');
+    }
+
+    function showStudentDashboard(s) {
+        let attHistory = (s.attendance || []).reverse().map(a => `
+            <tr><td>${a.date}</td><td><span class="${a.status==='P'?'badge-present':'badge-absent'}">${a.status==='P'?'Wuu Joogay ✅':'Ma Joogin ❌'}</span></td></tr>
+        `).join('');
+        
+        let examTable = (s.exam.subjects || []).map(sub => `
+            <tr><td>${sub.name}</td><td><b>${sub.score}</b></td></tr>
+        `).join('');
+
+        document.getElementById('dynamicContent').innerHTML = `
+            <div class="card" style="background:var(--nav); color:white;">
+                <h2>Welcome Back, ${s.fullName}</h2>
+                <p>NBS ID: ${s.nbsCode} | Fasal: ${s.class}${s.section}</p>
+            </div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:25px;">
+                <div class="card">
+                    <h3>Exam Results (12 Subjects)</h3>
+                    <table><tr><th>Subject</th><th>Score</th></tr>${examTable}</table>
+                    <h3 style="text-align:right; color:var(--accent);">Average: ${s.exam.average || 0}%</h3>
+                </div>
+                <div class="card">
+                    <h3>Attendance History</h3>
+                    <table><tr><th>Date</th><th>Status</th></tr>${attHistory}</table>
+                </div>
+            </div>`;
     }
 
     function showAddForm() {
         document.getElementById('dynamicContent').innerHTML = `
-            <div class="card" style="max-width:500px; margin:auto">
+            <div class="card" style="max-width:450px; margin:auto">
                 <h3>Register New Student</h3>
-                <input id="nc" placeholder="NBS Code (Ex: NBS001)">
+                <input id="nc" placeholder="NBS Code">
                 <input id="nn" placeholder="Full Name">
                 <select id="ncl"><option value="9">9aad</option><option value="10">10aad</option><option value="11">11aad</option><option value="12">12aad</option></select>
                 <select id="nsc"><option value="A">A</option><option value="B">B</option><option value="C">C</option></select>
@@ -142,60 +194,8 @@
     }
 
     async function submitNew() {
-        const payload = { nbsCode: nc.value, fullName: nn.value, class: ncl.value, section: nsc.value };
-        await fetch('/api/admin/save', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(payload)
-        });
-        alert("Ardayga waa la keydiyey!");
-        nav('attendance');
-    }
-
-    async function editExam(id) {
-        const res = await fetch(`/api/student/${id}`);
-        const s = await res.json();
-        const subjects = ["Math", "English", "Arabic", "Islamic", "Physics", "Chemistry", "Biology", "History", "Geography", "Somali", "ICT", "Business"];
-        
-        let inputs = subjects.map((name, i) => {
-            let score = (s.exam && s.exam.subjects ? s.exam.subjects.find(x => x.name === name) : null) || {score: 0};
-            return `<div style="display:flex; gap:10px; margin-top:5px"><span style="flex:2">${name}</span><input id="score-${i}" type="number" value="${score.score}" style="flex:1"></div>`;
-        }).join('');
-
-        document.getElementById('dynamicContent').innerHTML = `
-            <div class="card">
-                <h3>Edit Grades: ${s.fullName}</h3>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px">${inputs}</div>
-                <button class="btn-p" onclick="saveExamResults('${id}')">Save & Update Rank</button>
-            </div>`;
-    }
-
-    async function saveExamResults(id) {
-        const subNames = ["Math", "English", "Arabic", "Islamic", "Physics", "Chemistry", "Biology", "History", "Geography", "Somali", "ICT", "Business"];
-        let subs = [];
-        for(let i=0; i<12; i++) {
-            subs.push({ name: subNames[i], score: Number(document.getElementById(`score-${i}`).value) });
-        }
-        let avg = (subs.reduce((a,b) => a + b.score, 0) / 12).toFixed(2);
-        await fetch('/api/admin/save', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ nbsCode: id, exam: { subjects: subs, average: avg } })
-        });
-        alert("Grades Updated!");
-        nav('exam');
-    }
-
-    function showStudentDashboard(s) {
-        document.getElementById('dynamicContent').innerHTML = `
-            <div class="card">
-                <h1>Ku soo dhowaw, ${s.fullName}</h1>
-                <p>NBS ID: ${s.nbsCode} | Fasal: ${s.class}${s.section}</p>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
-                    <div class="card" style="background:var(--accent); color:white; text-align:center;"><h3>AVERAGE</h3><h2>${s.exam.average || 0}%</h2></div>
-                    <div class="card" style="text-align:center;"><h3>FEES</h3><h2>${s.fees.paid >= 1200 ? 'PAID' : 'UNPAID'}</h2></div>
-                </div>
-            </div>`;
+        await fetch('/api/admin/save', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ nbsCode: nc.value, fullName: nn.value, class: ncl.value, section: nsc.value }) });
+        alert("Student Registered!"); nav('attendance');
     }
 </script>
 </body>
