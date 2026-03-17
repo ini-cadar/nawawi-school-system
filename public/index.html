@@ -2,63 +2,47 @@
 <html lang="so">
 <head>
     <meta charset="UTF-8">
-    <title>Nawawi Pro | Official Portal</title>
+    <title>Nawawi Pro | Global System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --primary: #0f172a; --accent: #2563eb; --red: #e11d48; --green: #10b981; --bg: #f8fafc; }
-        body { font-family: 'Inter', sans-serif; margin: 0; background: var(--bg); display: flex; }
-        
-        /* Sidebar Bidixda ah */
-        .sidebar { width: 280px; background: var(--primary); color: white; height: 100vh; position: fixed; padding: 30px 20px; box-sizing: border-box; }
-        .sidebar h2 { color: var(--accent); text-align: center; margin-bottom: 40px; font-size: 24px; letter-spacing: 1px; }
-        .sidebar button { width: 100%; padding: 15px; background: none; border: none; color: #94a3b8; text-align: left; font-size: 16px; cursor: pointer; border-radius: 10px; margin-bottom: 8px; transition: 0.3s; }
-        .sidebar button:hover, .sidebar button.active { background: var(--accent); color: white; }
-        .sidebar i { margin-right: 15px; width: 20px; text-align: center; }
-
-        /* Main View */
-        .main-view { margin-left: 280px; flex: 1; padding: 40px; min-height: 100vh; }
-        .card { background: white; padding: 25px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 25px; }
-        
-        /* Login UI */
-        #loginBox { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 2000; }
-        .login-card { background: white; padding: 45px; border-radius: 20px; width: 380px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.1); }
-        
-        /* Buttons & Inputs */
-        .btn-main { background: var(--accent); color: white; border: none; padding: 14px; border-radius: 10px; cursor: pointer; width: 100%; font-weight: 600; margin-top: 15px; }
-        input, select { padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0; width: 100%; box-sizing: border-box; margin-top: 10px; }
-        
-        /* Stats Grid */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
-        .stat-card { padding: 20px; border-radius: 15px; color: white; text-align: center; }
+        :root { --main: #0f172a; --blue: #2563eb; --bg: #f8fafc; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); display: flex; }
+        .sidebar { width: 280px; background: var(--main); color: white; height: 100vh; position: fixed; padding: 25px; box-sizing: border-box; }
+        .sidebar button { width: 100%; padding: 15px; background: none; border: none; color: #94a3b8; text-align: left; cursor: pointer; border-radius: 10px; margin-bottom: 5px; }
+        .sidebar button:hover { background: var(--blue); color: white; }
+        .content { margin-left: 280px; flex: 1; padding: 40px; }
+        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 25px; }
+        #loginBox { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .login-card { background: white; padding: 40px; border-radius: 20px; width: 360px; text-align: center; }
+        input, select { width: 100%; padding: 12px; margin-top: 10px; border-radius: 8px; border: 1px solid #ddd; }
     </style>
 </head>
 <body>
 
 <div id="loginBox">
     <div class="login-card">
-        <h1 style="color:var(--primary); margin-bottom:10px;">NAWAWI PRO</h1>
-        <p style="color:#64748b; margin-bottom:30px;">Ku soo dhowaw Portal-ka Dugsiga</p>
+        <h2>NAWAWI PRO</h2>
         <select id="role"><option value="student">Student Portal</option><option value="admin">Admin Portal</option></select>
-        <input type="text" id="uID" placeholder="NBS Code ama Admin User">
-        <input type="password" id="uPass" placeholder="Password (123456)">
-        <button class="btn-main" onclick="handleAuth()">LOGIN</button>
+        <input id="uID" placeholder="NBS Code / Admin User">
+        <input id="uPass" type="password" placeholder="Password">
+        <button onclick="login()" style="width:100%; padding:15px; background:var(--blue); color:white; border:none; margin-top:20px; border-radius:10px;">Login</button>
     </div>
 </div>
 
-<div id="sidebar" class="sidebar" style="display:none">
-    <h2>NAWAWI PRO</h2>
-    <div id="navMenu"></div>
-    <button onclick="location.reload()" style="color:var(--red); margin-top: 100px;"><i class="fas fa-sign-out-alt"></i> Logout</button>
+<div id="side" class="sidebar" style="display:none">
+    <h2 style="text-align:center">NBS PRO</h2>
+    <div id="menu"></div>
+    <button onclick="location.reload()" style="color:red; margin-top:50px;"><i class="fas fa-power-off"></i> Logout</button>
 </div>
 
-<div id="main" class="main-view" style="display:none">
-    <div id="viewArea"></div>
+<div id="main" class="content" style="display:none">
+    <div id="view"></div>
 </div>
 
 <script>
-    let loggedUser = null;
+    let user = null;
 
-    async function handleAuth() {
+    async function login() {
         const res = await fetch('/api/login', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -66,74 +50,60 @@
         });
         const data = await res.json();
         if(data.success) {
-            loggedUser = data;
+            user = data;
             document.getElementById('loginBox').style.display = 'none';
-            document.getElementById('sidebar').style.display = 'block';
+            document.getElementById('side').style.display = 'block';
             document.getElementById('main').style.display = 'block';
-            data.role === 'admin' ? initAdmin() : initStudent();
-        } else alert("Details khaldan!");
+            data.role === 'admin' ? loadAdmin() : loadStudent();
+        } else alert("Xogtu waa khaldan tahay!");
     }
 
-    // --- Admin Module ---
-    function initAdmin() {
-        document.getElementById('navMenu').innerHTML = `
-            <button onclick="adminClasses()"><i class="fas fa-school"></i> Classes</button>
-            <button onclick="adminAddStudent()"><i class="fas fa-user-plus"></i> Add Student</button>
+    function loadAdmin() {
+        document.getElementById('menu').innerHTML = `
+            <button onclick="adminView()"><i class="fas fa-users"></i> Manage Classes</button>
+            <button onclick="addStudent()"><i class="fas fa-plus"></i> Add Student</button>
         `;
-        adminClasses();
+        adminView();
     }
 
-    function adminClasses() {
-        document.getElementById('viewArea').innerHTML = `
-            <div class="card">
-                <h3>Select Class & Section</h3>
-                <div style="display:flex; gap:15px;">
-                    <select id="selC"><option value="9">Class 9</option><option value="12">Class 12</option></select>
-                    <select id="selS"><option value="A">Section A</option><option value="B">Section B</option></select>
-                    <button class="btn-main" onclick="loadClassList()" style="width:200px; margin-top:10px;">Filter</button>
-                </div>
-            </div>
-            <div id="listDisplay"></div>
+    function loadStudent() {
+        const s = user.data;
+        document.getElementById('menu').innerHTML = `
+            <button onclick="stDash()"><i class="fas fa-home"></i> Dashboard</button>
+            <button onclick="stAtt()"><i class="fas fa-check-circle"></i> Attendance</button>
+            <button onclick="stFee()"><i class="fas fa-money-bill"></i> Fee Status</button>
+            <button onclick="stExam()"><i class="fas fa-file-alt"></i> Exams</button>
         `;
+        stDash();
     }
 
-    // --- Student Module ---
-    function initStudent() {
-        const s = loggedUser.data;
-        document.getElementById('navMenu').innerHTML = `
-            <button onclick="stDashboard()"><i class="fas fa-th-large"></i> Dashboard</button>
-            <button onclick="stAttendance()"><i class="fas fa-calendar-alt"></i> Attendance</button>
-            <button onclick="stFees()"><i class="fas fa-wallet"></i> Fee Status</button>
-            <button onclick="stExams()"><i class="fas fa-file-alt"></i> Exam Results</button>
-        `;
-        stDashboard();
-    }
-
-    function stDashboard() {
-        const s = loggedUser.data;
-        document.getElementById('viewArea').innerHTML = `
-            <div class="card" style="background: linear-gradient(135deg, var(--accent), #1e40af); color:white;">
-                <h1>Soo dhowaw, ${s.fullName}!</h1>
-                <p>NBS ID: ${s.nbsCode} | Fasal: ${s.class}${s.section}</p>
-            </div>
-            <div class="stats-grid">
-                <div class="card stat-card" style="background:var(--green)"><h3>Attendance</h3><p style="font-size:28px;">100%</p></div>
-                <div class="card stat-card" style="background:var(--accent)"><h3>Fees Paid</h3><p style="font-size:28px;">$${s.fees.paid}</p></div>
-                <div class="card stat-card" style="background:#f59e0b"><h3>Exam Avg</h3><p style="font-size:28px;">${s.exam.average || 0}%</p></div>
+    function stDash() {
+        const s = user.data;
+        document.getElementById('view').innerHTML = `
+            <div class="card"><h1>Soo dhowaw, ${s.fullName}</h1><p>ID: ${s.nbsCode}</p></div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+                <div class="card"><h3>Attendance (%)</h3><p style="font-size:30px; color:green;">100%</p></div>
+                <div class="card"><h3>Exam Result</h3><p style="font-size:30px; color:blue;">${s.exam.average || 0}%</p></div>
             </div>
         `;
     }
 
-    function stAttendance() {
-        document.getElementById('viewArea').innerHTML = `
-            <div class="card">
-                <h3>Attendance History</h3>
-                <p>Maalmaha maqnaanshaha iyo taariikhda la diiwaangeliyey.</p>
-                <table width="100%" border="0">
-                    <tr style="background:#f1f5f9"><th>Taariikhda</th><th>Bisha</th><th>Status</th></tr>
-                    <tr><td colspan="3" style="text-align:center; padding:20px;">Ma jiraan maalmo maqnaansho ah oo diiwaangashan.</td></tr>
-                </table>
-            </div>
+    function stAtt() {
+        const s = user.data;
+        let rows = s.attendance.map(a => `<tr><td>${a.date}</td><td>${a.month}</td><td>${a.status}</td></tr>`).join('');
+        document.getElementById('view').innerHTML = `
+            <div class="card"><h3>Attendance History</h3>
+            <table width="100%"><tr><th>Date</th><th>Month</th><th>Status</th></tr>${rows || '<tr><td colspan="3">Ma jiro maqnaansho.</td></tr>'}</table></div>
+        `;
+    }
+
+    function stFee() {
+        const s = user.data;
+        document.getElementById('view').innerHTML = `
+            <div class="card"><h3>Fee Status</h3>
+            <p>Lacagta la bixiyey: $${s.fees.paid}</p>
+            <p>Inta hartay: $${s.fees.total - s.fees.paid}</p>
+            <p>Xaaladda: ${s.fees.paid >= s.fees.total ? 'Paid' : 'Unpaid'}</p></div>
         `;
     }
 </script>
