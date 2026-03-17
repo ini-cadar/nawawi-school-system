@@ -2,58 +2,37 @@
 <html lang="so">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nawawi School - Diiwaangelinta</title>
+    <title>Nawawi School</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 350px; }
-        h2 { text-align: center; color: #1a73e8; margin-bottom: 20px; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background-color: #1a73e8; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; }
-        button:hover { background-color: #1557b0; }
-        #msg { text-align: center; margin-top: 15px; font-weight: bold; }
+        body { font-family: sans-serif; display: flex; justify-content: center; padding: 50px; background: #f4f4f4; }
+        .box { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        input { display: block; width: 100%; margin: 10px 0; padding: 10px; }
+        button { width: 100%; padding: 10px; background: #007bff; color: white; border: none; cursor: pointer; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Nawawi School</h2>
-        <p style="text-align: center; color: #666;">Diiwaangeli Arday Cusub</p>
-        <form id="regForm">
-            <input type="text" id="magaca" placeholder="Magaca oo buuxa" required>
-            <input type="text" id="fasalka" placeholder="Fasalka (tusaale: Form 1)" required>
-            <button type="submit">Keydi Xogta</button>
+    <div class="box">
+        <h2>Diiwaangelinta Ardayda</h2>
+        <form id="studentForm">
+            <input type="text" id="name" placeholder="Magaca Ardayga" required>
+            <input type="text" id="class" placeholder="Fasalka" required>
+            <button type="submit">Keydi</button>
         </form>
-        <div id="msg"></div>
+        <p id="res"></p>
     </div>
-
     <script>
-        document.getElementById('regForm').addEventListener('submit', async (e) => {
+        document.getElementById('studentForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const msgDiv = document.getElementById('msg');
-            msgDiv.innerText = "Diiwaangelintu way socotaa...";
-
-            const xogta = {
-                name: document.getElementById('magaca').value,
-                class: document.getElementById('fasalka').value
-            };
-
-            try {
-                const res = await fetch('/api/students', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(xogta)
-                });
-
-                if (res.ok) {
-                    msgDiv.style.color = "green";
-                    msgDiv.innerText = "✅ Ardayga waa la keydiyey!";
-                    document.getElementById('regForm').reset();
-                } else {
-                    throw new Error();
-                }
-            } catch (err) {
-                msgDiv.style.color = "red";
-                msgDiv.innerText = "❌ Cilad ayaa dhacday!";
+            const name = document.getElementById('name').value;
+            const className = document.getElementById('class').value;
+            const res = await fetch('/api/students', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ name, class: className })
+            });
+            if(res.ok) {
+                document.getElementById('res').innerText = "✅ Waa la keydiyey!";
+                document.getElementById('studentForm').reset();
             }
         });
     </script>
