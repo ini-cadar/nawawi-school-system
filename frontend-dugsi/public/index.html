@@ -5,52 +5,88 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nawawi School System</title>
     <style>
-        body { font-family: sans-serif; background: #f4f7f6; display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        .card { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 320px; }
-        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        #status { margin-top: 15px; text-align: center; font-weight: bold; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; max-width: 450px; margin-bottom: 25px; }
+        h2 { text-align: center; color: #1a73e8; margin-top: 0; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #1a73e8; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        button:hover { background: #1557b0; }
+        table { width: 100%; max-width: 600px; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #1a73e8; color: white; }
+        .delete-btn { background: #dc3545; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; }
+        #status { text-align: center; margin-top: 10px; font-weight: bold; }
     </style>
 </head>
 <body>
     <div class="card">
-        <h2 style="text-align:center; color:#333;">Nawawi School</h2>
+        <h2>Nawawi School</h2>
         <form id="studentForm">
             <input type="text" id="name" placeholder="Magaca Ardayga" required>
-            <input type="text" id="class" placeholder="Fasalka (e.g. Form 1)" required>
-            <button type="submit">Keydi Ardayga</button>
+            <input type="text" id="class" placeholder="Fasalka (e.g. Form 4)" required>
+            <button type="submit">Keydi Xogta</button>
         </form>
         <div id="status"></div>
     </div>
 
+    <h3>Ardayda Diiwaangashan</h3>
+    <table id="studentTable">
+        <thead>
+            <tr>
+                <th>Magaca</th>
+                <th>Fasalka</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
     <script>
+        const status = document.getElementById('status');
+
+        async function loadStudents() {
+            const res = await fetch('/api/students');
+            const students = await res.json();
+            const tbody = document.querySelector('#studentTable tbody');
+            tbody.innerHTML = '';
+            students.forEach(s => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${s.name}</td>
+                        <td>${s.class}</td>
+                        <td><button class="delete-btn" onclick="deleteStudent('${s._id}')">Tirtir</button></td>
+                    </tr>`;
+            });
+        }
+
         document.getElementById('studentForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const status = document.getElementById('status');
             const data = {
                 name: document.getElementById('name').value,
                 class: document.getElementById('class').value
             };
-
             status.innerText = "Gelinayaa...";
-            try {
-                const response = await fetch('/api/students', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                if (response.ok) {
-                    status.style.color = "green";
-                    status.innerText = "✅ Ardayga waa la keydiyey!";
-                    document.getElementById('studentForm').reset();
-                } else {
-                    status.style.color = "red";
-                    status.innerText = "❌ Cilad ayaa dhacday!";
-                }
-            } catch (err) {
-                status.innerText = "❌ Xiriirka ayaa go'an!";
+            const response = await fetch('/api/students', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            if (response.ok) {
+                status.style.color = "green";
+                status.innerText = "✅ Ardayga waa la keydiyey!";
+                document.getElementById('studentForm').reset();
+                loadStudents();
             }
         });
+
+        async function deleteStudent(id) {
+            if (confirm('Ma hubtaa inaad tirtirto?')) {
+                await fetch(`/api/students/${id}`, { method: 'DELETE' });
+                loadStudents();
+            }
+        }
+
+        loadStudents();
     </script>
 </body>
 </html>
