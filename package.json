@@ -1,12 +1,14 @@
 {
-  "name": "nawawi-nbs-pro-v9",
-  "version": "9.0.0",
-  "description": "Nawawi School Management System - Ultimate Full Edition",
+  "name": "nawawi-school-system",
+  "version": "1.0.0",
   "main": "index.js",
-  "scripts": { "start": "node index.js" },
+  "scripts": {
+    "start": "node index.js"
+  },
   "dependencies": {
     "express": "^4.18.2",
-    "mongoose": "^8.2.0",
-    "cors": "^2.8.5"
+    "mongoose": "^7.0.0",
+    "cors": "^2.8.5",
+    "path": "^0.12.7"
   }
 }
