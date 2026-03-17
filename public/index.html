@@ -2,135 +2,139 @@
 <html lang="so">
 <head>
     <meta charset="UTF-8">
-    <title>Nawawi Pro | Official Global System</title>
+    <title>Nawawi Pro | Official Portal</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --primary: #0f172a; --accent: #2563eb; --red: #ef4444; --green: #22c55e; --bg: #f1f5f9; }
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); display: flex; }
+        :root { --primary: #0f172a; --accent: #2563eb; --red: #e11d48; --green: #10b981; --bg: #f8fafc; }
+        body { font-family: 'Inter', sans-serif; margin: 0; background: var(--bg); display: flex; }
+        
+        /* Sidebar Bidixda ah */
+        .sidebar { width: 280px; background: var(--primary); color: white; height: 100vh; position: fixed; padding: 30px 20px; box-sizing: border-box; }
+        .sidebar h2 { color: var(--accent); text-align: center; margin-bottom: 40px; font-size: 24px; letter-spacing: 1px; }
+        .sidebar button { width: 100%; padding: 15px; background: none; border: none; color: #94a3b8; text-align: left; font-size: 16px; cursor: pointer; border-radius: 10px; margin-bottom: 8px; transition: 0.3s; }
+        .sidebar button:hover, .sidebar button.active { background: var(--accent); color: white; }
+        .sidebar i { margin-right: 15px; width: 20px; text-align: center; }
+
+        /* Main View */
+        .main-view { margin-left: 280px; flex: 1; padding: 40px; min-height: 100vh; }
+        .card { background: white; padding: 25px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 25px; }
         
         /* Login UI */
-        #loginOverlay { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-        .login-card { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 350px; text-align: center; }
+        #loginBox { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 2000; }
+        .login-card { background: white; padding: 45px; border-radius: 20px; width: 380px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.1); }
         
-        /* Sidebar */
-        .sidebar { width: 260px; background: var(--primary); color: white; height: 100vh; position: fixed; padding: 20px; transition: 0.3s; }
-        .sidebar button { width: 100%; padding: 15px; background: transparent; color: #cbd5e1; border: none; text-align: left; font-size: 16px; cursor: pointer; border-radius: 8px; margin-bottom: 5px; }
-        .sidebar button:hover, .sidebar button.active { background: var(--accent); color: white; }
+        /* Buttons & Inputs */
+        .btn-main { background: var(--accent); color: white; border: none; padding: 14px; border-radius: 10px; cursor: pointer; width: 100%; font-weight: 600; margin-top: 15px; }
+        input, select { padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0; width: 100%; box-sizing: border-box; margin-top: 10px; }
         
-        /* Main Area */
-        .main { flex: 1; margin-left: 280px; padding: 40px; }
-        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 25px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
-        
-        /* Tables & Inputs */
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
-        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-top: 10px; }
-        .btn-primary { background: var(--accent); color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        /* Stats Grid */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        .stat-card { padding: 20px; border-radius: 15px; color: white; text-align: center; }
     </style>
 </head>
 <body>
 
-<div id="loginOverlay">
+<div id="loginBox">
     <div class="login-card">
-        <h2 style="color:var(--primary)">NAWAWI PRO</h2>
+        <h1 style="color:var(--primary); margin-bottom:10px;">NAWAWI PRO</h1>
+        <p style="color:#64748b; margin-bottom:30px;">Ku soo dhowaw Portal-ka Dugsiga</p>
         <select id="role"><option value="student">Student Portal</option><option value="admin">Admin Portal</option></select>
-        <input type="text" id="loginId" placeholder="NBS Code / Admin User">
-        <input type="password" id="loginPass" placeholder="Password (123456)">
-        <button class="btn-primary" onclick="auth()" style="width:100%; margin-top:20px;">Giri Portal-ka</button>
+        <input type="text" id="uID" placeholder="NBS Code ama Admin User">
+        <input type="password" id="uPass" placeholder="Password (123456)">
+        <button class="btn-main" onclick="handleAuth()">LOGIN</button>
     </div>
 </div>
 
 <div id="sidebar" class="sidebar" style="display:none">
-    <h2 style="text-align:center">NBS PRO</h2>
-    <hr style="opacity: 0.1; margin-bottom: 20px;">
-    <div id="menuItems"></div>
-    <button onclick="location.reload()" style="color:var(--red); margin-top: auto;"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    <h2>NAWAWI PRO</h2>
+    <div id="navMenu"></div>
+    <button onclick="location.reload()" style="color:var(--red); margin-top: 100px;"><i class="fas fa-sign-out-alt"></i> Logout</button>
 </div>
 
-<div id="main" class="main" style="display:none">
-    <div id="viewContainer"></div>
+<div id="main" class="main-view" style="display:none">
+    <div id="viewArea"></div>
 </div>
 
 <script>
-    let user = null;
+    let loggedUser = null;
 
-    async function auth() {
+    async function handleAuth() {
         const res = await fetch('/api/login', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({role: role.value, id: loginId.value, pass: loginPass.value})
+            body: JSON.stringify({role: role.value, id: uID.value, pass: uPass.value})
         });
         const data = await res.json();
         if(data.success) {
-            user = data;
-            document.getElementById('loginOverlay').style.display = 'none';
+            loggedUser = data;
+            document.getElementById('loginBox').style.display = 'none';
             document.getElementById('sidebar').style.display = 'block';
             document.getElementById('main').style.display = 'block';
-            data.role === 'admin' ? loadAdmin() : loadStudent();
-        } else alert("Xogtu waa khalad!");
+            data.role === 'admin' ? initAdmin() : initStudent();
+        } else alert("Details khaldan!");
     }
 
     // --- Admin Module ---
-    function loadAdmin() {
-        document.getElementById('menuItems').innerHTML = `
-            <button onclick="adminDashboard()"><i class="fas fa-th-large"></i> Manage Classes</button>
-            <button onclick="addStudentForm()"><i class="fas fa-user-plus"></i> Add Student</button>
+    function initAdmin() {
+        document.getElementById('navMenu').innerHTML = `
+            <button onclick="adminClasses()"><i class="fas fa-school"></i> Classes</button>
+            <button onclick="adminAddStudent()"><i class="fas fa-user-plus"></i> Add Student</button>
         `;
-        adminDashboard();
+        adminClasses();
     }
 
-    function adminDashboard() {
-        const container = document.getElementById('viewContainer');
-        container.innerHTML = `
+    function adminClasses() {
+        document.getElementById('viewArea').innerHTML = `
             <div class="card">
                 <h3>Select Class & Section</h3>
-                <div class="grid">
+                <div style="display:flex; gap:15px;">
                     <select id="selC"><option value="9">Class 9</option><option value="12">Class 12</option></select>
-                    <select id="selS"><option value="A">Section A</option><option value="B">Section B</option><option value="C">Section C</option><option value="D">Section D</option></select>
-                    <button class="btn-primary" onclick="fetchClass()">Load List</button>
+                    <select id="selS"><option value="A">Section A</option><option value="B">Section B</option></select>
+                    <button class="btn-main" onclick="loadClassList()" style="width:200px; margin-top:10px;">Filter</button>
                 </div>
             </div>
-            <div id="adminList"></div>
+            <div id="listDisplay"></div>
         `;
-    }
-
-    async function fetchClass() {
-        const res = await fetch(`/api/students/${selC.value}/${selS.value}`);
-        const list = await res.json();
-        let html = `<table><tr><th>ID</th><th>Name</th><th>Action</th></tr>`;
-        list.forEach(s => {
-            html += `<tr><td>${s.nbsCode}</td><td>${s.fullName}</td><td><button onclick='editSt(${JSON.stringify(s)})'>Edit</button></td></tr>`;
-        });
-        document.getElementById('adminList').innerHTML = html + `</table>`;
     }
 
     // --- Student Module ---
-    function loadStudent() {
-        const s = user.data;
-        document.getElementById('menuItems').innerHTML = `
-            <button onclick="stDash()"><i class="fas fa-home"></i> Dashboard (100%)</button>
-            <button onclick="stAttendance()"><i class="fas fa-calendar-check"></i> Attendance</button>
-            <button onclick="stFees()"><i class="fas fa-dollar-sign"></i> Fee Status</button>
-            <button onclick="stExams()"><i class="fas fa-file-invoice"></i> Exam Results</button>
+    function initStudent() {
+        const s = loggedUser.data;
+        document.getElementById('navMenu').innerHTML = `
+            <button onclick="stDashboard()"><i class="fas fa-th-large"></i> Dashboard</button>
+            <button onclick="stAttendance()"><i class="fas fa-calendar-alt"></i> Attendance</button>
+            <button onclick="stFees()"><i class="fas fa-wallet"></i> Fee Status</button>
+            <button onclick="stExams()"><i class="fas fa-file-alt"></i> Exam Results</button>
         `;
-        stDash();
+        stDashboard();
     }
 
-    function stDash() {
-        const s = user.data;
-        document.getElementById('viewContainer').innerHTML = `
-            <div class="card"><h1>Ku soo dhowaw, ${s.fullName}</h1><p>ID: ${s.nbsCode} | Class: ${s.class}${s.section}</p></div>
-            <div class="grid">
-                <div class="card" style="border-left:5px solid var(--green)"><h3>Attendance</h3><p>100% Active</p></div>
-                <div class="card" style="border-left:5px solid var(--accent)"><h3>Fees</h3><p>$${s.fees.paid} Paid</p></div>
-                <div class="card" style="border-left:5px solid orange"><h3>Exam Avg</h3><p>${s.exam.average || 0}%</p></div>
+    function stDashboard() {
+        const s = loggedUser.data;
+        document.getElementById('viewArea').innerHTML = `
+            <div class="card" style="background: linear-gradient(135deg, var(--accent), #1e40af); color:white;">
+                <h1>Soo dhowaw, ${s.fullName}!</h1>
+                <p>NBS ID: ${s.nbsCode} | Fasal: ${s.class}${s.section}</p>
+            </div>
+            <div class="stats-grid">
+                <div class="card stat-card" style="background:var(--green)"><h3>Attendance</h3><p style="font-size:28px;">100%</p></div>
+                <div class="card stat-card" style="background:var(--accent)"><h3>Fees Paid</h3><p style="font-size:28px;">$${s.fees.paid}</p></div>
+                <div class="card stat-card" style="background:#f59e0b"><h3>Exam Avg</h3><p style="font-size:28px;">${s.exam.average || 0}%</p></div>
             </div>
         `;
     }
 
     function stAttendance() {
-        document.getElementById('viewContainer').innerHTML = `<div class="card"><h3>Attendance History</h3><p>Bisha iyo Maalinta la qalday halkan bay ku soo muuqanayaan.</p></div>`;
+        document.getElementById('viewArea').innerHTML = `
+            <div class="card">
+                <h3>Attendance History</h3>
+                <p>Maalmaha maqnaanshaha iyo taariikhda la diiwaangeliyey.</p>
+                <table width="100%" border="0">
+                    <tr style="background:#f1f5f9"><th>Taariikhda</th><th>Bisha</th><th>Status</th></tr>
+                    <tr><td colspan="3" style="text-align:center; padding:20px;">Ma jiraan maalmo maqnaansho ah oo diiwaangashan.</td></tr>
+                </table>
+            </div>
+        `;
     }
 </script>
 </body>

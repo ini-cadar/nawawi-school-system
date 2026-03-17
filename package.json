@@ -1,6 +1,6 @@
 {
   "name": "nawawi-nbs-pro-v9",
-  "version": "10.0.0",
+  "version": "9.0.0",
   "description": "Nawawi School Management System - Ultimate Full Edition",
   "main": "index.js",
   "scripts": { "start": "node index.js" },
