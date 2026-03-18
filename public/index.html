@@ -13,10 +13,11 @@
         input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 6px; border: 1px solid #ddd; box-sizing: border-box; }
         button { background: var(--s); color: white; border: none; cursor: pointer; font-weight: bold; transition: 0.3s; }
         button:hover { opacity: 0.8; }
+        .btn-del { background: var(--r); width: auto !important; padding: 5px 10px !important; font-size: 12px; margin-left: 5px; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
         th, td { border: 1px solid #eee; padding: 12px; text-align: left; }
         th { background: #f8f9fa; }
-        @media print { .sidebar, button { display: none; } .main { margin: 0; width: 100%; } }
+        @media print { .sidebar, button, .no-print { display: none !important; } .main { margin: 0; width: 100%; } }
     </style>
 </head>
 <body>
@@ -60,24 +61,26 @@
         const username = document.getElementById('user').value;
         const password = document.getElementById('pass').value;
 
-        const res = await fetch('/api/login', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({username, password, role})
-        });
-        const data = await res.json();
+        try {
+            const res = await fetch('/api/login', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({username, password, role})
+            });
+            const data = await res.json();
 
-        if(data.success) {
-            document.getElementById('loginPage').style.display = 'none';
-            if(data.role === 'admin') {
-                document.getElementById('adminPanel').style.display = 'flex';
-                showAdmin('add');
-            } else {
-                activeUser = data.data;
-                document.getElementById('studentPanel').style.display = 'flex';
-                stdDash();
-            }
-        } else alert(data.message);
+            if(data.success) {
+                document.getElementById('loginPage').style.display = 'none';
+                if(data.role === 'admin') {
+                    document.getElementById('adminPanel').style.display = 'flex';
+                    showAdmin('add');
+                } else {
+                    activeUser = data.data;
+                    document.getElementById('studentPanel').style.display = 'flex';
+                    stdDash();
+                }
+            } else alert(data.message);
+        } catch (e) { alert("Cilad xiriirka server-ka!"); }
     }
 
     function showAdmin(page) {
@@ -91,10 +94,10 @@
                 <button onclick="saveStudent()">💾 DIIWAANGELI</button></div>`;
         } else {
             html = `<div class="card"><h2>${page.toUpperCase()}</h2>
-                <div style="display:flex; gap:10px;">
+                <div style="display:flex; gap:10px;" class="no-print">
                     <select id="fCls"><option value="9">9aad</option><option value="12">12aad</option></select>
                     <select id="fSec"><option value="A">A</option><option value="B">B</option></select>
-                    <button onclick="fetchList('${page}')">🔍 SOO BANDHIG</button>
+                    <button onclick="fetchList('${page.toLowerCase()}')">🔍 SOO BANDHIG</button>
                 </div>
                 <div id="listArea"></div></div>`;
         }
@@ -103,21 +106,23 @@
 
     // --- FETCH: SAVE STUDENT ---
     async function saveStudent() {
-        const nbs = document.getElementById('nbs').value;
-        const name = document.getElementById('name').value;
-        if(!nbs || !name) return alert("Fadlan buuxi xogta!");
+        const nbsCode = document.getElementById('nbs').value;
+        const fullName = document.getElementById('name').value;
+        if(!nbsCode || !fullName) return alert("Fadlan buuxi xogta!");
 
         await fetch('/api/admin/save', { 
             method: 'POST', 
             headers: {'Content-Type': 'application/json'}, 
             body: JSON.stringify({
-                nbsCode: nbs,
-                fullName: name,
+                nbsCode,
+                fullName,
                 class: document.getElementById('cls').value,
                 section: document.getElementById('sec').value
             }) 
         });
         alert("Waa la keydiyey!");
+        document.getElementById('nbs').value = '';
+        document.getElementById('name').value = '';
     }
 
     // --- FETCH: GET LIST & PRINT ---
@@ -130,15 +135,31 @@
         let html = `<table><tr><th>NBS Code</th><th>Magaca</th><th>Action</th></tr>`;
         students.forEach(s => {
             html += `<tr><td>${s.nbsCode}</td><td>${s.fullName}</td><td>`;
-            if(type === 'att') html += `<button onclick="updateAtt('${s.nbsCode}', 'Present')" style="background:var(--g); width:40px;">P</button> <button onclick="updateAtt('${s.nbsCode}', 'Absent')" style="background:var(--r); width:40px;">A</button>`;
+            if(type === 'att') {
+                html += `<button onclick="updateAtt('${s.nbsCode}', 'Present')" style="background:var(--g); width:40px;">P</button> 
+                         <button onclick="updateAtt('${s.nbsCode}', 'Absent')" style="background:var(--r); width:40px;">A</button>`;
+            }
             if(type === 'fees') html += `$${s.fees.paid} <button onclick="payFee('${s.nbsCode}', ${s.fees.paid})" style="width:60px;">Pay</button>`;
             if(type === 'exam') html += `<button onclick="addMark('${s.nbsCode}')" style="width:80px;">Marks</button>`;
+            
+            html += `<button onclick="deleteStudent('${s.nbsCode}')" class="btn-del no-print">🗑️ Delete</button>`;
             html += `</td></tr>`;
         });
-        document.getElementById('listArea').innerHTML = html + `</table><br><button onclick="window.print()">🖨️ DAABAC (PRINT)</button>`;
+        document.getElementById('listArea').innerHTML = html + `</table><br><button class="no-print" onclick="window.print()">🖨️ DAABAC (PRINT)</button>`;
     }
 
-    // --- FETCH: UPDATE DATA ---
+    // --- FETCH: DELETE ---
+    async function deleteStudent(nbsCode) {
+        if(!confirm("Ma hubtaa inaad tirtirto ardaygan?")) return;
+        const res = await fetch(`/api/admin/student/${nbsCode}`, { method: 'DELETE' });
+        const data = await res.json();
+        if(data.success) {
+            alert(data.message);
+            location.reload(); 
+        }
+    }
+
+    // --- FETCH: UPDATE DATA (Attendance & Fees) ---
     async function updateAtt(nbsCode, status) {
         const date = new Date().toLocaleDateString();
         await fetch('/api/admin/save', { 
@@ -146,11 +167,11 @@
             headers: {'Content-Type': 'application/json'}, 
             body: JSON.stringify({ nbsCode, $push: { attendance: { date, status } } }) 
         });
-        alert("Xadiriska waa la qaaday!");
+        alert("Xadiriska waa la keydiyey!");
     }
 
     async function payFee(nbsCode, current) {
-        const amount = prompt("Lacagta ($):");
+        const amount = prompt("Lacagta la bixinayo ($):");
         if(amount) {
             await fetch('/api/admin/save', { 
                 method: 'POST', 
@@ -160,6 +181,18 @@
             alert("Lacagta waa la cusubaysiiyey!");
             fetchList('fees');
         }
+    }
+
+    async function addMark(nbsCode) {
+        const sub = prompt("Maadada:");
+        const score = prompt("Dhibcaha:");
+        if(!sub || !score) return;
+        await fetch('/api/admin/save', { 
+            method: 'POST', 
+            headers: {'Content-Type': 'application/json'}, 
+            body: JSON.stringify({ nbsCode, $push: { "exams.exam1": { subject: sub, score: parseInt(score) } } }) 
+        });
+        alert("Dhibcaha waa la keydiyey!");
     }
 
     function stdDash() {

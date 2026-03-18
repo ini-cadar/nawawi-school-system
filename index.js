@@ -10,8 +10,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// --- ISKU-XIRKA DATABASE-KA ---
+// --- ISKU-XIRKA DATABASE-KA (Halkan ayaa la hagaajiyay) ---
 const mongoURI = "mongodb+srv://raaziwayrax_db_user:raasi1234@cluster0.cvcctca.mongodb.net/NawawiDB?retryWrites=true&w=majority";
+
 mongoose.connect(mongoURI)
     .then(() => console.log("✅ Database-ka waa lagu guulaystay!"))
     .catch(err => console.error("❌ Cilad xiriirka DB:", err));
