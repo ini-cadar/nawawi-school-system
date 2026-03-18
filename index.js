@@ -12,8 +12,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // --- ISKU-XIRKA DATABASE-KA (HALKAN AYAA LA SAXAY) ---
 // Hubi in password-ka 'admin123' uu yahay kan aad MongoDB Atlas u sameysay
-const mongoURI = "mongodb+srv://raaziwayrax_db_user:admin123@cluster0.cvcctca.mongodb.net/NawawiDB?retryWrites=true&w=majority";
-
+const mongoURI = "mongodb+srv://raaziwayrax_db_user:<db_password>@cluster0.cvcctca.mongodb.net/?appName=Cluster0";
 mongoose.connect(mongoURI)
     .then(() => console.log("✅ Database-ka waa lagu guulaystay!"))
     .catch(err => console.error("❌ Cilad xiriirka DB:", err));
