@@ -11,7 +11,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // --- ISKU-XIRKA DATABASE-KA (Halkan ayaa la hagaajiyay) ---
-const mongoURI = "mongodb+srv://raaziwayrax_db_user:admin123@cluster0.cvcctca.mongodb.net/NawawiDB?retryWrites=true&w=majority";
+const mongoURI = "mongodb+srv://raaziwayrax_db_user:raasi1234.@cluster0.cvcctca.mongodb.net/NawawiDB?retryWrites=true&w=majority";
 
 mongoose.connect(mongoURI)
     .then(() => console.log("✅ Database-ka waa lagu guulaystay!"))
