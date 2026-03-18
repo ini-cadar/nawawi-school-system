@@ -4,25 +4,30 @@ const cors = require('cors');
 const path = require('path');
 
 const app = express();
+
+// --- MIDDLEWARE ---
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ISKU-XIRKA DATABASE-KA
+// --- ISKU-XIRKA DATABASE-KA ---
 const mongoURI = "mongodb+srv://raaziwayrax_db_user:raasi1234@cluster0.cvcctca.mongodb.net/NawawiDB?retryWrites=true&w=majority";
 
 mongoose.connect(mongoURI)
-    .then(() => console.log("✅ DATABASE: Isku-xirka MongoDB waa guul!"))
-    .catch(err => console.log("❌ DATABASE ERROR:", err));
+    .then(() => console.log("✅ Database-ka waa lagu guulaystay!"))
+    .catch(err => console.error("❌ Cilad xiriirka DB:", err));
 
-// SCHEMA-KA ARDAYGA
+// --- SCHEMA-KA ARDAYGA ---
 const StudentSchema = new mongoose.Schema({
     nbsCode: { type: String, unique: true, required: true },
     password: { type: String, default: "1234" },
     fullName: { type: String, required: true },
     class: { type: String, required: true },
     section: { type: String, required: true },
-    fees: { paid: { type: Number, default: 0 }, total: { type: Number, default: 1200 } },
+    fees: { 
+        paid: { type: Number, default: 0 }, 
+        total: { type: Number, default: 1200 } 
+    },
     attendance: [{ date: String, status: String }],
     exams: {
         exam1: [{ subject: String, score: Number }],
@@ -34,69 +39,85 @@ const StudentSchema = new mongoose.Schema({
 
 const Student = mongoose.model('Student', StudentSchema);
 
-// --- API-YADA ---
+// --- API-YADA (ROUTES) ---
 
-// 1. LOGIN
+// 1. LOGIN (Admin & Student)
 app.post('/api/login', async (req, res) => {
-    const { username, role } = req.body;
-    console.log(`🔑 LOGIN ATTEMPT: Role: ${role}, User: ${username}`);
-    
-    const { password } = req.body;
-    if (role === 'admin') {
-        if (username === 'admin' && password === 'admin123') {
-            console.log("✅ Admin si sax ah ayuu u soo galay");
-            return res.json({ success: true, role: 'admin' });
+    try {
+        const { username, password, role } = req.body;
+        
+        if (role === 'admin') {
+            if (username === 'admin' && password === 'admin123') {
+                return res.json({ success: true, role: 'admin' });
+            }
+        } else {
+            const student = await Student.findOne({ nbsCode: username, password: password });
+            if (student) {
+                return res.json({ success: true, role: 'student', data: student });
+            }
         }
-    } else {
-        const student = await Student.findOne({ nbsCode: username, password: password });
-        if (student) {
-            console.log(`✅ Ardayga ${student.fullName} waa uu soo galay`);
-            return res.json({ success: true, role: 'student', data: student });
-        }
+        res.status(401).json({ success: false, message: "Username ama Password waa khaldan yihiin!" });
+    } catch (err) {
+        res.status(500).json({ success: false, message: "Server error" });
     }
-    console.log("❌ Login Failed: Macluumaad qaldan");
-    res.json({ success: false, message: "Xogtu waa khaldan tahay!" });
 });
 
-// 2. SAVE (Keydinta oo Server-ku sheegayo)
+// 2. SAVE/UPDATE (Diiwaangelinta & Wax ka bedelka)
 app.post('/api/admin/save', async (req, res) => {
-    console.log("📥 REQUEST: Keydin arday cusub...");
-    console.log("Xogta soo gaartay:", req.body);
-    
     try {
-        const { nbsCode, ...data } = req.body;
-        const student = await Student.findOneAndUpdate(
+        const { nbsCode } = req.body;
+        if (!nbsCode) return res.status(400).json({ success: false, message: "NBS Code waa lagama maarmaan!" });
+
+        // 'upsert' waxay u samaysaa arday cusub haduusan jirin, hadii kalena way u cusubaysaa
+        const updatedStudent = await Student.findOneAndUpdate(
             { nbsCode }, 
-            data, 
+            req.body, 
             { upsert: true, new: true }
         );
-        console.log(`✅ SUCCESS: Ardayga ${student.fullName} (ID: ${nbsCode}) waa la keydiyey!`);
-        res.json({ success: true });
+        res.json({ success: true, data: updatedStudent });
     } catch (err) {
-        console.log("❌ SAVE ERROR:", err.message);
+        console.error(err);
+        res.status(500).json({ success: false, message: "Khalad baa ka dhacay keydinta." });
+    }
+});
+
+// 3. FETCH BY CLASS (Soo saarista liiska fasalka si loo daabaco)
+app.get('/api/students/:class/:section', async (req, res) => {
+    try {
+        const { class: cls, section: sec } = req.params;
+        const list = await Student.find({ class: cls, section: sec }).sort({ fullName: 1 });
+        res.json(list);
+    } catch (err) {
+        res.status(500).json({ success: false, message: "Error fetching students" });
+    }
+});
+
+// 4. GET SINGLE STUDENT (Warqadda natiijada ama profile-ka gaarka ah)
+app.get('/api/student/:nbsCode', async (req, res) => {
+    try {
+        const student = await Student.findOne({ nbsCode: req.params.nbsCode });
+        if (student) {
+            res.json({ success: true, data: student });
+        } else {
+            res.status(404).json({ success: false, message: "Ardayga lama helin" });
+        }
+    } catch (err) {
         res.status(500).json({ success: false });
     }
 });
 
-// 3. FETCH (Soo saarista ardayda oo Server-ku sheegayo)
-app.get('/api/students/:c/:s', async (req, res) => {
-    const { c, s } = req.params;
-    console.log(`🔍 SEARCH: Raadinaya ardayda Fasalka: ${c}, Section: ${s}`);
-    
+// 5. DELETE STUDENT (Hadii arday la tirtirayo)
+app.delete('/api/admin/student/:nbsCode', async (req, res) => {
     try {
-        const list = await Student.find({ class: c, section: s }).sort({ fullName: 1 });
-        console.log(`📊 RESULT: Waxaa la helay ${list.length} arday.`);
-        res.json(list);
+        await Student.findOneAndDelete({ nbsCode: req.params.nbsCode });
+        res.json({ success: true, message: "Ardayga waa la tirtiray" });
     } catch (err) {
-        console.log("❌ FETCH ERROR:", err.message);
-        res.json([]);
+        res.status(500).json({ success: false });
     }
 });
 
+// --- SERVER START ---
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
-    console.log("-----------------------------------------");
-    console.log(`🚀 SERVER IS LIVE: http://localhost:${PORT}`);
-    console.log(`📅 DATE: ${new Date().toLocaleString()}`);
-    console.log("-----------------------------------------");
+    console.log(`🚀 Server-ku wuxuu si fiican uga shaqaynayaa: http://localhost:${PORT}`);
 });

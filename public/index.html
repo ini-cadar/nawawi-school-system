@@ -11,10 +11,13 @@
         .main { margin-left: 280px; padding: 30px; }
         .card { background: var(--w); padding: 25px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
         input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 6px; border: 1px solid #ddd; box-sizing: border-box; }
-        button { background: var(--s); color: white; border: none; cursor: pointer; font-weight: bold; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        button { background: var(--s); color: white; border: none; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        button:hover { opacity: 0.8; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
         th, td { border: 1px solid #eee; padding: 12px; text-align: left; }
+        th { background: #f8f9fa; }
         .perc-badge { font-size: 24px; color: var(--s); font-weight: bold; }
+        @media print { .sidebar, button { display: none; } .main { margin: 0; width: 100%; } }
     </style>
 </head>
 <body>
@@ -31,7 +34,7 @@
     <div class="sidebar">
         <h3>NBS ADMIN</h3>
         <button onclick="showAdmin('add')">➕ Add Student</button>
-        <button onclick="showAdmin('att')">📝 Attendance (A/B)</button>
+        <button onclick="showAdmin('att')">📝 Attendance</button>
         <button onclick="showAdmin('fees')">💰 Fees & Payment</button>
         <button onclick="showAdmin('exam')">📊 Exam Management</button>
         <button style="background:var(--r); margin-top:50px;" onclick="location.reload()">Logout</button>
@@ -79,21 +82,22 @@
         } else alert(data.message);
     }
 
-    // --- ADMIN FUNCTIONS ---
     function showAdmin(page) {
         let html = '';
         if(page === 'add') {
-            html = `<div class="card"><h2>Add New Student</h2>
+            html = `<div class="card"><h2>Add Student</h2>
                 <input id="nbs" placeholder="NBS/100/2026">
                 <input id="name" placeholder="Magaca oo Dhammaystiran">
                 <select id="cls"><option value="9">9aad</option><option value="10">10aad</option><option value="11">11aad</option><option value="12">12aad</option></select>
                 <select id="sec"><option value="A">A</option><option value="B">B</option></select>
                 <button onclick="saveStudent()">💾 DIIWAANGELI</button></div>`;
         } else {
-            html = `<div class="card"><h2>${page.toUpperCase()} - Dooro Fasalka</h2>
-                <select id="fCls"><option value="9">9aad</option><option value="12">12aad</option></select>
-                <select id="fSec"><option value="A">A</option><option value="B">B</option></select>
-                <button onclick="fetchList('${page}')">🔍 SOO BANDHIG</button>
+            html = `<div class="card"><h2>${page.toUpperCase()} Management</h2>
+                <div style="display:flex; gap:10px;">
+                    <select id="fCls"><option value="9">9aad</option><option value="12">12aad</option></select>
+                    <select id="fSec"><option value="A">A</option><option value="B">B</option></select>
+                    <button onclick="fetchList('${page}')">🔍 SOO BANDHIG</button>
+                </div>
                 <div id="listArea"></div></div>`;
         }
         document.getElementById('adminContent').innerHTML = html;
@@ -110,23 +114,55 @@
         alert("Waa la keydiyey!");
     }
 
-    // --- STUDENT FUNCTIONS ---
-    function stdDash() {
-        const total = activeUser.attendance.length;
-        const present = activeUser.attendance.filter(a => a.status === 'Present').length;
-        const perc = total > 0 ? ((present / total) * 100).toFixed(1) : 0;
+    async function fetchList(type) {
+        const cls = document.getElementById('fCls').value;
+        const sec = document.getElementById('fSec').value;
+        const res = await fetch(`/api/students/${cls}/${sec}`);
+        const students = await res.json();
+        
+        let html = `<table><tr><th>NBS Code</th><th>Magaca</th><th>Action/Status</th></tr>`;
+        students.forEach(s => {
+            html += `<tr><td>${s.nbsCode}</td><td>${s.fullName}</td><td>`;
+            if(type === 'att') html += `<button onclick="updateAtt('${s.nbsCode}', 'Present')">✅ P</button> <button style="background:var(--r)" onclick="updateAtt('${s.nbsCode}', 'Absent')">❌ A</button>`;
+            if(type === 'fees') html += `$${s.fees.paid} / $${s.fees.total} <button onclick="payFee('${s.nbsCode}', ${s.fees.paid})">Pay</button>`;
+            if(type === 'exam') html += `<button onclick="addMark('${s.nbsCode}')">Add Marks</button>`;
+            html += `</td></tr>`;
+        });
+        document.getElementById('listArea').innerHTML = html + `</table> <br> <button onclick="window.print()">🖨️ Daabaco Liiska</button>`;
+    }
 
-        document.getElementById('stdContent').innerHTML = `
-            <div class="card"><h1>Dashboard-ka Ardayga</h1>
-                <div style="display:flex; gap:20px;">
-                    <div class="card" style="flex:1; text-align:center;"><h3>Xadiriska (Attendance)</h3><div class="perc-badge">${perc}%</div></div>
-                    <div class="card" style="flex:1; text-align:center;"><h3>Xaaladda Lacagta</h3><h2 style="color:${activeUser.fees.paid >= activeUser.fees.total ? 'var(--g)' : 'var(--r)'}">${activeUser.fees.paid >= activeUser.fees.total ? 'BIXIYEY' : 'MA BIXIN'}</h2></div>
-                </div>
-            </div>`;
+    async function updateAtt(nbsCode, status) {
+        const date = new Date().toLocaleDateString();
+        await fetch('/api/admin/save', { 
+            method: 'POST', 
+            headers: {'Content-Type': 'application/json'}, 
+            body: JSON.stringify({ nbsCode, $push: { attendance: { date, status } } }) 
+        });
+        alert("Xadiriska waa la qaaday!");
+    }
+
+    async function payFee(nbsCode, current) {
+        const amount = prompt("Lacagta la bixinayo ($):");
+        if(!amount) return;
+        await fetch('/api/admin/save', { 
+            method: 'POST', 
+            headers: {'Content-Type': 'application/json'}, 
+            body: JSON.stringify({ nbsCode, "fees.paid": parseInt(current) + parseInt(amount) }) 
+        });
+        alert("Lacagta waa la cusubaysiiyey!");
+        fetchList('fees');
+    }
+
+    // STUDENT SIDE LOGIC
+    function stdDash() {
+        const att = activeUser.attendance || [];
+        const present = att.filter(a => a.status === 'Present').length;
+        const perc = att.length > 0 ? ((present / att.length) * 100).toFixed(1) : 0;
+        document.getElementById('stdContent').innerHTML = `<div class="card"><h2>Ku soo dhawaaw, ${activeUser.fullName}</h2><p>NBS Code: ${activeUser.nbsCode}</p><div style="display:flex;gap:10px"><div class="card">Attendance: ${perc}%</div><div class="card">Fees: $${activeUser.fees.paid}</div></div></div>`;
     }
 
     function stdExams() {
-        let html = `<div class="card"><h2>Natiijada Imtixaanka (12 Maado)</h2><table><tr><th>Maadada</th><th>Dhibcaha</th></tr>`;
+        let html = `<div class="card"><h2>Imtixaanka</h2><table><tr><th>Maadada</th><th>Dhibcaha</th></tr>`;
         subjects.forEach(s => html += `<tr><td>${s}</td><td>-</td></tr>`);
         document.getElementById('stdContent').innerHTML = html + `</table></div>`;
     }
