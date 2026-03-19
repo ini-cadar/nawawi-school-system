@@ -4,70 +4,119 @@
     <meta charset="UTF-8">
     <title>Nawawi School System</title>
     <style>
-        body { font-family: Arial; background: #f4f4f4; padding: 20px; }
-        .container { max-width: 500px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        input, select, button { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
-        button { background: #28a745; color: white; border: none; cursor: pointer; font-weight: bold; }
-        button:hover { background: #218838; }
-        h2 { color: #333; text-align: center; }
+        body { font-family: Arial; padding: 20px; background: #f4f4f4; }
+        .box { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        input, select, button { padding: 10px; margin: 5px; border-radius: 5px; border: 1px solid #ddd; }
+        button { background: #28a745; color: white; cursor: pointer; border: none; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: #eee; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>Diiwaangelinta Ardayda</h2>
-    <input type="text" id="nbsCode" placeholder="Code-ka Ardayga (Tusaale: NBS/101)">
-    <input type="text" id="fullName" placeholder="Magaca oo Dhammaystiran">
-    
-    <select id="classSelect">
-        <option value="1">Class 1</option>
-        <option value="2">Class 2</option>
-        <option value="3">Class 3</option>
-    </select>
+    <h2>Nawawi School System - Dashboard</h2>
 
-    <select id="sectionSelect">
-        <option value="A">Section A</option>
-        <option value="B">Section B</option>
-         <option value="c">Section c</option>
-    </select>
+    <div class="box">
+        <h3>1. Diiwaangeli Arday Cusub</h3>
+        <input type="text" id="fullName" placeholder="Magaca Saddexan">
+        <input type="text" id="motherName" placeholder="Magaca Hooyada">
+        <input type="text" id="examNumber" placeholder="Lambarka Imtixaanka">
+        <select id="regGrade">
+            <option value="9">Fasalka 9aad</option>
+            <option value="10">Fasalka 10aad</option>
+            <option value="11">Fasalka 11aad</option>
+            <option value="12">Fasalka 12aad</option>
+        </select>
+        <select id="regSection">
+            <option value="A">Qolka A</option>
+            <option value="B">Qolka B</option>
+            <option value="C">Qolka C</option>
+        </select>
+        <input type="text" id="phone1" placeholder="Tel Waalidka 1">
+        <input type="text" id="phone2" placeholder="Tel Waalidka 2">
+        <button onclick="registerStudent()">Save Ardayga</button>
+    </div>
 
-    <input type="number" id="paidAmount" placeholder="Lacagta uu bixiyey ($)">
-    
-    <button onclick="saveStudent()">Keydi Ardayga</button>
-</div>
+    <div class="box">
+        <h3>2. Xadirinta Ardayda (Attendance)</h3>
+        <select id="filterGrade">
+            <option value="9">Fasalka 9aad</option>
+            <option value="10">Fasalka 10aad</option>
+            <option value="11">Fasalka 11aad</option>
+            <option value="12">Fasalka 12aad</option>
+        </select>
+        <select id="filterSection">
+            <option value="A">Qolka A</option>
+            <option value="B">Qolka B</option>
+            <option value="C">Qolka C</option>
+        </select>
+        <button onclick="fetchStudents()">Soo saar Ardayda</button>
 
-<script>
-    async function saveStudent() {
-        const data = {
-            nbsCode: document.getElementById('nbsCode').value,
-            fullName: document.getElementById('fullName').value,
-            class: document.getElementById('classSelect').value,
-            section: document.getElementById('sectionSelect').value,
-            fees: {
-                paid: Number(document.getElementById('paidAmount').value) || 0,
-                total: 1200
-            }
-        };
+        <table id="studentTable" style="display:none;">
+            <thead>
+                <tr>
+                    <th>Magaca</th>
+                    <th>Exam No</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="studentList"></tbody>
+        </table>
+    </div>
 
-        if(!data.nbsCode || !data.fullName) return alert("Fadlan buuxi meelaha banaan!");
-
-        try {
-            const response = await fetch('http://localhost:3001/api/admin/save', {
+    <script>
+        async function registerStudent() {
+            const data = {
+                fullName: document.getElementById('fullName').value,
+                motherName: document.getElementById('motherName').value,
+                examNumber: document.getElementById('examNumber').value,
+                grade: document.getElementById('regGrade').value,
+                section: document.getElementById('regSection').value,
+                parentPhone1: document.getElementById('phone1').value,
+                parentPhone2: document.getElementById('phone2').value
+            };
+            const res = await fetch('/api/register', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(data)
             });
-
-            const result = await response.json();
-            if (result.success) {
-                alert("✅ " + result.message);
-                document.querySelectorAll('input').forEach(i => i.value = '');
-            }
-        } catch (err) {
-            alert("❌ Cilad: Server-ka ma shaqaynayo!");
+            const result = await res.json();
+            alert(result.message);
         }
-    }
-</script>
 
+        async function fetchStudents() {
+            const grade = document.getElementById('filterGrade').value;
+            const section = document.getElementById('filterSection').value;
+            const res = await fetch(`/api/filter?grade=${grade}&section=${section}`);
+            const students = await res.json();
+            
+            const list = document.getElementById('studentList');
+            list.innerHTML = '';
+            document.getElementById('studentTable').style.display = 'table';
+
+            students.forEach(s => {
+                list.innerHTML += `
+                    <tr>
+                        <td>${s.fullName}</td>
+                        <td>${s.examNumber}</td>
+                        <td>
+                            <button style="background:blue" onclick="mark('${s._id}', 'Present')">Jooga</button>
+                            <button style="background:red" onclick="mark('${s._id}', 'Absent')">Maqan</button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        async function mark(id, status) {
+            const date = new Date().toISOString().split('T')[0];
+            await fetch('/api/attendance', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ studentId: id, status, date })
+            });
+            alert('Waa la xadiyay!');
+        }
+    </script>
 </body>
 </html>
