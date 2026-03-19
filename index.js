@@ -50,7 +50,7 @@ app.put('/api/student/:id', async (req, res) => {
 // Login Core (Admin & Student)
 app.post('/api/login', async (req, res) => {
     const { roll, pass } = req.body;
-    if(roll === 'admin' && pass === 'admin1234') return res.json({ role: 'admin' });
+    if(roll === 'admin' && pass === 'admin1234') return res.json({ role: 'admin',data: {} });
     const s = await Student.findOne({ examNumber: roll, password: pass });
     if(s) res.json({ role: 'student', data: s });
     else res.status(401).json({ error: 'Khalad!' });
