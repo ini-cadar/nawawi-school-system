@@ -2,128 +2,253 @@
 <html lang="so">
 <head>
     <meta charset="UTF-8">
-    <title>NBS Portal | Full System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NBS Portal | Full Management System</title>
     <style>
-        :root { --primary: #2c3e50; --accent: #27ae60; --danger: #e74c3c; --text: #333; }
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; height: 100vh; background: #f0f2f5; }
-        .sidebar { width: 260px; background: var(--primary); color: white; display: none; flex-direction: column; }
-        .nav-item { padding: 15px 25px; cursor: pointer; border-bottom: 1px solid #34495e; transition: 0.3s; }
-        .nav-item:hover { background: #34495e; border-left: 5px solid var(--accent); }
-        .main { flex: 1; padding: 30px; overflow-y: auto; }
-        .box { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 6px; border: 1px solid #ddd; box-sizing: border-box; }
-        button { background: var(--accent); color: white; font-weight: bold; cursor: pointer; border: none; }
-        .status-btn { border-radius: 20px; width: auto; padding: 5px 15px; font-size: 12px; }
+        :root { 
+            --primary: #2c3e50; 
+            --accent: #27ae60; 
+            --danger: #e74c3c; 
+            --warning: #f39c12;
+            --text: #333; 
+            --light: #f4f7f6;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; display: flex; height: 100vh; background: var(--light); color: var(--text); }
+        
+        /* Sidebar Styling */
+        .sidebar { width: 260px; background: var(--primary); color: white; display: none; flex-direction: column; box-shadow: 2px 0 5px rgba(0,0,0,0.1); }
+        .sidebar-header { padding: 25px; text-align: center; border-bottom: 1px solid #34495e; background: #1a252f; }
+        .nav-item { padding: 15px 25px; cursor: pointer; border-bottom: 1px solid #34495e; transition: 0.3s; display: flex; align-items: center; gap: 10px; }
+        .nav-item:hover { background: #34495e; border-left: 5px solid var(--accent); padding-left: 20px; }
+        .nav-active { background: #34495e; border-left: 5px solid var(--accent); }
+
+        /* Main Content */
+        .main { flex: 1; padding: 30px; overflow-y: auto; position: relative; }
+        .box { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #eee; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        
+        /* Form Elements */
+        input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 6px; border: 1px solid #ddd; box-sizing: border-box; font-size: 14px; }
+        button { background: var(--accent); color: white; font-weight: bold; cursor: pointer; border: none; transition: 0.2s; }
+        button:hover { opacity: 0.9; transform: translateY(-1px); }
+        
+        /* Search Box */
+        .search-container { margin-bottom: 20px; display: flex; gap: 10px; }
+        .search-container input { flex: 1; }
+        .search-container button { width: 120px; margin: 8px 0; }
+
+        /* Status Badges */
+        .status-btn { border-radius: 20px; width: auto; padding: 6px 15px; font-size: 12px; border: none; color: white; display: inline-block; }
+        .bg-paid { background: var(--accent); }
+        .bg-pending { background: var(--danger); }
+        
         .hidden { display: none; }
-        #loginOverlay { position: fixed; inset: 0; background: var(--primary); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        #loginOverlay { position: fixed; inset: 0; background: linear-gradient(135deg, var(--primary), #1a252f); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; color: var(--primary); }
+
+        .exam-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .subject-card { background: #f9f9f9; padding: 10px; border-radius: 5px; border-left: 4px solid var(--primary); }
     </style>
 </head>
 <body>
 
 <div id="loginOverlay">
-    <div class="box" style="width: 350px; text-align: center;">
-        <h2 style="color: var(--primary);">UOB PORTAL</h2>
-        <select id="l-role"><option value="admin">Admin Access</option><option value="student">Student Portal</option></select>
-        <input id="l-u" placeholder="Roll Number / Admin">
+    <div class="box" style="width: 380px; text-align: center; padding: 40px;">
+        <h2 style="color: var(--primary); margin-bottom: 30px;">NAWAWI PORTAL</h2>
+        <select id="l-role">
+            <option value="admin">Admin Access</option>
+            <option value="student">Student Portal</option>
+        </select>
+        <input id="l-u" type="text" placeholder="Roll Number / Username">
         <input id="l-p" type="password" placeholder="Password">
-        <button onclick="handleLogin()">Sign In</button>
+        <button onclick="handleLogin()" style="margin-top: 20px;">SIGN IN</button>
+        <p style="font-size: 12px; color: #777; margin-top: 15px;">Nawawi Boarding School Management System</p>
     </div>
 </div>
 
 <div class="sidebar" id="sidebar">
-    <div style="padding: 25px; text-align: center; border-bottom: 1px solid #34495e;"><h3>NBS SYSTEM</h3></div>
-    <div class="admin-only">
-        <div class="nav-item" onclick="nav('dash')">📊 Dashboard</div>
-        <div class="nav-item" onclick="nav('add')">📝 Add Student</div>
-        <div class="nav-item" onclick="nav('fee')">💰 Fee Management</div>
-        <div class="nav-item" onclick="nav('exam')">📚 Exam Center</div>
-        <div class="nav-item" onclick="nav('att')">📅 Attendance</div>
+    <div class="sidebar-header">
+        <h3 style="margin:0;">NBS SYSTEM</h3>
+        <small id="user-display" style="color: var(--accent);"></small>
     </div>
-    <div class="student-only hidden">
-        <div class="nav-item" onclick="nav('s-profile')">👤 My Dashboard</div>
+    <div id="admin-menu" class="hidden">
+        <div class="nav-item nav-active" onclick="nav('dash', this)">📊 Dashboard</div>
+        <div class="nav-item" onclick="nav('add', this)">📝 Register Student</div>
+        <div class="nav-item" onclick="nav('search-view', this)">🔍 Search & Manage</div>
+        <div class="nav-item" onclick="nav('att', this)">📅 Attendance</div>
     </div>
-    <button onclick="location.reload()" style="margin-top: auto; background: var(--danger);">Logout</button>
+    <div id="student-menu" class="hidden">
+        <div class="nav-item nav-active" onclick="nav('s-profile', this)">👤 My Results</div>
+    </div>
+    <button onclick="location.reload()" style="margin: auto 20px 20px 20px; background: var(--danger); width: calc(100% - 40px);">Logout</button>
 </div>
 
 <div class="main" id="app" style="display: none;">
+    
     <section id="dash" class="view">
         <div class="box">
-            <h3>Admin Dashboard Overview</h3>
-            <select id="d-grade" onchange="loadAdminDash(this.value)"><option>Select Grade</option><option value="9">9aad</option><option value="12">12aad</option></select>
-            <div id="student-list-dash"></div>
+            <h2>School Overview</h2>
+            <div class="grid">
+                <div class="box" style="background: #e8f5e9; border: none;">
+                    <h4>Total Students</h4>
+                    <h2 id="total-count">0</h2>
+                </div>
+                <div class="box" style="background: #fff3e0; border: none;">
+                    <h4>Grade 12 Students</h4>
+                    <h2 id="g12-count">0</h2>
+                </div>
+            </div>
         </div>
     </section>
 
     <section id="add" class="view hidden">
         <div class="box">
-            <h3>Register New Student</h3>
+            <h2>Add New Student</h2>
             <div class="grid">
-                <input id="f-name" placeholder="Full Name (Saddexan)">
-                <input id="m-name" placeholder="Mother Name (Saddexan)">
-                <input id="f-phone" placeholder="Father Phone">
-                <input id="m-phone" placeholder="Mother Phone">
-                <input id="r-num" placeholder="Roll Number">
-                <select id="r-grade"><option value="9">9aad</option><option value="10">10aad</option><option value="11">11aad</option><option value="12">12aad</option></select>
+                <div>
+                    <label>Full Name</label>
+                    <input id="f-name" placeholder="Ex: Ahmed Ali Warsame">
+                </div>
+                <div>
+                    <label>Mother Name</label>
+                    <input id="m-name" placeholder="Ex: Hawa Abdi">
+                </div>
+                <div>
+                    <label>Roll Number (Exam ID)</label>
+                    <input id="r-num" placeholder="Ex: NBS001">
+                </div>
+                <div>
+                    <label>Grade</label>
+                    <select id="r-grade">
+                        <option value="9">Grade 9</option>
+                        <option value="10">Grade 10</option>
+                        <option value="11">Grade 11</option>
+                        <option value="12">Grade 12</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Father Phone</label>
+                    <input id="f-phone" placeholder="25261xxxxxx">
+                </div>
+                <div>
+                    <label>Mother Phone</label>
+                    <input id="m-phone" placeholder="25261xxxxxx">
+                </div>
             </div>
-            <button onclick="saveNewStudent()">Save Records</button>
+            <button onclick="saveNewStudent()" style="width: 200px; margin-top: 20px;">Save Record</button>
+        </div>
+    </section>
+
+    <section id="search-view" class="view hidden">
+        <div class="box">
+            <h2>Student Search & Management</h2>
+            <div class="search-container">
+                <input type="text" id="adminSearchInput" placeholder="Search by Name or Roll Number..." onkeyup="adminSearch()">
+                <button onclick="adminSearch()">Search</button>
+            </div>
+            <table id="adminTable">
+                <thead>
+                    <tr>
+                        <th>Roll No</th>
+                        <th>Full Name</th>
+                        <th>Grade</th>
+                        <th>Fees</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="adminStudentList"></tbody>
+            </table>
         </div>
     </section>
 
     <section id="att" class="view hidden">
         <div class="box">
-            <h3>Daily Attendance (Automatic Date)</h3>
-            <div id="att-list"></div>
+            <h2>Attendance Management</h2>
+            <div id="att-list">
+                <p>Loading students for attendance...</p>
+            </div>
         </div>
     </section>
 
     <section id="s-profile" class="view hidden">
         <div class="box" style="text-align: center;">
-            <h2 id="sp-name"></h2>
-            <p id="sp-roll" style="color: #666;"></p>
-            <div style="display: flex; justify-content: center; gap: 20px;">
-                <button class="status-btn" style="background: var(--accent);">Attendance: 100%</button>
-                <button id="sp-fee" class="status-btn"></button>
+            <div id="student-header">
+                <h1 id="sp-name">---</h1>
+                <p id="sp-roll" style="font-size: 18px; color: #666;"></p>
+                <div style="display: flex; justify-content: center; gap: 15px; margin-top: 15px;">
+                    <span id="sp-fee-status" class="status-btn">---</span>
+                    <span class="status-btn" style="background: var(--primary);">Term: 2025/2026</span>
+                </div>
             </div>
-            <div id="sp-exams" style="margin-top: 30px; text-align: left;"></div>
+            <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
+            <div style="text-align: left;">
+                <h3>Exam Results (Official)</h3>
+                <div id="sp-exams" class="exam-grid"></div>
+            </div>
         </div>
     </section>
+
 </div>
 
 <script>
-    let currentUser = null;
-    let studentsData = [];
+    let currentRole = null;
 
+    // --- Authentication ---
     async function handleLogin() {
         const roll = document.getElementById('l-u').value;
         const pass = document.getElementById('l-p').value;
-        const res = await fetch('/api/login', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({roll, pass}) });
-        const data = await res.json();
-        
-        if(res.ok) {
-            currentUser = data;
-            document.getElementById('loginOverlay').style.display = 'none';
-            document.getElementById('sidebar').style.display = 'flex';
-            document.getElementById('app').style.display = 'block';
+        const role = document.getElementById('l-role').value;
+
+        try {
+            const res = await fetch('/api/login', { 
+                method: 'POST', 
+                headers: {'Content-Type': 'application/json'}, 
+                body: JSON.stringify({roll, pass}) 
+            });
+            const data = await res.json();
             
-            if(data.role === 'admin') {
-                document.querySelectorAll('.admin-only').forEach(e => e.classList.remove('hidden'));
-                nav('dash');
+            if(res.ok) {
+                currentRole = data.role;
+                document.getElementById('loginOverlay').style.display = 'none';
+                document.getElementById('sidebar').style.display = 'flex';
+                document.getElementById('app').style.display = 'block';
+                
+                if(data.role === 'admin') {
+                    document.getElementById('admin-menu').classList.remove('hidden');
+                    document.getElementById('user-display').innerText = "Maamul (Admin)";
+                    nav('dash', document.querySelector('.nav-item'));
+                    loadStats();
+                } else {
+                    document.getElementById('student-menu').classList.remove('hidden');
+                    document.getElementById('user-display').innerText = "Student Portal";
+                    renderStudentProfile(data.data);
+                    nav('s-profile', document.querySelector('#student-menu .nav-item'));
+                }
             } else {
-                document.querySelectorAll('.admin-only').forEach(e => e.classList.add('hidden'));
-                document.querySelectorAll('.student-only').forEach(e => e.classList.remove('hidden'));
-                renderStudentProfile(data.data);
-                nav('s-profile');
+                alert(data.error || "Login Failed!");
             }
-        } else alert("Khald ayaa jira!");
+        } catch (e) {
+            alert("Connection Error!");
+        }
     }
 
-    function nav(id) {
+    // --- Navigation ---
+    function nav(id, el) {
         document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
         document.getElementById(id).classList.remove('hidden');
-        if(id === 'att') loadAttendanceList();
+        
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('nav-active'));
+        if(el) el.classList.add('nav-active');
+
+        if(id === 'search-view') adminSearch();
+        if(id === 'att') loadAttendance();
+        if(id === 'dash') loadStats();
     }
 
+    // --- Admin Actions ---
     async function saveNewStudent() {
         const body = {
             fullName: document.getElementById('f-name').value,
@@ -133,49 +258,95 @@
             examNumber: document.getElementById('r-num').value,
             grade: document.getElementById('r-grade').value
         };
-        await fetch('/api/register', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body) });
-        alert("Waa la keydiyay!");
+
+        if(!body.fullName || !body.examNumber) return alert("Fadlan buuxi meelaha banaan!");
+
+        const res = await fetch('/api/register', { 
+            method: 'POST', 
+            headers: {'Content-Type': 'application/json'}, 
+            body: JSON.stringify(body) 
+        });
+        
+        if(res.ok) {
+            alert("Ardayga waa la keydiyay!");
+            location.reload();
+        }
     }
 
-    async function loadAdminDash(g) {
-        const res = await fetch(`/api/filter?grade=${g}`);
+    async function loadStats() {
+        const res = await fetch('/api/students');
         const data = await res.json();
-        const div = document.getElementById('student-list-dash');
-        div.innerHTML = data.map(s => `
-            <div class="box" style="display:flex; justify-content:space-between; align-items:center;">
-                <div><b>${s.fullName}</b><br><small>${s.examNumber}</small></div>
-                <button class="status-btn" style="background: var(--accent);">100% Present</button>
-            </div>
+        document.getElementById('total-count').innerText = data.length;
+        document.getElementById('g12-count').innerText = data.filter(s => s.grade == '12').length;
+    }
+
+    async function adminSearch() {
+        const query = document.getElementById('adminSearchInput').value;
+        const res = await fetch(`/api/students?search=${query}`);
+        const data = await res.json();
+        
+        const tbody = document.getElementById('adminStudentList');
+        tbody.innerHTML = data.map(s => `
+            <tr>
+                <td>${s.examNumber}</td>
+                <td><b>${s.fullName}</b></td>
+                <td>Grade ${s.grade}</td>
+                <td>
+                    <button class="status-btn ${s.feePaid ? 'bg-paid' : 'bg-pending'}" onclick="toggleFee('${s._id}', ${s.feePaid})">
+                        ${s.feePaid ? 'Paid' : 'Unpaid'}
+                    </button>
+                </td>
+                <td>
+                    <button style="width:auto; padding:5px 10px; background:var(--primary);" onclick="alert('Update system coming soon')">Edit</button>
+                </td>
+            </tr>
         `).join('');
     }
 
-    function renderStudentProfile(s) {
-        document.getElementById('sp-name').innerText = s.fullName;
-        document.getElementById('sp-roll').innerText = `Roll Number: ${s.examNumber}`;
-        document.getElementById('sp-fee').innerText = s.feePaid ? "Fee: Paid ✅" : "Fee: Pending ❌";
-        document.getElementById('sp-fee').style.background = s.feePaid ? 'var(--accent)' : 'var(--danger)';
-        
-        const examsHtml = `<h3>Exam Results (12 Subjects)</h3><div class="grid">` + 
-            s.examScores.map(e => `<div class="box" style="padding:10px;">${e.subject}: <b>${e.score} (${e.gradeLetter})</b></div>`).join('') + `</div>`;
-        document.getElementById('sp-exams').innerHTML = examsHtml;
+    async function toggleFee(id, currentStatus) {
+        await fetch(`/api/student/${id}`, {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ feePaid: !currentStatus })
+        });
+        adminSearch();
     }
 
-    async function loadAttendanceList() {
-        // Halkan waxaa imaanaya nidaamka xadiriska labada waqti
-        const res = await fetch('/api/filter?grade=9'); 
+    async function loadAttendance() {
+        const res = await fetch('/api/students');
         const data = await res.json();
         const div = document.getElementById('att-list');
         const today = new Date().toLocaleDateString();
-        div.innerHTML = `<h4>Date: ${today}</h4>` + data.map(s => `
-            <div class="box" style="display:flex; justify-content:space-between;">
-                <span>${s.fullName}</span>
-                <div>
-                    <button class="status-btn" onclick="mark('${s._id}', 'Morning')">Morning</button>
-                    <button class="status-btn" onclick="mark('${s._id}', 'Afternoon')">Afternoon</button>
+        
+        div.innerHTML = `<h3>Date: ${today}</h3>` + data.map(s => `
+            <div class="box" style="display:flex; justify-content:space-between; align-items:center;">
+                <span>${s.fullName} (${s.grade})</span>
+                <div style="display:flex; gap:10px;">
+                    <button class="status-btn bg-paid" onclick="alert('Morning marked for ${s.fullName}')">Morning</button>
+                    <button class="status-btn bg-paid" onclick="alert('Afternoon marked for ${s.fullName}')">Afternoon</button>
                 </div>
             </div>
         `).join('');
     }
+
+    // --- Student Actions ---
+    function renderStudentProfile(s) {
+        document.getElementById('sp-name').innerText = s.fullName;
+        document.getElementById('sp-roll').innerText = `Roll Number: ${s.examNumber} | Grade: ${s.grade}`;
+        
+        const feeBadge = document.getElementById('sp-fee-status');
+        feeBadge.innerText = s.feePaid ? "Status: Fee Paid ✅" : "Status: Fee Pending ❌";
+        feeBadge.className = `status-btn ${s.feePaid ? 'bg-paid' : 'bg-pending'}`;
+        
+        const examsHtml = s.examScores.map(e => `
+            <div class="subject-card">
+                <div style="font-weight:bold; color:var(--primary);">${e.subject}</div>
+                <div style="font-size:20px;">${e.score} <small style="color:#777;">(${e.gradeLetter})</small></div>
+            </div>
+        `).join('');
+        document.getElementById('sp-exams').innerHTML = examsHtml;
+    }
+
 </script>
 </body>
 </html>
