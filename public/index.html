@@ -3,144 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nawawi School System | Dashboard</title>
+    <title>Nawawi School System</title>
     <style>
-        :root { --primary: #2c3e50; --secondary: #34495e; --accent: #27ae60; --danger: #e74c3c; --text: #ecf0f1; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; display: flex; background: #f4f7f6; height: 100vh; }
+        :root { --primary: #2c3e50; --secondary: #34495e; --accent: #27ae60; --danger: #e74c3c; --white: #ffffff; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background: #f4f7f6; height: 100vh; display: flex; overflow: hidden; }
         
-        /* Sidebar Styling u eg UOB */
-        .sidebar { width: 250px; background: var(--primary); color: var(--text); display: flex; flex-direction: column; transition: 0.3s; }
-        .sidebar h2 { padding: 20px; font-size: 1.2rem; border-bottom: 1px solid var(--secondary); margin: 0; }
-        .menu-item { padding: 15px 20px; cursor: pointer; border-bottom: 1px solid #3e587157; transition: 0.3s; display: flex; align-items: center; }
-        .menu-item:hover { background: var(--secondary); }
-        .active { background: var(--accent) !important; }
+        /* LOGIN PAGE - Full Screen Overlay */
+        #loginPage { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: var(--primary); display: flex; justify-content: center; 
+            align-items: center; z-index: 9999; 
+        }
+        .login-box { background: var(--white); padding: 40px; border-radius: 12px; width: 350px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .login-box input { width: 90%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; }
+        .login-box button { width: 97%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
 
-        /* Main Content */
-        .main-content { flex: 1; overflow-y: auto; padding: 30px; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; background: white; padding: 15px 25px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        
-        /* Box & Table */
-        .box { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-bottom: 25px; }
-        input, select, button { padding: 12px; border-radius: 8px; border: 1px solid #ddd; margin: 5px; font-size: 14px; }
-        button { background: var(--accent); color: white; border: none; cursor: pointer; font-weight: bold; }
-        button:hover { opacity: 0.9; }
+        /* DASHBOARD STRUCTURE */
+        #dashboardWrapper { display: flex; width: 100%; height: 100%; }
+        .sidebar { width: 260px; background: var(--primary); color: white; display: flex; flex-direction: column; height: 100vh; }
+        .sidebar h2 { padding: 25px; text-align: center; border-bottom: 1px solid #455d75; margin: 0; font-size: 1.2rem; }
+        .menu-item { padding: 15px 25px; cursor: pointer; transition: 0.3s; border-bottom: 1px solid #3e58713b; }
+        .menu-item:hover { background: var(--secondary); }
+        .menu-item.active { background: var(--accent); }
+
+        .main-content { flex: 1; overflow-y: auto; padding: 30px; background: #f4f7f6; }
+        .header { background: white; padding: 20px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 25px; }
+        .box { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
+
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; }
         th { background: #f8f9fa; }
 
-        .hidden { display: none; }
-        .modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 15px; box-shadow: 0 0 50px rgba(0,0,0,0.3); z-index: 1000; width: 400px; }
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; }
+        .hidden { display: none !important; }
+        button.action-btn { padding: 8px 15px; border-radius: 5px; border: none; cursor: pointer; color: white; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div id="loginPage" style="width: 100%; display: flex; justify-content: center; align-items: center; background: var(--primary);">
-        <div class="box" style="width: 350px; text-align: center;">
-            <img src="https://via.placeholder.com/80" alt="Logo" style="border-radius: 50%; margin-bottom: 15px;">
-            <h2 style="margin-bottom: 25px;">UOB PORTAL LOGIN</h2>
-            <input type="text" id="username" placeholder="Roll Number / Admin" style="width: 85%"><br>
-            <input type="password" id="password" placeholder="Password" style="width: 85%"><br>
-            <button onclick="login()" style="width: 93%; margin-top: 15px; background: var(--primary);">Login</button>
+    <div id="loginPage">
+        <div class="login-box">
+            <h2 style="color: var(--primary);">UOB PORTAL LOGIN</h2>
+            <input type="text" id="username" placeholder="Roll Number / Admin">
+            <input type="password" id="password" placeholder="Password">
+            <button onclick="login()">LOGIN</button>
         </div>
     </div>
 
-    <div id="dashboardWrapper" class="hidden" style="display: flex; width: 100%;">
+    <div id="dashboardWrapper" class="hidden">
         <nav class="sidebar">
             <h2>NBS PORTAL</h2>
-            <div class="menu-item active" onclick="showSection('overview')">🏠 Dashboard</div>
-            <div id="adminMenu1" class="menu-item hidden" onclick="showSection('registration')">📝 Registration</div>
-            <div id="adminMenu2" class="menu-item hidden" onclick="showSection('management')">📊 Management</div>
-            <div id="studentMenu1" class="menu-item hidden" onclick="showSection('myGrades')">📚 My Exam Marks</div>
+            <div class="menu-item active" onclick="showPage('overview')">🏠 Dashboard</div>
+            <div id="adminLink1" class="menu-item hidden" onclick="showPage('registration')">📝 Registration</div>
+            <div id="adminLink2" class="menu-item hidden" onclick="showPage('management')">📊 Management</div>
+            <div id="studentLink1" class="menu-item hidden" onclick="showPage('myResults')">📚 My Results</div>
             <div class="menu-item" style="margin-top: auto; background: var(--danger);" onclick="logout()">🚪 Logout</div>
         </nav>
 
         <main class="main-content">
             <div class="header">
-                <h2 id="pageTitle">Overview</h2>
-                <div id="userInfo">
-                    <span id="userNameDisplay" style="font-weight: bold;"></span>
-                    <span id="userRoleBadge" style="background: #eee; padding: 5px 10px; border-radius: 20px; font-size: 12px; margin-left: 10px;"></span>
+                <h2 id="sectionTitle">Overview</h2>
+                <div>
+                    <span id="userDisp" style="font-weight: bold; margin-right: 10px;"></span>
+                    <span id="roleDisp" style="background: #eee; padding: 4px 10px; border-radius: 15px; font-size: 12px;"></span>
                 </div>
             </div>
 
-            <section id="overview" class="section-page">
+            <section id="overview" class="page-content">
                 <div class="box">
-                    <h3>Ku soo dhawaada nidaamka maamulka dugsiga Nawawi.</h3>
-                    <p>Fasalka hadda socda: 2025/2026</p>
+                    <h3>Ku soo dhawaada nidaamka Nawawi School.</h3>
+                    <p>Fasalka: 2025/2026 | Maanta: <span id="currentDate"></span></p>
                 </div>
             </section>
 
-            <section id="registration" class="section-page hidden">
+            <section id="registration" class="page-content hidden">
                 <div class="box">
                     <h3>Diiwaangeli Arday Cusub</h3>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                        <input type="text" id="regName" placeholder="Magaca Saddexan">
-                        <input type="text" id="regMother" placeholder="Magaca Hooyada">
-                        <input type="text" id="regRoll" placeholder="Roll Number (NBS001)">
-                        <input type="text" id="regPhone" placeholder="Mobile-ka Waalidka">
-                        <select id="regGrade">
-                            <option value="9">Fasalka 9aad</option>
-                            <option value="10">Fasalka 10aad</option>
-                            <option value="11">Fasalka 11aad</option>
-                            <option value="12">Fasalka 12aad</option>
-                        </select>
-                        <select id="regSection">
-                            <option value="A">Qolka A</option>
-                            <option value="B">Qolka B</option>
-                            <option value="C">Qolka C</option>
-                        </select>
-                    </div>
-                    <button onclick="saveNewStudent()" style="margin-top: 15px; width: 100%;">Keydi Ardayga</button>
-                </div>
-            </section>
-
-            <section id="management" class="section-page hidden">
-                <div class="box">
-                    <h3>Maamulka & Dhibcaha</h3>
-                    <select id="filterGrade">
+                    <input type="text" id="rName" placeholder="Magaca Saddexan" style="width: 45%;">
+                    <input type="text" id="rRoll" placeholder="Roll Number (NBS001)" style="width: 45%;">
+                    <select id="rGrade" style="width: 45%; padding: 12px; margin-top: 10px;">
                         <option value="9">Fasalka 9aad</option>
                         <option value="10">Fasalka 10aad</option>
                         <option value="11">Fasalka 11aad</option>
                         <option value="12">Fasalka 12aad</option>
                     </select>
-                    <button onclick="loadStudentList()">Soo saar Ardayda</button>
-                    <table id="adminTable">
-                        <thead>
-                            <tr><th>Magaca</th><th>Roll No</th><th>Falka (Action)</th></tr>
-                        </thead>
-                        <tbody id="adminStudentList"></tbody>
+                    <button onclick="saveStudent()" style="margin-top: 20px; display: block;">Keydi Xogta</button>
+                </div>
+            </section>
+
+            <section id="management" class="page-content hidden">
+                <div class="box">
+                    <h3>Maamulidda Ardayda</h3>
+                    <select id="fGrade" onchange="loadStudents()">
+                        <option value="9">Fasalka 9aad</option>
+                        <option value="10">Fasalka 10aad</option>
+                        <option value="11">Fasalka 11aad</option>
+                        <option value="12">Fasalka 12aad</option>
+                    </select>
+                    <table>
+                        <thead><tr><th>Magaca</th><th>Roll No</th><th>Falka</th></tr></thead>
+                        <tbody id="studentTableBody"></tbody>
                     </table>
                 </div>
             </section>
 
-            <section id="myGrades" class="section-page hidden">
+            <section id="myResults" class="page-content hidden">
                 <div class="box">
-                    <h3>Natiijada Imtixaanka (12 Maaddo)</h3>
-                    <table id="gradesTable">
-                        <thead>
-                            <tr><th>Maaddada</th><th>Dhibcaha</th><th>Natiijada</th></tr>
-                        </thead>
-                        <tbody id="myGradesList"></tbody>
+                    <h3>Natiijada Imtixaanka</h3>
+                    <table id="myMarksTable">
+                        <thead><tr><th>Maaddada</th><th>Dhibcaha</th><th>Natiijada</th></tr></thead>
+                        <tbody id="myMarksBody"></tbody>
                     </table>
                 </div>
             </section>
         </main>
     </div>
 
-    <div id="editModal" class="hidden">
-        <div class="overlay" onclick="closeModal()"></div>
-        <div class="modal">
-            <h3>Wax ka beddel Xogta: <span id="editStudentName"></span></h3>
-            <div id="subjectsInputs" style="max-height: 300px; overflow-y: auto;">
-                </div>
-            <button onclick="updateStudentScores()" style="width: 100%; margin-top: 15px;">Update Marks</button>
-        </div>
-    </div>
-
     <script>
         let currentUser = null;
-        let selectedStudentId = null;
         const subjects = ["Tarbiya", "Carabi", "Soomaali", "English", "Math", "Physics", "Chemistry", "Biology", "Geography", "History", "ICT", "Business"];
 
         async function login() {
@@ -148,129 +127,83 @@
             const pass = document.getElementById('password').value;
 
             if (user === 'admin' && pass === 'admin1234') {
-                currentUser = { role: 'admin', name: 'Adminstrator' };
-                initDashboard();
+                currentUser = { role: 'admin', name: 'Administrator' };
+                setupUI();
             } else {
-                // Check student login
                 const res = await fetch(`/api/student/me/${user}`);
-                const student = await res.json();
-                if (student && pass === '123456') {
-                    currentUser = { role: 'student', ...student };
-                    initDashboard();
+                const data = await res.json();
+                if (data && pass === '123456') {
+                    currentUser = { role: 'student', ...data };
+                    setupUI();
                 } else {
                     alert("Roll Number ama Password waa khalad!");
                 }
             }
         }
 
-        function initDashboard() {
-            document.getElementById('loginPage').style.display = 'none';
+        function setupUI() {
+            document.getElementById('loginPage').classList.add('hidden');
             document.getElementById('dashboardWrapper').classList.remove('hidden');
-            document.getElementById('userNameDisplay').innerText = currentUser.fullName || currentUser.name;
-            document.getElementById('userRoleBadge').innerText = currentUser.role.toUpperCase();
+            document.getElementById('userDisp').innerText = currentUser.fullName || currentUser.name;
+            document.getElementById('roleDisp').innerText = currentUser.role.toUpperCase();
+            document.getElementById('currentDate').innerText = new Date().toLocaleDateString();
 
             if (currentUser.role === 'admin') {
-                document.getElementById('adminMenu1').classList.remove('hidden');
-                document.getElementById('adminMenu2').classList.remove('hidden');
+                document.getElementById('adminLink1').classList.remove('hidden');
+                document.getElementById('adminLink2').classList.remove('hidden');
             } else {
-                document.getElementById('studentMenu1').classList.remove('hidden');
-                showMyGrades();
+                document.getElementById('studentLink1').classList.remove('hidden');
+                loadMyResults();
             }
         }
 
-        function showSection(id) {
-            document.querySelectorAll('.section-page').forEach(s => s.classList.add('hidden'));
+        function showPage(id) {
+            document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
             document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
             document.getElementById(id).classList.remove('hidden');
             event.currentTarget.classList.add('active');
-            document.getElementById('pageTitle').innerText = id.charAt(0).toUpperCase() + id.slice(1);
+            document.getElementById('sectionTitle').innerText = id.charAt(0).toUpperCase() + id.slice(1);
         }
 
-        async function saveNewStudent() {
+        async function saveStudent() {
             const data = {
-                fullName: document.getElementById('regName').value,
-                motherName: document.getElementById('regMother').value,
-                examNumber: document.getElementById('regRoll').value,
-                parentPhone1: document.getElementById('regPhone').value,
-                grade: document.getElementById('regGrade').value,
-                section: document.getElementById('regSection').value
+                fullName: document.getElementById('rName').value,
+                examNumber: document.getElementById('rRoll').value,
+                grade: document.getElementById('rGrade').value,
+                motherName: "Lama sheegin"
             };
             const res = await fetch('/api/register', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(data)
             });
-            const result = await res.json();
-            alert(result.message);
+            const resData = await res.json();
+            alert(resData.message);
         }
 
-        async function loadStudentList() {
-            const grade = document.getElementById('filterGrade').value;
-            const res = await fetch(`/api/filter?grade=${grade}`);
+        async function loadStudents() {
+            const g = document.getElementById('fGrade').value;
+            const res = await fetch(`/api/filter?grade=${g}`);
             const students = await res.json();
-            const list = document.getElementById('adminStudentList');
-            list.innerHTML = '';
+            const body = document.getElementById('studentTableBody');
+            body.innerHTML = '';
             students.forEach(s => {
-                list.innerHTML += `
-                    <tr>
-                        <td>${s.fullName}</td>
-                        <td>${s.examNumber}</td>
-                        <td>
-                            <button onclick="openEditModal('${s._id}', '${s.fullName}')" style="background: orange;">Edit Marks</button>
-                            <button onclick="deleteStudent('${s._id}')" style="background: red;">Delete</button>
-                        </td>
-                    </tr>`;
+                body.innerHTML += `<tr><td>${s.fullName}</td><td>${s.examNumber}</td><td><button class="action-btn" style="background:orange">Edit</button></td></tr>`;
             });
         }
 
-        function openEditModal(id, name) {
-            selectedStudentId = id;
-            document.getElementById('editStudentName').innerText = name;
-            const container = document.getElementById('subjectsInputs');
-            container.innerHTML = '';
+        function loadMyResults() {
+            const body = document.getElementById('myMarksBody');
+            body.innerHTML = '';
+            const scores = currentUser.examScores || [];
             subjects.forEach(sub => {
-                container.innerHTML += `
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 5px;">
-                        <label>${sub}:</label>
-                        <input type="number" class="score-input" data-subject="${sub}" value="0" style="width: 60px;">
-                    </div>`;
-            });
-            document.getElementById('editModal').classList.remove('hidden');
-        }
-
-        async function updateStudentScores() {
-            const scores = [];
-            document.querySelectorAll('.score-input').forEach(input => {
-                scores.push({
-                    subject: input.getAttribute('data-subject'),
-                    score: parseInt(input.value) || 0
-                });
-            });
-
-            await fetch(`/api/student/${selectedStudentId}`, {
-                method: 'PUT',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ examScores: scores })
-            });
-            alert("Dhibcaha waa la cusboonaysiiyay!");
-            closeModal();
-            loadStudentList();
-        }
-
-        function showMyGrades() {
-            const list = document.getElementById('myGradesList');
-            list.innerHTML = '';
-            const myScores = currentUser.examScores || [];
-            
-            subjects.forEach(sub => {
-                const found = myScores.find(s => s.subject === sub);
-                const score = found ? found.score : 0;
-                const result = score >= 50 ? '<b style="color:green">Pass</b>' : '<b style="color:red">Fail</b>';
-                list.innerHTML += `<tr><td>${sub}</td><td>${score}</td><td>${result}</td></tr>`;
+                const s = scores.find(x => x.subject === sub);
+                const val = s ? s.score : 0;
+                const status = val >= 50 ? '<span style="color:green">Pass</span>' : '<span style="color:red">Fail</span>';
+                body.innerHTML += `<tr><td>${sub}</td><td>${val}</td><td>${status}</td></tr>`;
             });
         }
 
-        function closeModal() { document.getElementById('editModal').classList.add('hidden'); }
         function logout() { location.reload(); }
     </script>
 </body>
