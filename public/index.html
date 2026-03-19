@@ -2,6 +2,7 @@
 <html lang="so">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nawawi School System</title>
     <style>
         body { font-family: Arial; padding: 20px; background: #f4f4f4; }
@@ -11,11 +12,14 @@
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
         th { background: #eee; }
+        .nav { background: #2c3e50; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; }
     </style>
 </head>
 <body>
 
-    <h2>Nawawi School System - Dashboard</h2>
+    <div class="nav">
+        <h1>Nawawi School System - Dashboard</h1>
+    </div>
 
     <div class="box">
         <h3>1. Diiwaangeli Arday Cusub</h3>
@@ -51,7 +55,7 @@
             <option value="B">Qolka B</option>
             <option value="C">Qolka C</option>
         </select>
-        <button onclick="fetchStudents()">Soo saar Ardayda</button>
+        <button onclick="fetchStudents()" style="background:#007bff">Soo saar Ardayda</button>
 
         <table id="studentTable" style="display:none;">
             <thead>
@@ -76,6 +80,9 @@
                 parentPhone1: document.getElementById('phone1').value,
                 parentPhone2: document.getElementById('phone2').value
             };
+            
+            if(!data.fullName || !data.examNumber) return alert('Fadlan geli Magaca iyo Exam Number');
+
             const res = await fetch('/api/register', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -83,6 +90,7 @@
             });
             const result = await res.json();
             alert(result.message);
+            if(result.success) location.reload();
         }
 
         async function fetchStudents() {
@@ -95,14 +103,19 @@
             list.innerHTML = '';
             document.getElementById('studentTable').style.display = 'table';
 
+            if(students.length === 0) {
+                list.innerHTML = '<tr><td colspan="3" style="text-align:center">Wax arday ah laguma helin qolkan.</td></tr>';
+                return;
+            }
+
             students.forEach(s => {
                 list.innerHTML += `
                     <tr>
                         <td>${s.fullName}</td>
                         <td>${s.examNumber}</td>
                         <td>
-                            <button style="background:blue" onclick="mark('${s._id}', 'Present')">Jooga</button>
-                            <button style="background:red" onclick="mark('${s._id}', 'Absent')">Maqan</button>
+                            <button style="background:blue; width:70px" onclick="mark('${s._id}', 'Present')">Jooga</button>
+                            <button style="background:red; width:70px" onclick="mark('${s._id}', 'Absent')">Maqan</button>
                         </td>
                     </tr>`;
             });
@@ -110,12 +123,13 @@
 
         async function mark(id, status) {
             const date = new Date().toISOString().split('T')[0];
-            await fetch('/api/attendance', {
+            const res = await fetch('/api/attendance', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ studentId: id, status, date })
             });
-            alert('Waa la xadiyay!');
+            const result = await res.json();
+            if(result.success) alert('Xogta xadirinta waa la keydiyay!');
         }
     </script>
 </body>
