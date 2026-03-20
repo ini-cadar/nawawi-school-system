@@ -13,19 +13,22 @@
             --text: #333; 
             --light: #f4f7f6;
         }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; display: flex; height: 100vh; background: var(--light); color: var(--text); }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; display: flex; height: 100vh; background: var(--light); color: var(--text); overflow: hidden; }
         
+        /* Mobile Menu Toggle */
+        .menu-toggle { display: none; position: fixed; top: 15px; left: 15px; z-index: 1001; background: var(--primary); color: white; border: none; padding: 10px; border-radius: 5px; }
+
         /* Sidebar Styling */
-        .sidebar { width: 260px; background: var(--primary); color: white; display: none; flex-direction: column; box-shadow: 2px 0 5px rgba(0,0,0,0.1); }
+        .sidebar { width: 260px; background: var(--primary); color: white; display: none; flex-direction: column; box-shadow: 2px 0 5px rgba(0,0,0,0.1); flex-shrink: 0; }
         .sidebar-header { padding: 25px; text-align: center; border-bottom: 1px solid #34495e; background: #1a252f; }
         .nav-item { padding: 15px 25px; cursor: pointer; border-bottom: 1px solid #34495e; transition: 0.3s; display: flex; align-items: center; gap: 10px; }
         .nav-item:hover { background: #34495e; border-left: 5px solid var(--accent); padding-left: 20px; }
         .nav-active { background: #34495e; border-left: 5px solid var(--accent); }
 
         /* Main Content */
-        .main { flex: 1; padding: 30px; overflow-y: auto; position: relative; }
-        .box { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #eee; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .main { flex: 1; padding: 20px; overflow-y: auto; position: relative; width: 100%; }
+        .box { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #eee; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
         
         /* Form Elements */
         input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 6px; border: 1px solid #ddd; box-sizing: border-box; font-size: 14px; }
@@ -33,30 +36,47 @@
         button:hover { opacity: 0.9; transform: translateY(-1px); }
         
         /* Search Box */
-        .search-container { margin-bottom: 20px; display: flex; gap: 10px; }
-        .search-container input { flex: 1; }
-        .search-container button { width: 120px; margin: 8px 0; }
+        .search-container { margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .search-container input { flex: 1; min-width: 200px; }
+        .search-container button { width: auto; min-width: 100px; }
 
         /* Status Badges */
-        .status-btn { border-radius: 20px; width: auto; padding: 6px 15px; font-size: 12px; border: none; color: white; display: inline-block; }
+        .status-btn { border-radius: 20px; width: auto; padding: 6px 15px; font-size: 12px; border: none; color: white; display: inline-block; cursor: pointer; }
         .bg-paid { background: var(--accent); }
         .bg-pending { background: var(--danger); }
         
-        .hidden { display: none; }
-        #loginOverlay { position: fixed; inset: 0; background: linear-gradient(135deg, var(--primary), #1a252f); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .hidden { display: none !important; }
+        #loginOverlay { position: fixed; inset: 0; background: linear-gradient(135deg, var(--primary), #1a252f); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
         
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; min-width: 600px; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
         th { background: #f8f9fa; color: var(--primary); }
 
-        .exam-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .exam-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
         .subject-card { background: #f9f9f9; padding: 10px; border-radius: 5px; border-left: 4px solid var(--primary); }
+
+        /* Edit Modal */
+        #editModal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { background: white; width: 100%; max-width: 700px; max-height: 90vh; overflow-y: auto; border-radius: 12px; padding: 25px; }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .sidebar { position: fixed; height: 100%; z-index: 1002; left: -260px; transition: 0.3s; }
+            .sidebar.active { left: 0; display: flex; }
+            .menu-toggle { display: block; }
+            .main { padding-top: 70px; }
+            .exam-grid { grid-template-columns: 1fr 1fr; }
+        }
     </style>
 </head>
 <body>
 
+<button class="menu-toggle" onclick="toggleSidebar()">☰ Menu</button>
+
 <div id="loginOverlay">
-    <div class="box" style="width: 380px; text-align: center; padding: 40px;">
+    <div class="box" style="width: 100%; max-width: 380px; text-align: center; padding: 40px;">
         <h2 style="color: var(--primary); margin-bottom: 30px;">NAWAWI PORTAL</h2>
         <select id="l-role">
             <option value="admin">Admin Access</option>
@@ -65,7 +85,6 @@
         <input id="l-u" type="text" placeholder="Roll Number / Username">
         <input id="l-p" type="password" placeholder="Password">
         <button onclick="handleLogin()" style="margin-top: 20px;">SIGN IN</button>
-        <p style="font-size: 12px; color: #777; margin-top: 15px;">Nawawi Boarding School Management System</p>
     </div>
 </div>
 
@@ -78,6 +97,7 @@
         <div class="nav-item nav-active" onclick="nav('dash', this)">📊 Dashboard</div>
         <div class="nav-item" onclick="nav('add', this)">📝 Register Student</div>
         <div class="nav-item" onclick="nav('search-view', this)">🔍 Search & Manage</div>
+        <div class="nav-item" onclick="nav('subj-view', this)">📚 Manage Subjects</div>
         <div class="nav-item" onclick="nav('att', this)">📅 Attendance</div>
     </div>
     <div id="student-menu" class="hidden">
@@ -97,8 +117,8 @@
                     <h2 id="total-count">0</h2>
                 </div>
                 <div class="box" style="background: #fff3e0; border: none;">
-                    <h4>Grade 12 Students</h4>
-                    <h2 id="g12-count">0</h2>
+                    <h4>Active Subjects</h4>
+                    <h2 id="subj-count">0</h2>
                 </div>
             </div>
         </div>
@@ -108,245 +128,264 @@
         <div class="box">
             <h2>Add New Student</h2>
             <div class="grid">
-                <div>
-                    <label>Full Name</label>
-                    <input id="f-name" placeholder="Ex: Ahmed Ali Warsame">
-                </div>
-                <div>
-                    <label>Mother Name</label>
-                    <input id="m-name" placeholder="Ex: Hawa Abdi">
-                </div>
-                <div>
-                    <label>Roll Number (Exam ID)</label>
-                    <input id="r-num" placeholder="Ex: NBS001">
-                </div>
+                <div><label>Full Name</label><input id="f-name" placeholder="Ahmed Ali"></div>
+                <div><label>Roll Number</label><input id="r-num" placeholder="NBS001"></div>
                 <div>
                     <label>Grade</label>
                     <select id="r-grade">
-                        <option value="9">Grade 9</option>
-                        <option value="10">Grade 10</option>
-                        <option value="11">Grade 11</option>
-                        <option value="12">Grade 12</option>
+                        <option value="9">Grade 9</option><option value="10">Grade 10</option>
+                        <option value="11">Grade 11</option><option value="12">Grade 12</option>
                     </select>
                 </div>
                 <div>
-                    <label>Father Phone</label>
-                    <input id="f-phone" placeholder="25261xxxxxx">
+                    <label>Section (Fasalka)</label>
+                    <select id="r-section">
+                        <option value="A">Section A</option><option value="B">Section B</option>
+                        <option value="C">Section C</option>
+                    </select>
                 </div>
-                <div>
-                    <label>Mother Phone</label>
-                    <input id="m-phone" placeholder="25261xxxxxx">
-                </div>
+                <div><label>Father Phone</label><input id="f-phone" placeholder="61xxxxxx"></div>
+                <div><label>Password</label><input id="r-pass" type="password" value="123456"></div>
             </div>
-            <button onclick="saveNewStudent()" style="width: 200px; margin-top: 20px;">Save Record</button>
+            <button onclick="saveNewStudent()" style="max-width: 200px; margin-top: 20px;">Save Record</button>
         </div>
     </section>
 
     <section id="search-view" class="view hidden">
         <div class="box">
-            <h2>Student Search & Management</h2>
+            <h2>Manage Students</h2>
             <div class="search-container">
-                <input type="text" id="adminSearchInput" placeholder="Search by Name or Roll Number..." onkeyup="adminSearch()">
-                <button onclick="adminSearch()">Search</button>
+                <input type="text" id="adminSearchInput" placeholder="Search name or roll..." onkeyup="adminSearch()">
+                <select id="filterSection" onchange="adminSearch()" style="width: auto;">
+                    <option value="">All Sections</option><option value="A">Section A</option>
+                    <option value="B">Section B</option><option value="C">Section C</option>
+                </select>
             </div>
-            <table id="adminTable">
-                <thead>
-                    <tr>
-                        <th>Roll No</th>
-                        <th>Full Name</th>
-                        <th>Grade</th>
-                        <th>Fees</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="adminStudentList"></tbody>
-            </table>
+            <div class="table-wrapper">
+                <table id="adminTable">
+                    <thead>
+                        <tr><th>Roll No</th><th>Name</th><th>Class</th><th>Fees</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody id="adminStudentList"></tbody>
+                </table>
+            </div>
         </div>
     </section>
 
-    <section id="att" class="view hidden">
+    <section id="subj-view" class="view hidden">
         <div class="box">
-            <h2>Attendance Management</h2>
-            <div id="att-list">
-                <p>Loading students for attendance...</p>
+            <h2>12 Subjects Management</h2>
+            <div class="search-container">
+                <input type="text" id="newSubjInput" placeholder="New Subject Name (e.g. Biology)">
+                <button onclick="addSubject()">Add Subject</button>
             </div>
+            <div id="subjectListGrid" class="grid"></div>
         </div>
     </section>
 
     <section id="s-profile" class="view hidden">
         <div class="box" style="text-align: center;">
-            <div id="student-header">
-                <h1 id="sp-name">---</h1>
-                <p id="sp-roll" style="font-size: 18px; color: #666;"></p>
-                <div style="display: flex; justify-content: center; gap: 15px; margin-top: 15px;">
-                    <span id="sp-fee-status" class="status-btn">---</span>
-                    <span class="status-btn" style="background: var(--primary);">Term: 2025/2026</span>
-                </div>
-            </div>
-            <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
-            <div style="text-align: left;">
-                <h3>Exam Results (Official)</h3>
-                <div id="sp-exams" class="exam-grid"></div>
-            </div>
+            <h1 id="sp-name">---</h1>
+            <p id="sp-roll"></p>
+            <div id="sp-fee-status" class="status-btn">---</div>
+            <hr style="margin: 20px 0;">
+            <div class="exam-grid" id="sp-exams"></div>
         </div>
     </section>
 
 </div>
 
+<div id="editModal" class="hidden">
+    <div class="modal-content">
+        <h3>Edit Student & Exam Scores</h3>
+        <div class="grid" id="edit-basic-info">
+            <input id="edit-id" type="hidden">
+            <input id="edit-name" placeholder="Full Name">
+            <select id="edit-section"><option value="A">A</option><option value="B">B</option><option value="C">C</option></select>
+        </div>
+        <h4>Exam Scores (Dhibcaha Imtixaanka)</h4>
+        <div id="edit-scores-grid" class="grid"></div>
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button onclick="closeEdit()" style="background: #95a5a6;">Cancel</button>
+            <button onclick="updateStudent()">Update Everything</button>
+        </div>
+    </div>
+</div>
+
 <script>
     let currentRole = null;
 
-    // --- Authentication ---
+    // Mobile Sidebar Toggle
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('active');
+    }
+
+    // Authentication
     async function handleLogin() {
         const roll = document.getElementById('l-u').value;
         const pass = document.getElementById('l-p').value;
-        const role = document.getElementById('l-role').value;
-
-        try {
-            const res = await fetch('/api/login', { 
-                method: 'POST', 
-                headers: {'Content-Type': 'application/json'}, 
-                body: JSON.stringify({roll, pass}) 
-            });
-            const data = await res.json();
-            
-            if(res.ok) {
-                currentRole = data.role;
-                document.getElementById('loginOverlay').style.display = 'none';
-                document.getElementById('sidebar').style.display = 'flex';
-                document.getElementById('app').style.display = 'block';
-                
-                if(data.role === 'admin') {
-                    document.getElementById('admin-menu').classList.remove('hidden');
-                    document.getElementById('user-display').innerText = "Maamul (Admin)";
-                    nav('dash', document.querySelector('.nav-item'));
-                    loadStats();
-                } else {
-                    document.getElementById('student-menu').classList.remove('hidden');
-                    document.getElementById('user-display').innerText = "Student Portal";
-                    renderStudentProfile(data.data);
-                    nav('s-profile', document.querySelector('#student-menu .nav-item'));
-                }
+        const res = await fetch('/api/login', { 
+            method: 'POST', 
+            headers: {'Content-Type': 'application/json'}, 
+            body: JSON.stringify({roll, pass}) 
+        });
+        const data = await res.json();
+        
+        if(res.ok) {
+            document.getElementById('loginOverlay').style.display = 'none';
+            document.getElementById('sidebar').style.display = 'flex';
+            document.getElementById('app').style.display = 'block';
+            if(data.role === 'admin') {
+                document.getElementById('admin-menu').classList.remove('hidden');
+                nav('dash', document.querySelector('.nav-item'));
             } else {
-                alert(data.error || "Login Failed!");
+                document.getElementById('student-menu').classList.remove('hidden');
+                renderStudentProfile(data.data);
+                nav('s-profile');
             }
-        } catch (e) {
-            alert("Connection Error!");
-        }
+        } else alert("Login Failed!");
     }
 
-    // --- Navigation ---
     function nav(id, el) {
         document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
         document.getElementById(id).classList.remove('hidden');
-        
-        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('nav-active'));
-        if(el) el.classList.add('nav-active');
-
+        if(window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('active');
         if(id === 'search-view') adminSearch();
-        if(id === 'att') loadAttendance();
+        if(id === 'subj-view') loadSubjects();
         if(id === 'dash') loadStats();
     }
 
-    // --- Admin Actions ---
+    // Subject Management
+    async function loadSubjects() {
+        const res = await fetch('/api/subjects');
+        const data = await res.json();
+        document.getElementById('subj-count').innerText = data.length;
+        document.getElementById('subjectListGrid').innerHTML = data.map(s => `
+            <div class="subject-card" style="display:flex; justify-content:space-between; align-items:center;">
+                <span>${s.name}</span>
+                <button onclick="deleteSubject('${s._id}')" style="width:auto; padding:5px; background:var(--danger);">X</button>
+            </div>
+        `).join('');
+    }
+
+    async function addSubject() {
+        const name = document.getElementById('newSubjInput').value;
+        if(!name) return;
+        await fetch('/api/subjects', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({name})
+        });
+        document.getElementById('newSubjInput').value = '';
+        loadSubjects();
+    }
+
+    async function deleteSubject(id) {
+        if(confirm('Ma tirtirtaa maadadan?')) {
+            await fetch(`/api/subjects/${id}`, { method: 'DELETE' });
+            loadSubjects();
+        }
+    }
+
+    // Student Management
     async function saveNewStudent() {
         const body = {
             fullName: document.getElementById('f-name').value,
-            motherName: document.getElementById('m-name').value,
-            fatherPhone: document.getElementById('f-phone').value,
-            motherPhone: document.getElementById('m-phone').value,
             examNumber: document.getElementById('r-num').value,
-            grade: document.getElementById('r-grade').value
+            grade: document.getElementById('r-grade').value,
+            section: document.getElementById('r-section').value,
+            fatherPhone: document.getElementById('f-phone').value,
+            password: document.getElementById('r-pass').value
+        };
+        const res = await fetch('/api/register', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(body)
+        });
+        if(res.ok) { alert("Waa la keydiyay!"); nav('search-view'); }
+    }
+
+    async function adminSearch() {
+        const query = document.getElementById('adminSearchInput').value;
+        const sec = document.getElementById('filterSection').value;
+        const res = await fetch(`/api/students?search=${query}&section=${sec}`);
+        const data = await res.json();
+        
+        document.getElementById('adminStudentList').innerHTML = data.map(s => `
+            <tr>
+                <td>${s.examNumber}</td>
+                <td>${s.fullName}</td>
+                <td>${s.grade}-${s.section}</td>
+                <td><button class="status-btn ${s.feePaid?'bg-paid':'bg-pending'}" onclick="toggleFee('${s._id}',${s.feePaid})">${s.feePaid?'Paid':'Unpaid'}</button></td>
+                <td><button onclick="openEdit('${s._id}')" style="width:auto; padding:5px 10px; background:var(--primary);">Edit</button></td>
+            </tr>
+        `).join('');
+    }
+
+    async function openEdit(id) {
+        const res = await fetch('/api/students');
+        const students = await res.json();
+        const s = students.find(x => x._id === id);
+        
+        document.getElementById('edit-id').value = s._id;
+        document.getElementById('edit-name').value = s.fullName;
+        document.getElementById('edit-section').value = s.section;
+        
+        document.getElementById('edit-scores-grid').innerHTML = s.examScores.map((ex, i) => `
+            <div class="subject-card">
+                <label>${ex.subject}</label>
+                <input type="number" class="edit-score-val" data-name="${ex.subject}" value="${ex.score}">
+            </div>
+        `).join('');
+        
+        document.getElementById('editModal').classList.remove('hidden');
+    }
+
+    async function updateStudent() {
+        const id = document.getElementById('edit-id').value;
+        const scoreInputs = document.querySelectorAll('.edit-score-val');
+        const scores = Array.from(scoreInputs).map(inp => ({
+            subject: inp.dataset.name,
+            score: Number(inp.value),
+            gradeLetter: Number(inp.value) >= 50 ? 'P' : 'F'
+        }));
+
+        const body = {
+            fullName: document.getElementById('edit-name').value,
+            section: document.getElementById('edit-section').value,
+            examScores: scores
         };
 
-        if(!body.fullName || !body.examNumber) return alert("Fadlan buuxi meelaha banaan!");
-
-        const res = await fetch('/api/register', { 
-            method: 'POST', 
-            headers: {'Content-Type': 'application/json'}, 
-            body: JSON.stringify(body) 
+        await fetch(`/api/student/${id}`, {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(body)
         });
-        
-        if(res.ok) {
-            alert("Ardayga waa la keydiyay!");
-            location.reload();
-        }
+        closeEdit();
+        adminSearch();
     }
+
+    function closeEdit() { document.getElementById('editModal').classList.add('hidden'); }
 
     async function loadStats() {
         const res = await fetch('/api/students');
         const data = await res.json();
         document.getElementById('total-count').innerText = data.length;
-        document.getElementById('g12-count').innerText = data.filter(s => s.grade == '12').length;
+        loadSubjects();
     }
 
-    async function adminSearch() {
-        const query = document.getElementById('adminSearchInput').value;
-        const res = await fetch(`/api/students?search=${query}`);
-        const data = await res.json();
-        
-        const tbody = document.getElementById('adminStudentList');
-        tbody.innerHTML = data.map(s => `
-            <tr>
-                <td>${s.examNumber}</td>
-                <td><b>${s.fullName}</b></td>
-                <td>Grade ${s.grade}</td>
-                <td>
-                    <button class="status-btn ${s.feePaid ? 'bg-paid' : 'bg-pending'}" onclick="toggleFee('${s._id}', ${s.feePaid})">
-                        ${s.feePaid ? 'Paid' : 'Unpaid'}
-                    </button>
-                </td>
-                <td>
-                    <button style="width:auto; padding:5px 10px; background:var(--primary);" onclick="alert('Update system coming soon')">Edit</button>
-                </td>
-            </tr>
-        `).join('');
-    }
-
-    async function toggleFee(id, currentStatus) {
-        await fetch(`/api/student/${id}`, {
-            method: 'PUT',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ feePaid: !currentStatus })
-        });
-        adminSearch();
-    }
-
-    async function loadAttendance() {
-        const res = await fetch('/api/students');
-        const data = await res.json();
-        const div = document.getElementById('att-list');
-        const today = new Date().toLocaleDateString();
-        
-        div.innerHTML = `<h3>Date: ${today}</h3>` + data.map(s => `
-            <div class="box" style="display:flex; justify-content:space-between; align-items:center;">
-                <span>${s.fullName} (${s.grade})</span>
-                <div style="display:flex; gap:10px;">
-                    <button class="status-btn bg-paid" onclick="alert('Morning marked for ${s.fullName}')">Morning</button>
-                    <button class="status-btn bg-paid" onclick="alert('Afternoon marked for ${s.fullName}')">Afternoon</button>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    // --- Student Actions ---
     function renderStudentProfile(s) {
         document.getElementById('sp-name').innerText = s.fullName;
-        document.getElementById('sp-roll').innerText = `Roll Number: ${s.examNumber} | Grade: ${s.grade}`;
-        
-        const feeBadge = document.getElementById('sp-fee-status');
-        feeBadge.innerText = s.feePaid ? "Status: Fee Paid ✅" : "Status: Fee Pending ❌";
-        feeBadge.className = `status-btn ${s.feePaid ? 'bg-paid' : 'bg-pending'}`;
-        
-        const examsHtml = s.examScores.map(e => `
+        document.getElementById('sp-roll').innerText = `ID: ${s.examNumber} | Class: ${s.grade}-${s.section}`;
+        document.getElementById('sp-fee-status').className = `status-btn ${s.feePaid?'bg-paid':'bg-pending'}`;
+        document.getElementById('sp-fee-status').innerText = s.feePaid ? "Fees Paid" : "Fees Pending";
+        document.getElementById('sp-exams').innerHTML = s.examScores.map(e => `
             <div class="subject-card">
-                <div style="font-weight:bold; color:var(--primary);">${e.subject}</div>
-                <div style="font-size:20px;">${e.score} <small style="color:#777;">(${e.gradeLetter})</small></div>
+                <b>${e.subject}</b><br>
+                <span>${e.score} (${e.gradeLetter})</span>
             </div>
         `).join('');
-        document.getElementById('sp-exams').innerHTML = examsHtml;
     }
-
 </script>
 </body>
 </html>
