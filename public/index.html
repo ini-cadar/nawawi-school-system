@@ -3,407 +3,605 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NBS Portal | Full Management System</title>
+    <title>NBS Portal | Advanced School Management System</title>
     <style>
         :root { 
             --primary: #2c3e50; 
             --accent: #27ae60; 
             --danger: #e74c3c; 
             --warning: #f39c12;
+            --info: #3498db;
             --text: #333; 
             --light: #f4f7f6;
+            --white: #ffffff;
         }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; display: flex; height: 100vh; background: var(--light); color: var(--text); overflow: hidden; }
-        
-        /* Mobile Menu Toggle */
-        .menu-toggle { display: none; position: fixed; top: 15px; left: 15px; z-index: 1001; background: var(--primary); color: white; border: none; padding: 10px; border-radius: 5px; }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            display: flex; 
+            height: 100vh; 
+            background: var(--light); 
+            color: var(--text); 
+            overflow: hidden; 
+        }
 
         /* Sidebar Styling */
-        .sidebar { width: 260px; background: var(--primary); color: white; display: none; flex-direction: column; box-shadow: 2px 0 5px rgba(0,0,0,0.1); flex-shrink: 0; }
-        .sidebar-header { padding: 25px; text-align: center; border-bottom: 1px solid #34495e; background: #1a252f; }
-        .nav-item { padding: 15px 25px; cursor: pointer; border-bottom: 1px solid #34495e; transition: 0.3s; display: flex; align-items: center; gap: 10px; }
-        .nav-item:hover { background: #34495e; border-left: 5px solid var(--accent); padding-left: 20px; }
-        .nav-active { background: #34495e; border-left: 5px solid var(--accent); }
+        .sidebar { 
+            width: 280px; 
+            background: var(--primary); 
+            color: var(--white); 
+            display: flex; 
+            flex-direction: column; 
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1); 
+            flex-shrink: 0; 
+            transition: all 0.3s ease;
+        }
 
-        /* Main Content */
-        .main { flex: 1; padding: 20px; overflow-y: auto; position: relative; width: 100%; }
-        .box { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #eee; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
-        
-        /* Form Elements */
-        input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 6px; border: 1px solid #ddd; box-sizing: border-box; font-size: 14px; }
-        button { background: var(--accent); color: white; font-weight: bold; cursor: pointer; border: none; transition: 0.2s; }
-        button:hover { opacity: 0.9; transform: translateY(-1px); }
-        
-        /* Search Box */
-        .search-container { margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
-        .search-container input { flex: 1; min-width: 200px; }
-        .search-container button { width: auto; min-width: 100px; }
+        .sidebar-header { 
+            padding: 30px 20px; 
+            text-align: center; 
+            border-bottom: 1px solid #34495e; 
+            background: #1a252f; 
+        }
 
-        /* Status & Icons */
-        .status-btn { border-radius: 20px; width: auto; padding: 6px 15px; font-size: 12px; border: none; color: white; display: inline-block; cursor: pointer; }
-        .bg-paid { background: var(--accent); }
-        .bg-pending { background: var(--danger); }
-        .icon-check { color: var(--accent); font-size: 1.5rem; font-weight: bold; }
-        .icon-cross { color: var(--danger); font-size: 1.5rem; font-weight: bold; }
-        
+        .sidebar-header h3 { margin: 0; letter-spacing: 2px; color: var(--accent); }
+
+        .nav-menu { flex: 1; margin-top: 20px; }
+
+        .nav-item { 
+            padding: 15px 25px; 
+            cursor: pointer; 
+            border-bottom: 1px solid #34495e; 
+            transition: 0.3s; 
+            display: flex; 
+            align-items: center; 
+            gap: 15px;
+            font-size: 15px;
+        }
+
+        .nav-item:hover { 
+            background: #34495e; 
+            border-left: 6px solid var(--accent); 
+            padding-left: 30px; 
+        }
+
+        .nav-active { 
+            background: #34495e; 
+            border-left: 6px solid var(--accent); 
+        }
+
+        /* Main Content Area */
+        .main { 
+            flex: 1; 
+            padding: 25px; 
+            overflow-y: auto; 
+            position: relative; 
+            background-image: linear-gradient(to bottom right, #f4f7f6, #e9ecef);
+        }
+
+        .box { 
+            background: var(--white); 
+            padding: 25px; 
+            border-radius: 15px; 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06); 
+            margin-bottom: 25px; 
+            border: 1px solid #e1e8ed; 
+        }
+
+        .header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .grid-stats { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+            gap: 20px; 
+        }
+
+        .stat-card {
+            padding: 20px;
+            border-radius: 12px;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Forms and Controls */
+        input, select, button { 
+            width: 100%; 
+            padding: 14px; 
+            margin: 10px 0; 
+            border-radius: 8px; 
+            border: 1px solid #ced4da; 
+            box-sizing: border-box; 
+            font-size: 14px; 
+            outline: none;
+        }
+
+        button { 
+            background: var(--accent); 
+            color: white; 
+            font-weight: bold; 
+            cursor: pointer; 
+            border: none; 
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+
+        button:hover { 
+            background: #219150; 
+            transform: translateY(-2px); 
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+        }
+
+        .btn-secondary { background: var(--info); }
+        .btn-danger { background: var(--danger); }
+
+        /* Table Styling */
+        .table-container { overflow-x: auto; margin-top: 15px; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #f1f3f5; }
+        th { background: #f8f9fa; color: var(--primary); font-weight: 600; text-transform: uppercase; font-size: 13px; }
+        tr:hover { background-color: #fcfcfc; }
+
+        /* Attendance Toggles */
+        .att-toggle { display: flex; gap: 5px; }
+        .btn-check { 
+            width: auto; padding: 8px 15px; margin: 0; font-size: 12px; border-radius: 20px; 
+            border: 2px solid #ddd; background: white; color: #555;
+        }
+        .btn-check.present { border-color: var(--accent); color: var(--accent); }
+        .btn-check.present.active { background: var(--accent); color: white; }
+        .btn-check.absent { border-color: var(--danger); color: var(--danger); }
+        .btn-check.absent.active { background: var(--danger); color: white; }
+
+        /* Grades Badges */
+        .badge { padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 12px; color: white; }
+        .bg-a { background: #2ecc71; } .bg-b { background: #3498db; } .bg-c { background: #f1c40f; } .bg-f { background: #e74c3c; }
+
+        /* Modal */
+        .modal-overlay { 
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7); 
+            display: flex; align-items: center; justify-content: center; z-index: 2000; padding: 20px; 
+        }
+        .modal-card { 
+            background: white; width: 100%; max-width: 900px; max-height: 90vh; 
+            border-radius: 15px; overflow-y: auto; padding: 30px; 
+        }
+
         .hidden { display: none !important; }
-        #loginOverlay { position: fixed; inset: 0; background: linear-gradient(135deg, var(--primary), #1a252f); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
-        
-        .table-wrapper { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; min-width: 600px; background: white; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
-        th { background: #f8f9fa; color: var(--primary); }
 
-        .exam-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
-        .subject-card { background: #f9f9f9; padding: 10px; border-radius: 5px; border-left: 4px solid var(--primary); }
-
-        /* Edit Modal */
-        #editModal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .modal-content { background: white; width: 100%; max-width: 700px; max-height: 90vh; overflow-y: auto; border-radius: 12px; padding: 25px; }
-
-        /* Mobile Responsiveness */
+        /* Mobile Adjustments */
         @media (max-width: 768px) {
-            body { flex-direction: column; }
-            .sidebar { position: fixed; height: 100%; z-index: 1002; left: -260px; transition: 0.3s; }
-            .sidebar.active { left: 0; display: flex; }
-            .menu-toggle { display: block; }
-            .main { padding-top: 70px; }
-            .exam-grid { grid-template-columns: 1fr 1fr; }
+            .sidebar { position: absolute; left: -280px; height: 100%; z-index: 1500; }
+            .sidebar.show { left: 0; }
+            .grid-stats { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
-<button class="menu-toggle" onclick="toggleSidebar()">☰ Menu</button>
+    <div id="loginSection" class="modal-overlay">
+        <div class="box" style="width: 100%; max-width: 400px; text-align: center;">
+            <h2 style="color: var(--primary);">NBS PORTAL LOGIN</h2>
+            <p>Fadlan geli aqoonsigaaga</p>
+            <select id="loginRole">
+                <option value="admin">Maamul (Admin)</option>
+                <option value="student">Arday (Student)</option>
+            </select>
+            <input type="text" id="username" placeholder="Username / Roll Number">
+            <input type="password" id="password" placeholder="Password">
+            <button onclick="attemptLogin()">GURADA GAL</button>
+        </div>
+    </div>
 
-<div id="loginOverlay">
-    <div class="box" style="width: 100%; max-width: 380px; text-align: center; padding: 40px;">
-        <h2 style="color: var(--primary); margin-bottom: 30px;">NAWAWI PORTAL</h2>
-        <select id="l-role">
-            <option value="admin">Admin Access</option>
-            <option value="student">Student Portal</option>
-        </select>
-        <input id="l-u" type="text" placeholder="Roll Number / Username">
-        <input id="l-p" type="password" placeholder="Password">
-        <button onclick="handleLogin()" style="margin-top: 20px;">SIGN IN</button>
-    </div>
-</div>
-
-<div class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-        <h3 style="margin:0;">NBS SYSTEM</h3>
-        <small id="user-display" style="color: var(--accent);"></small>
-    </div>
-    <div id="admin-menu" class="hidden">
-        <div class="nav-item nav-active" onclick="nav('dash', this)">📊 Dashboard</div>
-        <div class="nav-item" onclick="nav('add', this)">📝 Register Student</div>
-        <div class="nav-item" onclick="nav('search-view', this)">🔍 Search & Manage</div>
-        <div class="nav-item" onclick="nav('subj-view', this)">📚 Manage Subjects</div>
-    </div>
-    <div id="student-menu" class="hidden">
-        <div class="nav-item nav-active" onclick="nav('s-profile', this)">👤 My Results</div>
-    </div>
-    <button onclick="location.reload()" style="margin: auto 20px 20px 20px; background: var(--danger); width: calc(100% - 40px);">Logout</button>
-</div>
-
-<div class="main" id="app" style="display: none;">
-    
-    <section id="dash" class="view">
-        <div class="box">
-            <h2>School Overview</h2>
-            <div class="grid">
-                <div class="box" style="background: #e8f5e9; border: none;">
-                    <h4>Total Students</h4>
-                    <h2 id="total-count">0</h2>
-                </div>
-                <div class="box" style="background: #fff3e0; border: none;">
-                    <h4>Active Subjects</h4>
-                    <h2 id="subj-count">11</h2>
-                </div>
+    <div class="sidebar" id="mainSidebar" style="display: none;">
+        <div class="sidebar-header">
+            <h3>NBS PORTAL</h3>
+            <small id="userRoleDisplay" style="color: #bdc3c7;"></small>
+        </div>
+        <div class="nav-menu">
+            <div id="adminLinks" class="hidden">
+                <div class="nav-item nav-active" onclick="showPage('dashPage', this)">📊 Dashboard</div>
+                <div class="nav-item" onclick="showPage('attPage', this)">📅 Attendance (Xadirin)</div>
+                <div class="nav-item" onclick="showPage('examPage', this)">📝 Exam & Results</div>
+                <div class="nav-item" onclick="showPage('regPage', this)">👤 Register Student</div>
+                <div class="nav-item" onclick="showPage('managePage', this)">⚙️ Manage System</div>
+            </div>
+            <div id="studentLinks" class="hidden">
+                <div class="nav-item nav-active" onclick="showPage('resultPage', this)">👤 My Report Card</div>
             </div>
         </div>
-    </section>
+        <button onclick="location.reload()" style="margin: 20px; background: var(--danger);">LOGOUT</button>
+    </div>
 
-    <section id="add" class="view hidden">
-        <div class="box">
-            <h2>Add New Student</h2>
-            <div class="grid">
-                <div><label>Full Name</label><input id="f-name" placeholder="Ahmed Ali"></div>
-                <div><label>Roll Number</label><input id="r-num" placeholder="NBS001"></div>
-                <div>
-                    <label>Grade</label>
-                    <select id="r-grade">
+    <main class="main" id="mainContent" style="display: none;">
+        
+        <section id="dashPage" class="page-view">
+            <div class="header-flex">
+                <h2>School Dashboard</h2>
+                <div id="currentDate"></div>
+            </div>
+            <div class="grid-stats">
+                <div class="stat-card" style="background: var(--primary);">
+                    <small>Total Students</small>
+                    <h1 id="countStudents">0</h1>
+                </div>
+                <div class="stat-card" style="background: var(--accent);">
+                    <small>Active Subjects</small>
+                    <h1>11</h1>
+                </div>
+                <div class="stat-card" style="background: var(--info);">
+                    <small>Term Status</small>
+                    <h1>Semester 2</h1>
+                </div>
+            </div>
+            
+            <div class="box" style="margin-top: 30px;">
+                <h3>Recent Activity</h3>
+                <p>Nidaamka waa diyaar. Waxaad bilaabi kartaa xadirinta ama diiwaangelinta.</p>
+            </div>
+        </section>
+
+        <section id="attPage" class="page-view hidden">
+            <div class="box">
+                <h2>Xadirinta Fasallada</h2>
+                <p>Dooro fasalka aad rabto inaad xadiriso hadda.</p>
+                <div class="grid-stats" style="grid-template-columns: 2fr 2fr 1fr;">
+                    <select id="attGrade">
                         <option value="9">Grade 9</option><option value="10">Grade 10</option>
                         <option value="11">Grade 11</option><option value="12">Grade 12</option>
                     </select>
-                </div>
-                <div>
-                    <label>Section</label>
-                    <select id="r-section">
-                        <option value="A">Section A</option><option value="B">Section B</option>
-                        <option value="C">Section C</option>
+                    <select id="attSection">
+                        <option value="A">Section A</option><option value="B">Section B</option><option value="C">Section C</option>
                     </select>
-                </div>
-                <div><label>Father Phone</label><input id="f-phone" placeholder="61xxxxxx"></div>
-                <div><label>Password</label><input id="r-pass" type="password" value="123456"></div>
-            </div>
-            <button onclick="saveNewStudent()" style="max-width: 200px; margin-top: 20px;">Save Record</button>
-        </div>
-    </section>
-
-    <section id="search-view" class="view hidden">
-        <div class="box">
-            <h2>Manage Students</h2>
-            <div class="search-container">
-                <input type="text" id="adminSearchInput" placeholder="Search name or roll..." onkeyup="adminSearch()">
-                <select id="filterSection" onchange="adminSearch()" style="width: auto;">
-                    <option value="">All Sections</option><option value="A">Section A</option>
-                    <option value="B">Section B</option><option value="C">Section C</option>
-                </select>
-            </div>
-            <div class="table-wrapper">
-                <table id="adminTable">
-                    <thead>
-                        <tr><th>Roll No</th><th>Name</th><th>Class</th><th>Fees</th><th>Att.</th><th>Actions</th></tr>
-                    </thead>
-                    <tbody id="adminStudentList"></tbody>
-                </table>
-            </div>
-        </div>
-    </section>
-
-    <section id="subj-view" class="view hidden">
-        <div class="box">
-            <h2>Active 11 Subjects</h2>
-            <div id="subjectListGrid" class="grid">
-                </div>
-        </div>
-    </section>
-
-    <section id="s-profile" class="view hidden">
-        <div class="box" style="text-align: center; border-top: 5px solid var(--primary);">
-            <h1 id="sp-name">---</h1>
-            <p id="sp-roll" style="font-weight: bold; color: var(--primary);"></p>
-            
-            <div class="grid" style="margin: 20px 0;">
-                <div class="box" style="margin-bottom:0;">
-                    <small>Fee Status (Lacagta)</small>
-                    <div id="sp-fee-icon"></div>
-                </div>
-                <div class="box" style="margin-bottom:0;">
-                    <small>Attendance (Joogitaanka)</small>
-                    <div id="sp-att-icon"></div>
+                    <button onclick="fetchAttendanceList()">SOO BANDHIG</button>
                 </div>
             </div>
+            <div class="box">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Ardayga</th>
+                                <th>Roll Number</th>
+                                <th>Status (Present = 10pts)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendanceTableBody">
+                            <tr><td colspan="3" style="text-align:center;">Fadlan marka hore dooro fasalka</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <button onclick="submitAttendance()" style="margin-top: 20px; max-width: 250px;">KEYDI XADIRINTA</button>
+            </div>
+        </section>
 
+        <section id="examPage" class="page-view hidden">
+            <div class="box">
+                <div class="header-flex">
+                    <h2>Maareynta Imtixaanka</h2>
+                    <input type="text" id="searchExam" placeholder="Search student..." style="max-width: 300px;" onkeyup="filterExamTable()">
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Roll No</th>
+                                <th>Full Name</th>
+                                <th>Total (1100)</th>
+                                <th>Average</th>
+                                <th>Grade</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="examTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="regPage" class="page-view hidden">
+            <div class="box">
+                <h2>Diiwaangeli Arday Cusub</h2>
+                <div class="grid-stats">
+                    <div>
+                        <label>Magaca oo Dhammaystiran</label>
+                        <input type="text" id="regName" placeholder="Ahmed Mohamed Ali">
+                    </div>
+                    <div>
+                        <label>Roll Number (ID)</label>
+                        <input type="text" id="regRoll" placeholder="NBS100">
+                    </div>
+                    <div>
+                        <label>Fasalka (Grade)</label>
+                        <select id="regGrade">
+                            <option value="9">Grade 9</option><option value="10">Grade 10</option>
+                            <option value="11">Grade 11</option><option value="12">Grade 12</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Qaybta (Section)</label>
+                        <select id="regSection">
+                            <option value="A">A</option><option value="B">B</option><option value="C">C</option>
+                        </select>
+                    </div>
+                </div>
+                <button onclick="registerNewStudent()" style="margin-top: 20px; max-width: 300px;">KEYDI ARDAYGA</button>
+            </div>
+        </section>
+
+        <section id="resultPage" class="page-view hidden">
+            <div class="box" style="text-align: center;">
+                <h1 id="stNameHead">---</h1>
+                <p id="stRollHead" style="font-weight: bold; color: var(--primary);"></p>
+                <div class="grid-stats" style="margin: 30px 0;">
+                    <div class="box">Total Score: <h2 id="stTotal">0</h2></div>
+                    <div class="box">Average: <h2 id="stAvg">0%</h2></div>
+                    <div class="box">Rank: <h2 id="stRank">#1</h2></div>
+                </div>
+                <h3>Maadooyinka & Dhibcaha</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr><th>Maadada</th><th>Dhibcaha</th><th>Status</th></tr>
+                        </thead>
+                        <tbody id="stDetailTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <div id="scoreModal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <h3>Geli Dhibcaha: <span id="modalStudentName" style="color: var(--accent);"></span></h3>
             <hr>
-            <h3>Jadwalka Imtixaanka (Exam Results)</h3>
-            <div class="table-wrapper">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Maadada (Subject)</th>
-                            <th>Dhibcaha (Score)</th>
-                            <th>Natiijada (Status)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="sp-exam-body"></tbody>
-                </table>
+            <div id="scoreInputsGrid" class="grid-stats" style="grid-template-columns: repeat(3, 1fr); margin-top: 20px;">
+                </div>
+            <div style="margin-top: 30px; display: flex; gap: 15px;">
+                <button class="btn-danger" onclick="closeScoreModal()">KA NOQO</button>
+                <button onclick="saveStudentScores()">KEYDI DHIBCAHA</button>
             </div>
-        </div>
-    </section>
-
-</div>
-
-<div id="editModal" class="hidden">
-    <div class="modal-content">
-        <h3>Edit Student Info & Status</h3>
-        <div class="grid" id="edit-basic-info">
-            <input id="edit-id" type="hidden">
-            <div><label>Full Name</label><input id="edit-name"></div>
-            <div><label>Fee Status</label><select id="edit-fee-status"><option value="true">Paid (Bixiyay)</option><option value="false">Unpaid (Ma bixin)</option></select></div>
-            <div><label>Today Attendance</label><select id="edit-att-status"><option value="true">Present (Jooga)</option><option value="false">Absent (Ma joogo)</option></select></div>
-        </div>
-        <h4 style="margin-top:20px;">Exam Scores (0-100)</h4>
-        <div id="edit-scores-grid" class="grid" style="grid-template-columns: repeat(3, 1fr);"></div>
-        <div style="display: flex; gap: 10px; margin-top: 20px;">
-            <button onclick="closeEdit()" style="background: #95a5a6;">Cancel</button>
-            <button onclick="updateStudent()">Update Everything</button>
         </div>
     </div>
-</div>
 
-<script>
-    // 11-ka Maado ee rasmiga ah
-    const officialSubjects = ["Math", "English", "Arabic", "Tarbiya", "Chemistry", "Physics", "History", "Geography", "Somali", "ICT", "Biology"];
+    <script>
+        // --- DATA & CONFIG ---
+        const SUBJECTS = ["Math", "English", "Arabic", "Tarbiya", "Chemistry", "Physics", "History", "Geography", "Somali", "ICT", "Biology"];
+        let students = [];
+        let currentEditingId = null;
 
-    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
+        // --- AUTHENTICATION ---
+        function attemptLogin() {
+            const role = document.getElementById('loginRole').value;
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
 
-    async function handleLogin() {
-        const roll = document.getElementById('l-u').value;
-        const pass = document.getElementById('l-p').value;
-        const res = await fetch('/api/login', { 
-            method: 'POST', 
-            headers: {'Content-Type': 'application/json'}, 
-            body: JSON.stringify({roll, pass}) 
-        });
-        const data = await res.json();
-        
-        if(res.ok) {
-            document.getElementById('loginOverlay').style.display = 'none';
-            document.getElementById('sidebar').style.display = 'flex';
-            document.getElementById('app').style.display = 'block';
-            if(data.role === 'admin') {
-                document.getElementById('admin-menu').classList.remove('hidden');
-                nav('dash', document.querySelector('.nav-item'));
+            if (user === "admin" && pass === "123" && role === "admin") {
+                startSystem("admin");
+            } else if (role === "student") {
+                const found = students.find(s => s.roll === user);
+                if (found) {
+                    startSystem("student", found);
+                } else {
+                    alert("Roll Number-ka lama helin!");
+                }
             } else {
-                document.getElementById('student-menu').classList.remove('hidden');
-                renderStudentProfile(data.data);
-                nav('s-profile');
+                alert("Xogta aad gelisay waa khalad!");
             }
-        } else alert("Login Failed!");
-    }
+        }
 
-    function nav(id, el) {
-        document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
-        document.getElementById(id).classList.remove('hidden');
-        if(window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('active');
-        if(id === 'search-view') adminSearch();
-        if(id === 'subj-view') loadSubjectsDisplay();
-        if(id === 'dash') loadStats();
-    }
+        function startSystem(role, data = null) {
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('mainSidebar').style.display = 'flex';
+            document.getElementById('mainContent').style.display = 'block';
+            document.getElementById('userRoleDisplay').innerText = role === "admin" ? "ADMINISTRATOR" : "STUDENT PORTAL";
 
-    async function saveNewStudent() {
-        // Marka arday cusub la diiwaangelinayo, si toos ah u sii 11-ka maado oo dhibco la'aan ah
-        const initialScores = officialSubjects.map(s => ({ subject: s, score: 0, gradeLetter: 'F' }));
-        
-        const body = {
-            fullName: document.getElementById('f-name').value,
-            examNumber: document.getElementById('r-num').value,
-            grade: document.getElementById('r-grade').value,
-            section: document.getElementById('r-section').value,
-            password: document.getElementById('r-pass').value,
-            examScores: initialScores,
-            feePaid: false,
-            presentToday: false
-        };
-        const res = await fetch('/api/register', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(body)
-        });
-        if(res.ok) { alert("Waa la keydiyay!"); nav('search-view'); }
-    }
+            if (role === "admin") {
+                document.getElementById('adminLinks').classList.remove('hidden');
+                showPage('dashPage');
+            } else {
+                document.getElementById('studentLinks').classList.remove('hidden');
+                renderStudentPortal(data);
+                showPage('resultPage');
+            }
+            updateStats();
+        }
 
-    async function adminSearch() {
-        const query = document.getElementById('adminSearchInput').value;
-        const sec = document.getElementById('filterSection').value;
-        const res = await fetch(`/api/students?search=${query}&section=${sec}`);
-        const data = await res.json();
-        
-        document.getElementById('adminStudentList').innerHTML = data.map(s => `
-            <tr>
-                <td>${s.examNumber}</td>
-                <td>${s.fullName}</td>
-                <td>${s.grade}-${s.section}</td>
-                <td>${s.feePaid ? '✅' : '❌'}</td>
-                <td>${s.presentToday ? '✅' : '❌'}</td>
-                <td><button onclick="openEdit('${s._id}')" style="width:auto; padding:5px 10px; background:var(--primary);">Edit</button></td>
-            </tr>
-        `).join('');
-    }
-
-    function renderStudentProfile(s) {
-        document.getElementById('sp-name').innerText = s.fullName;
-        document.getElementById('sp-roll').innerText = `ID: ${s.examNumber} | Fasalka: ${s.grade}-${s.section}`;
-        
-        // Fee Status Icons
-        document.getElementById('sp-fee-icon').innerHTML = s.feePaid ? 
-            '<span class="icon-check">✔ Bixiyay</span>' : 
-            '<span class="icon-cross">✘ Ma Bixin</span>';
+        // --- NAVIGATION ---
+        function showPage(pageId, element = null) {
+            document.querySelectorAll('.page-view').forEach(p => p.classList.add('hidden'));
+            document.getElementById(pageId).classList.remove('hidden');
             
-        // Attendance Icons
-        document.getElementById('sp-att-icon').innerHTML = s.presentToday ? 
-            '<span class="icon-check">✔ Jooga</span>' : 
-            '<span class="icon-cross">✘ Ma Joogo</span>';
+            if (element) {
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('nav-active'));
+                element.classList.add('nav-active');
+            }
 
-        // Exam Table (Jedwal)
-        // Hubi in ardaygu leeyahay dhammaan maadooyinka
-        const tableHtml = officialSubjects.map(m => {
-            const entry = s.examScores.find(es => es.subject.toLowerCase() === m.toLowerCase()) || { score: 0 };
-            return `
+            if (pageId === 'examPage') renderExamTable();
+        }
+
+        // --- STUDENT REGISTRATION ---
+        function registerNewStudent() {
+            const name = document.getElementById('regName').value;
+            const roll = document.getElementById('regRoll').value;
+            const grade = document.getElementById('regGrade').value;
+            const section = document.getElementById('regSection').value;
+
+            if (!name || !roll) return alert("Fadlan buuxi meelaha banaan!");
+
+            const newStudent = {
+                id: Date.now().toString(),
+                fullName: name,
+                roll: roll,
+                grade: grade,
+                section: section,
+                scores: {},
+                presentToday: false,
+                attendancePoints: 0
+            };
+
+            // Init subjects with 0
+            SUBJECTS.forEach(s => newStudent.scores[s] = 0);
+            
+            students.push(newStudent);
+            alert("Ardayga waa la diiwaangeliyay!");
+            updateStats();
+            showPage('dashPage');
+        }
+
+        // --- ATTENDANCE LOGIC ---
+        function fetchAttendanceList() {
+            const g = document.getElementById('attGrade').value;
+            const s = document.getElementById('attSection').value;
+            const filtered = students.filter(st => st.grade === g && st.section === s);
+            
+            const tbody = document.getElementById('attendanceTableBody');
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Arday laga helay fasalkaas ma jirto.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(st => `
                 <tr>
-                    <td><b>${m}</b></td>
-                    <td>${entry.score}</td>
-                    <td><span class="status-btn ${entry.score >= 50 ? 'bg-paid' : 'bg-pending'}">${entry.score >= 50 ? 'Pass' : 'Fail'}</span></td>
+                    <td>${st.fullName}</td>
+                    <td>${st.roll}</td>
+                    <td>
+                        <div class="att-toggle">
+                            <button class="btn-check present ${st.presentToday ? 'active' : ''}" onclick="setAttendance('${st.id}', true, this)">SAX</button>
+                            <button class="btn-check absent ${!st.presentToday ? 'active' : ''}" onclick="setAttendance('${st.id}', false, this)">KHALAD</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function setAttendance(id, isPresent, btn) {
+            const st = students.find(x => x.id === id);
+            st.presentToday = isPresent;
+            st.attendancePoints = isPresent ? 10 : 0;
+            
+            // UI Toggle
+            const parent = btn.parentElement;
+            parent.querySelectorAll('.btn-check').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        function submitAttendance() {
+            alert("Xadirinta waa la keydiyay! (Bonus 10 points for present students)");
+            renderExamTable();
+        }
+
+        // --- EXAM & GRADING LOGIC ---
+        function calculateSummary(st) {
+            let examTotal = 0;
+            SUBJECTS.forEach(s => examTotal += (st.scores[s] || 0));
+            
+            const finalTotal = examTotal + st.attendancePoints;
+            const avg = Math.round(finalTotal / (SUBJECTS.length + 0.1)); // Adjusted for max 1110 points
+
+            let grade = "F";
+            if (avg >= 90) grade = "A";
+            else if (avg >= 80) grade = "B";
+            else if (avg >= 70) grade = "C";
+            else if (avg >= 50) grade = "D";
+
+            return { total: finalTotal, average: avg, grade: grade };
+        }
+
+        function renderExamTable() {
+            const tbody = document.getElementById('examTableBody');
+            tbody.innerHTML = students.map(st => {
+                const res = calculateSummary(st);
+                return `
+                    <tr>
+                        <td>${st.roll}</td>
+                        <td>${st.fullName}</td>
+                        <td><b>${res.total}</b></td>
+                        <td>${res.average}%</td>
+                        <td><span class="badge ${res.grade === 'F' ? 'bg-f' : 'bg-a'}">${res.grade}</span></td>
+                        <td><button style="width:auto;" onclick="openScoreModal('${st.id}')">EDIT</button></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function openScoreModal(id) {
+            currentEditingId = id;
+            const st = students.find(x => x.id === id);
+            document.getElementById('modalStudentName').innerText = st.fullName;
+            
+            const grid = document.getElementById('scoreInputsGrid');
+            grid.innerHTML = SUBJECTS.map(s => `
+                <div>
+                    <label style="font-size:12px;">${s}</label>
+                    <input type="number" class="score-input-val" data-subj="${s}" value="${st.scores[s] || 0}" max="100">
+                </div>
+            `).join('');
+
+            document.getElementById('scoreModal').classList.remove('hidden');
+        }
+
+        function saveStudentScores() {
+            const st = students.find(x => x.id === currentEditingId);
+            const inputs = document.querySelectorAll('.score-input-val');
+            
+            inputs.forEach(input => {
+                const subj = input.getAttribute('data-subj');
+                st.scores[subj] = parseInt(input.value) || 0;
+            });
+
+            closeScoreModal();
+            renderExamTable();
+            alert("Natiijada waa la cusboonaysiiyay!");
+        }
+
+        function closeScoreModal() {
+            document.getElementById('scoreModal').classList.add('hidden');
+        }
+
+        // --- STUDENT PORTAL ---
+        function renderStudentPortal(st) {
+            const res = calculateSummary(st);
+            document.getElementById('stNameHead').innerText = st.fullName;
+            document.getElementById('stRollHead').innerText = `ROLL: ${st.roll} | CLASS: ${st.grade}${st.section}`;
+            document.getElementById('stTotal').innerText = res.total;
+            document.getElementById('stAvg').innerText = res.average + "%";
+            
+            document.getElementById('stDetailTable').innerHTML = SUBJECTS.map(s => `
+                <tr>
+                    <td>${s}</td>
+                    <td>${st.scores[s] || 0}</td>
+                    <td style="color:${st.scores[s] >= 50 ? 'green' : 'red'}">${st.scores[s] >= 50 ? 'Pass' : 'Fail'}</td>
+                </tr>
+            `).join('') + `
+                <tr style="background:#e8f5e9;">
+                    <td><b>Attendance Bonus</b></td>
+                    <td><b>${st.attendancePoints}</b></td>
+                    <td>Bonus</td>
                 </tr>
             `;
-        }).join('');
-        document.getElementById('sp-exam-body').innerHTML = tableHtml;
-    }
+        }
 
-    function loadSubjectsDisplay() {
-        document.getElementById('subjectListGrid').innerHTML = officialSubjects.map(s => `
-            <div class="subject-card"><span>${s}</span></div>
-        `).join('');
-    }
+        // --- UTILS ---
+        function updateStats() {
+            document.getElementById('countStudents').innerText = students.length;
+            document.getElementById('currentDate').innerText = new Date().toDateString();
+        }
 
-    async function openEdit(id) {
-        const res = await fetch('/api/students');
-        const students = await res.json();
-        const s = students.find(x => x._id === id);
-        
-        document.getElementById('edit-id').value = s._id;
-        document.getElementById('edit-name').value = s.fullName;
-        document.getElementById('edit-fee-status').value = s.feePaid.toString();
-        document.getElementById('edit-att-status').value = s.presentToday ? s.presentToday.toString() : "false";
-        
-        // Maadooyinka Edit
-        document.getElementById('edit-scores-grid').innerHTML = officialSubjects.map(m => {
-            const entry = s.examScores.find(es => es.subject.toLowerCase() === m.toLowerCase()) || { score: 0 };
-            return `
-                <div class="subject-card">
-                    <label style="font-size:12px">${m}</label>
-                    <input type="number" class="edit-score-val" data-name="${m}" value="${entry.score}">
-                </div>
-            `;
-        }).join('');
-        
-        document.getElementById('editModal').classList.remove('hidden');
-    }
-
-    async function updateStudent() {
-        const id = document.getElementById('edit-id').value;
-        const scoreInputs = document.querySelectorAll('.edit-score-val');
-        const scores = Array.from(scoreInputs).map(inp => ({
-            subject: inp.dataset.name,
-            score: Number(inp.value),
-            gradeLetter: Number(inp.value) >= 50 ? 'P' : 'F'
-        }));
-
-        const body = {
-            fullName: document.getElementById('edit-name').value,
-            feePaid: document.getElementById('edit-fee-status').value === "true",
-            presentToday: document.getElementById('edit-att-status').value === "true",
-            examScores: scores
-        };
-
-        await fetch(`/api/student/${id}`, {
-            method: 'PUT',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(body)
+        // Dummy Data for Testing
+        students.push({
+            id: "1", fullName: "Ahmed Mohamed Ali", roll: "NBS001", grade: "10", section: "A",
+            scores: {"Math":85, "English":90, "Arabic":70, "Tarbiya":95, "Chemistry":80, "Physics":75, "History":88, "Geography":82, "Somali":92, "ICT":100, "Biology":85},
+            presentToday: true, attendancePoints: 10
         });
-        closeEdit();
-        adminSearch();
-    }
-
-    function closeEdit() { document.getElementById('editModal').classList.add('hidden'); }
-    async function loadStats() {
-        const res = await fetch('/api/students');
-        const data = await res.json();
-        document.getElementById('total-count').innerText = data.length;
-    }
-</script>
+    </script>
 </body>
 </html>
