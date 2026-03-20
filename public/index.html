@@ -100,7 +100,6 @@
         <div class="nav-item" onclick="nav('add', this)">📝 Register Student</div>
         <div class="nav-item" onclick="nav('search-view', this)">🔍 Search & Manage</div>
         <div class="nav-item" onclick="nav('subj-view', this)">📚 Manage Subjects</div>
-        <div class="nav-item" onclick="nav('att', this)">📅 Attendance Control</div>
     </div>
     <div id="student-menu" class="hidden">
         <div class="nav-item nav-active" onclick="nav('s-profile', this)">👤 My Results</div>
@@ -120,7 +119,7 @@
                 </div>
                 <div class="box" style="background: #fff3e0; border: none;">
                     <h4>Active Subjects</h4>
-                    <h2 id="subj-count">0</h2>
+                    <h2 id="subj-count">11</h2>
                 </div>
             </div>
         </div>
@@ -140,7 +139,7 @@
                     </select>
                 </div>
                 <div>
-                    <label>Section (Fasalka)</label>
+                    <label>Section</label>
                     <select id="r-section">
                         <option value="A">Section A</option><option value="B">Section B</option>
                         <option value="C">Section C</option>
@@ -176,12 +175,9 @@
 
     <section id="subj-view" class="view hidden">
         <div class="box">
-            <h2>Manage Subjects</h2>
-            <div class="search-container">
-                <input type="text" id="newSubjInput" placeholder="New Subject Name">
-                <button onclick="addSubject()">Add Subject</button>
-            </div>
-            <div id="subjectListGrid" class="grid"></div>
+            <h2>Active 11 Subjects</h2>
+            <div id="subjectListGrid" class="grid">
+                </div>
         </div>
     </section>
 
@@ -222,14 +218,15 @@
 
 <div id="editModal" class="hidden">
     <div class="modal-content">
-        <h3>Edit Student & Exam Scores</h3>
+        <h3>Edit Student Info & Status</h3>
         <div class="grid" id="edit-basic-info">
             <input id="edit-id" type="hidden">
-            <input id="edit-name" placeholder="Full Name">
-            <select id="edit-section"><option value="A">A</option><option value="B">B</option><option value="C">C</option></select>
+            <div><label>Full Name</label><input id="edit-name"></div>
+            <div><label>Fee Status</label><select id="edit-fee-status"><option value="true">Paid (Bixiyay)</option><option value="false">Unpaid (Ma bixin)</option></select></div>
+            <div><label>Today Attendance</label><select id="edit-att-status"><option value="true">Present (Jooga)</option><option value="false">Absent (Ma joogo)</option></select></div>
         </div>
-        <h4>Exam Scores (Dhibcaha Imtixaanka)</h4>
-        <div id="edit-scores-grid" class="grid"></div>
+        <h4 style="margin-top:20px;">Exam Scores (0-100)</h4>
+        <div id="edit-scores-grid" class="grid" style="grid-template-columns: repeat(3, 1fr);"></div>
         <div style="display: flex; gap: 10px; margin-top: 20px;">
             <button onclick="closeEdit()" style="background: #95a5a6;">Cancel</button>
             <button onclick="updateStudent()">Update Everything</button>
@@ -238,7 +235,8 @@
 </div>
 
 <script>
-    let currentRole = null;
+    // 11-ka Maado ee rasmiga ah
+    const officialSubjects = ["Math", "English", "Arabic", "Tarbiya", "Chemistry", "Physics", "History", "Geography", "Somali", "ICT", "Biology"];
 
     function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
 
@@ -272,18 +270,23 @@
         document.getElementById(id).classList.remove('hidden');
         if(window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('active');
         if(id === 'search-view') adminSearch();
-        if(id === 'subj-view') loadSubjects();
+        if(id === 'subj-view') loadSubjectsDisplay();
         if(id === 'dash') loadStats();
     }
 
     async function saveNewStudent() {
+        // Marka arday cusub la diiwaangelinayo, si toos ah u sii 11-ka maado oo dhibco la'aan ah
+        const initialScores = officialSubjects.map(s => ({ subject: s, score: 0, gradeLetter: 'F' }));
+        
         const body = {
             fullName: document.getElementById('f-name').value,
             examNumber: document.getElementById('r-num').value,
             grade: document.getElementById('r-grade').value,
             section: document.getElementById('r-section').value,
-            fatherPhone: document.getElementById('f-phone').value,
-            password: document.getElementById('r-pass').value
+            password: document.getElementById('r-pass').value,
+            examScores: initialScores,
+            feePaid: false,
+            presentToday: false
         };
         const res = await fetch('/api/register', {
             method: 'POST',
@@ -315,70 +318,84 @@
         document.getElementById('sp-name').innerText = s.fullName;
         document.getElementById('sp-roll').innerText = `ID: ${s.examNumber} | Fasalka: ${s.grade}-${s.section}`;
         
-        // Fee Icons (Sax iyo Khalad)
+        // Fee Status Icons
         document.getElementById('sp-fee-icon').innerHTML = s.feePaid ? 
             '<span class="icon-check">✔ Bixiyay</span>' : 
             '<span class="icon-cross">✘ Ma Bixin</span>';
             
-        // Attendance Icons (Sax iyo Khalad)
+        // Attendance Icons
         document.getElementById('sp-att-icon').innerHTML = s.presentToday ? 
             '<span class="icon-check">✔ Jooga</span>' : 
             '<span class="icon-cross">✘ Ma Joogo</span>';
 
         // Exam Table (Jedwal)
-        const tableHtml = s.examScores.map(e => `
-            <tr>
-                <td><b>${e.subject}</b></td>
-                <td>${e.score}</td>
-                <td><span class="status-btn ${e.score >= 50 ? 'bg-paid' : 'bg-pending'}">${e.score >= 50 ? 'Pass' : 'Fail'}</span></td>
-            </tr>
-        `).join('');
-        document.getElementById('sp-exam-body').innerHTML = tableHtml || '<tr><td colspan="3">Natiijo wali lama soo saarin</td></tr>';
+        // Hubi in ardaygu leeyahay dhammaan maadooyinka
+        const tableHtml = officialSubjects.map(m => {
+            const entry = s.examScores.find(es => es.subject.toLowerCase() === m.toLowerCase()) || { score: 0 };
+            return `
+                <tr>
+                    <td><b>${m}</b></td>
+                    <td>${entry.score}</td>
+                    <td><span class="status-btn ${entry.score >= 50 ? 'bg-paid' : 'bg-pending'}">${entry.score >= 50 ? 'Pass' : 'Fail'}</span></td>
+                </tr>
+            `;
+        }).join('');
+        document.getElementById('sp-exam-body').innerHTML = tableHtml;
     }
 
-    // Harayadii koodhka (Subjects, Stats, Update etc)
-    async function loadSubjects() {
-        const res = await fetch('/api/subjects');
-        const data = await res.json();
-        document.getElementById('subj-count').innerText = data.length;
-        document.getElementById('subjectListGrid').innerHTML = data.map(s => `
-            <div class="subject-card" style="display:flex; justify-content:space-between; align-items:center;">
-                <span>${s.name}</span>
-                <button onclick="deleteSubject('${s._id}')" style="width:auto; padding:5px; background:var(--danger);">X</button>
-            </div>
+    function loadSubjectsDisplay() {
+        document.getElementById('subjectListGrid').innerHTML = officialSubjects.map(s => `
+            <div class="subject-card"><span>${s}</span></div>
         `).join('');
-    }
-
-    async function addSubject() {
-        const name = document.getElementById('newSubjInput').value;
-        if(!name) return;
-        await fetch('/api/subjects', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({name}) });
-        document.getElementById('newSubjInput').value = ''; loadSubjects();
     }
 
     async function openEdit(id) {
         const res = await fetch('/api/students');
         const students = await res.json();
         const s = students.find(x => x._id === id);
+        
         document.getElementById('edit-id').value = s._id;
         document.getElementById('edit-name').value = s.fullName;
-        document.getElementById('edit-section').value = s.section;
-        document.getElementById('edit-scores-grid').innerHTML = s.examScores.map(ex => `
-            <div class="subject-card"><label>${ex.subject}</label><input type="number" class="edit-score-val" data-name="${ex.subject}" value="${ex.score}"></div>
-        `).join('');
+        document.getElementById('edit-fee-status').value = s.feePaid.toString();
+        document.getElementById('edit-att-status').value = s.presentToday ? s.presentToday.toString() : "false";
+        
+        // Maadooyinka Edit
+        document.getElementById('edit-scores-grid').innerHTML = officialSubjects.map(m => {
+            const entry = s.examScores.find(es => es.subject.toLowerCase() === m.toLowerCase()) || { score: 0 };
+            return `
+                <div class="subject-card">
+                    <label style="font-size:12px">${m}</label>
+                    <input type="number" class="edit-score-val" data-name="${m}" value="${entry.score}">
+                </div>
+            `;
+        }).join('');
+        
         document.getElementById('editModal').classList.remove('hidden');
     }
 
     async function updateStudent() {
         const id = document.getElementById('edit-id').value;
-        const scores = Array.from(document.querySelectorAll('.edit-score-val')).map(inp => ({
-            subject: inp.dataset.name, score: Number(inp.value), gradeLetter: Number(inp.value) >= 50 ? 'P' : 'F'
+        const scoreInputs = document.querySelectorAll('.edit-score-val');
+        const scores = Array.from(scoreInputs).map(inp => ({
+            subject: inp.dataset.name,
+            score: Number(inp.value),
+            gradeLetter: Number(inp.value) >= 50 ? 'P' : 'F'
         }));
+
+        const body = {
+            fullName: document.getElementById('edit-name').value,
+            feePaid: document.getElementById('edit-fee-status').value === "true",
+            presentToday: document.getElementById('edit-att-status').value === "true",
+            examScores: scores
+        };
+
         await fetch(`/api/student/${id}`, {
-            method: 'PUT', headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ fullName: document.getElementById('edit-name').value, section: document.getElementById('edit-section').value, examScores: scores })
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(body)
         });
-        closeEdit(); adminSearch();
+        closeEdit();
+        adminSearch();
     }
 
     function closeEdit() { document.getElementById('editModal').classList.add('hidden'); }
@@ -386,7 +403,6 @@
         const res = await fetch('/api/students');
         const data = await res.json();
         document.getElementById('total-count').innerText = data.length;
-        loadSubjects();
     }
 </script>
 </body>
