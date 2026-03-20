@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NBS Portal | Official School Management System v9.0</title>
+    <title>WEYRAX PORTAL | Weyrax School Management System v9.0</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { 
             --primary: #2c3e50; 
@@ -36,6 +37,7 @@
             box-shadow: 4px 0 10px rgba(0,0,0,0.1); 
             flex-shrink: 0; 
             transition: all 0.3s ease;
+            z-index: 1001;
         }
 
         .sidebar-header { 
@@ -69,6 +71,60 @@
         .nav-active { 
             background: #34495e; 
             border-left: 6px solid var(--accent); 
+        }
+
+        /* Mobile Menu Button */
+        .mobile-header {
+            display: none;
+            background: var(--primary);
+            color: white;
+            padding: 15px;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .menu-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            width: auto;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Responsive Sidebar */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -280px;
+                height: 100%;
+            }
+            .sidebar.open {
+                left: 0;
+            }
+            .mobile-header {
+                display: flex;
+            }
+            .main {
+                margin-top: 60px;
+                padding: 15px;
+            }
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(0,0,0,0.5);
+                z-index: 1000;
+            }
+            .sidebar-overlay.show {
+                display: block;
+            }
         }
 
         /* Main Content Area */
@@ -206,9 +262,17 @@
 </head>
 <body>
 
+    <div class="mobile-header" id="mobileHeader" style="display: none;">
+        <button class="menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+        <span style="font-weight: bold;">WEYRAX PORTAL</span>
+        <div style="width: 30px;"></div>
+    </div>
+
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
     <div id="loginSection" class="modal-overlay">
         <div class="box" style="width: 100%; max-width: 450px; text-align: center; border-top: 10px solid var(--accent);">
-            <h2 style="color: var(--primary); margin-bottom: 10px;">NBS PORTAL LOGIN</h2>
+            <h2 style="color: var(--primary); margin-bottom: 10px;">WEYRAX PORTAL LOGIN</h2>
             <p style="color: #666; font-size: 14px;">Maamul ama Arday, fadlan soo gal</p>
             <hr style="margin: 20px 0; opacity: 0.2;">
             
@@ -231,7 +295,7 @@
 
     <div class="sidebar" id="mainSidebar" style="display: none;">
         <div class="sidebar-header">
-            <h3>NBS PORTAL</h3>
+            <h3>WEYRAX PORTAL</h3>
             <small id="userRoleDisplay" style="color: #bdc3c7; font-weight: bold;"></small>
         </div>
         <div class="nav-menu">
@@ -415,6 +479,10 @@
             </div>
         </section>
 
+        <footer style="text-align: center; padding: 20px; color: #888; font-size: 13px;">
+            <p>Designed and Developed by <b>Weyrax</b> | &copy; 2026</p>
+        </footer>
+
     </main>
 
     <div id="scoreModal" class="modal-overlay hidden">
@@ -433,6 +501,14 @@
         const SUBJECTS = ["Math", "English", "Arabic", "Tarbiya", "Chemistry", "Physics", "History", "Geography", "Somali", "ICT", "Biology"];
         let students = JSON.parse(localStorage.getItem('nbs_official_v9_master')) || [];
         let currentEditingId = null;
+
+        // Toggle Sidebar Function
+        function toggleSidebar() {
+            const sidebar = document.getElementById('mainSidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('show');
+        }
 
         // --- AUTHENTICATION LOGIC ---
         function attemptLogin() {
@@ -463,6 +539,11 @@
             document.getElementById('mainSidebar').style.display = 'flex';
             document.getElementById('mainContent').style.display = 'block';
             document.getElementById('userRoleDisplay').innerText = role.toUpperCase();
+            
+            // Show Mobile Header if on mobile
+            if (window.innerWidth <= 768) {
+                document.getElementById('mobileHeader').style.display = 'flex';
+            }
 
             if (role === "admin") {
                 document.getElementById('adminLinks').classList.remove('hidden');
@@ -482,6 +563,14 @@
             if (element) {
                 document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('nav-active'));
                 element.classList.add('nav-active');
+            }
+
+            // Close sidebar on mobile after clicking link
+            if (window.innerWidth <= 768) {
+                const sidebar = document.getElementById('mainSidebar');
+                const overlay = document.getElementById('sidebarOverlay');
+                sidebar.classList.remove('open');
+                overlay.classList.remove('show');
             }
 
             if (pageId === 'examPage') renderExamTable();
