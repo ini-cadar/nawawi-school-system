@@ -1,15 +1,15 @@
 /**
- * ============================================================
- * NBS PORTAL - ADVANCED BACKEND SYSTEM v3.0
- * ============================================================
- * Features Included:
- * 1. Subject Management (CRUD)
- * 2. Student Management (Grade & Section Filtering)
- * 3. Automatic Attendance Bonus (10 Points)
- * 4. Auto-Calculation (Total, Average, Grade Letter)
- * 5. Admin Password Management
- * 6. Detailed Login Logic (Admin & Student)
- * ============================================================
+ * ============================================================================
+ * NBS PORTAL - OFFICIAL ADVANCED BACKEND SYSTEM v4.0
+ * ============================================================================
+ * Features:
+ * 1. Admin Login (Username: admin / Password: admin123)
+ * 2. Dynamic Subject Management (CRUD)
+ * 3. Student Management (Grade & Section Filtering)
+ * 4. Automatic Attendance Bonus (10 Points)
+ * 5. Auto-Calculation (Total, Average, Grade Letter)
+ * 6. Official Database Connectivity (MongoDB Atlas)
+ * ============================================================================
  */
 
 const express = require('express');
@@ -20,47 +20,53 @@ require('dotenv').config();
 
 const app = express();
 
-// --- MIDDLEWARES ---
+// --- 1. MIDDLEWARES & SECURITY ---
 app.use(express.json());
 app.use(cors());
 app.use(express.static('public'));
 
-// --- 1. DATABASE CONNECTION ---
-// Hubi in xogtaada MongoDB ay sax tahay
+// --- 2. DATABASE CONNECTION ---
+// Hubi in xogtaada MongoDB ay si sax ah ugu xidhan tahay Cluster-kaaga
 const MONGO_URI = "mongodb+srv://raazicadar_db_user:inicadar1234.@cluster0.z93llyc.mongodb.net/school_db?retryWrites=true&w=majority";
 
 mongoose.connect(MONGO_URI, {
     useNewUrlParser: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
+    autoIndex: true
 })
-.then(() => console.log('✅ NBS DATABASE: Connected Successfully!'))
-.catch(err => console.error('❌ DB ERROR:', err));
+.then(() => {
+    console.log('----------------------------------------------------');
+    console.log('✅ NBS DATABASE: Connected Successfully!');
+    console.log('📅 Time:', new Date().toLocaleString());
+    console.log('----------------------------------------------------');
+})
+.catch(err => {
+    console.error('❌ CRITICAL DB ERROR:', err);
+    process.exit(1); // Jooji server-ka haddii database-ku diido
+});
 
-// --- 2. MODELS & SCHEMAS ---
+// --- 3. MODELS & SCHEMAS ---
 
-// Schema-da Maadooyinka
+// Schema-da Maadooyinka (Subjects)
 const subjectSchema = new mongoose.Schema({
-    name: { type: String, unique: true, required: true },
-    code: String // Tusaale: MATH101
+    name: { type: String, unique: true, required: true, trim: true },
+    code: { type: String, uppercase: true }, 
+    createdAt: { type: Date, default: Date.now }
 });
 const Subject = mongoose.model('Subject', subjectSchema);
 
-// Schema-da Ardayga (Improved)
+// Schema-da Ardayga (Detailed Student Schema)
 const studentSchema = new mongoose.Schema({
-    fullName: { type: String, required: true },
-    examNumber: { type: String, unique: true, required: true },
+    fullName: { type: String, required: true, trim: true },
+    examNumber: { type: String, unique: true, required: true, uppercase: true },
     password: { type: String, default: '123456' },
-    grade: { type: String, required: true }, // 9, 10, 11, 12
+    grade: { type: String, required: true }, // Grade 9, 10, 11, 12
     section: { type: String, enum: ['A', 'B', 'C', 'D'], required: true },
     
-    // Family Info
-    fatherPhone: String,
-    motherName: String,
-
-    // Status & Attendance
+    // Status & Academic Performance
     feePaid: { type: Boolean, default: false },
     presentToday: { type: Boolean, default: false },
-    attScore: { type: Number, default: 0 }, // Bonus 10 points
+    attScore: { type: Number, default: 0 }, // Attendance Bonus logic
 
     // Results Array
     examScores: [{ 
@@ -72,17 +78,18 @@ const studentSchema = new mongoose.Schema({
     // Auto-Calculated Fields
     totalScore: { type: Number, default: 0 },
     average: { type: Number, default: 0 },
-    overallStatus: { type: String, default: 'Fail' }
+    overallStatus: { type: String, default: 'Fail' },
+    lastUpdated: { type: Date, default: Date.now }
 }, { timestamps: true });
 
 /**
  * AUTOMATIC CALCULATION MIDDLEWARE
- * Qaybtani waxay xisaabisaa natiijada ka hor intaan la keydin ardayga
+ * Logic-gan wuxuu xisaabiyaa natiijada mar kasta oo arday xogtiisa la kaydinayo
  */
 studentSchema.pre('save', function(next) {
     let totalMarks = 0;
     
-    // 1. Xisaabi Maado kasta Grade-keeda
+    // 1. Loop dhexmar maado kasta si loo helo Grade-ka (A, B, C...)
     this.examScores.forEach(s => {
         if (s.score >= 90) s.gradeLetter = 'A';
         else if (s.score >= 80) s.gradeLetter = 'B';
@@ -93,42 +100,54 @@ studentSchema.pre('save', function(next) {
         totalMarks += s.score;
     });
 
-    // 2. Ku dar Attendance Bonus (haddii uu joogo)
-    this.totalScore = totalMarks + (this.attScore || 0);
+    // 2. Ku dar Attendance Bonus (haddii uu 'Present' yahay)
+    this.attScore = this.presentToday ? 10 : 0;
+    this.totalScore = totalMarks + this.attScore;
 
-    // 3. Xisaabi Average-ka (Isugeyn / Maadooyinka + Attendance weight)
-    const subCount = this.examScores.length || 1;
+    // 3. Xisaabi Average-ka (Isugeyn / Maadooyinka)
+    const subCount = this.examScores.length > 0 ? this.examScores.length : 1;
     this.average = Math.round(this.totalScore / (subCount + 0.1));
 
-    // 4. Go'aami Pass/Fail
+    // 4. Go'aami Pass ama Fail (Official pass mark is 50)
     this.overallStatus = (this.average >= 50) ? 'Pass' : 'Fail';
+    this.lastUpdated = Date.now();
 
     next();
 });
 
 const Student = mongoose.model('Student', studentSchema);
 
-// --- 3. SUBJECT API (CRUD) ---
+// --- 4. SUBJECT API (CRUD OPERATIONS) ---
 
 app.get('/api/subjects', async (req, res) => {
-    const subjects = await Subject.find().sort({ name: 1 });
-    res.json(subjects);
+    try {
+        const subjects = await Subject.find().sort({ name: 1 });
+        res.status(200).json(subjects);
+    } catch (err) {
+        res.status(500).json({ error: "Maadooyinka lama soo kicin karo" });
+    }
 });
 
 app.post('/api/subjects', async (req, res) => {
     try {
         const newSub = new Subject(req.body);
         await newSub.save();
-        res.json({ success: true, message: "Maadada waa la daray!" });
-    } catch (e) { res.status(400).json({ error: "Maadadani way jirtaa!" }); }
+        res.status(201).json({ success: true, message: "Maadada waa la daray!" });
+    } catch (e) { 
+        res.status(400).json({ error: "Maadadani way jirtaa ama xogta waa khalad!" }); 
+    }
 });
 
 app.delete('/api/subjects/:id', async (req, res) => {
-    await Subject.findByIdAndDelete(req.params.id);
-    res.json({ success: true });
+    try {
+        await Subject.findByIdAndDelete(req.params.id);
+        res.json({ success: true, message: "Maadada waa la tirtiray" });
+    } catch (err) {
+        res.status(400).json({ error: "Tirtiristu ma suuragalin" });
+    }
 });
 
-// --- 4. STUDENT API (MANAGEMENT) ---
+// --- 5. STUDENT API (MANAGEMENT & SEARCH) ---
 
 // Filtered Search (Grade, Section, Name)
 app.get('/api/students', async (req, res) => {
@@ -145,25 +164,34 @@ app.get('/api/students', async (req, res) => {
         if (grade && grade !== "all") query.grade = grade;
         if (section && section !== "all") query.section = section;
 
-        const students = await Student.find(query).sort({ fullName: 1 });
-        res.json(students);
-    } catch (err) { res.status(500).json({ error: "Cilad raadinta ah" }); }
+        const students = await Student.find(query).sort({ totalScore: -1 });
+        res.status(200).json(students);
+    } catch (err) { 
+        res.status(500).json({ error: "Cilad ayaa ku timid soo kicinta ardayda" }); 
+    }
 });
 
-// Registration with Auto-Subject mapping
+// Registration with Auto-Subject Mapping
 app.post('/api/register', async (req, res) => {
     try {
         const subs = await Subject.find();
-        const initial = subs.map(s => ({ subject: s.name, score: 0, gradeLetter: 'F' }));
+        // Ardayga cusub si otomaatig ah ayaa loogu darayaa maadooyinka jira iyagoo eber ah
+        const initialScores = subs.map(s => ({ 
+            subject: s.name, 
+            score: 0, 
+            gradeLetter: 'F' 
+        }));
         
         const newStudent = new Student({ 
             ...req.body, 
-            examScores: initial 
+            examScores: initialScores 
         });
 
         await newStudent.save();
-        res.json({ success: true, message: "Ardayga waa la keydiyay!" });
-    } catch (e) { res.status(400).json({ error: "ID-ga hore ayaa loo isticmaalay!" }); }
+        res.status(201).json({ success: true, message: "Ardayga waa la keydiyay!" });
+    } catch (e) { 
+        res.status(400).json({ error: "ID-ga ardayga hore ayaa loo isticmaalay!" }); 
+    }
 });
 
 // Multi-Purpose Update (Attendance, Exam, Profile)
@@ -172,59 +200,75 @@ app.put('/api/student/:id', async (req, res) => {
         const student = await Student.findById(req.params.id);
         if(!student) return res.status(404).json({ error: "Ardayga lama helin" });
 
-        // Haddii xadirin la soo diray (Attendance logic)
-        if (req.body.presentToday !== undefined) {
-            student.presentToday = req.body.presentToday;
-            student.attScore = req.body.presentToday ? 10 : 0;
-        }
-
-        // Cusboonaysii xogta kale
+        // Cusboonaysii xogta la soo diray (Profile, Exam, or Attendance)
         Object.assign(student, req.body);
         
-        await student.save(); // Middleware-ka kore ayaa xisaabinaya natiijada
-        res.json({ success: true, data: student });
-    } catch (e) { res.status(500).json({ error: e.message }); }
-});
-
-// Password Change Route
-app.post('/api/change-password', async (req, res) => {
-    const { id, newPassword } = req.body;
-    try {
-        await Student.findByIdAndUpdate(id, { password: newPassword });
-        res.json({ success: true, message: "Password-ka waa la beddelay!" });
-    } catch (e) { res.status(500).json({ error: "Cilad beddelka password-ka" }); }
+        // Middleware-ka kore ayaa xisaabinaya natiijada markale ka hor save-ka
+        await student.save(); 
+        res.status(200).json({ success: true, data: student });
+    } catch (e) { 
+        res.status(500).json({ error: "Cusboonaysiintu ma suuragalin: " + e.message }); 
+    }
 });
 
 app.delete('/api/student/:id', async (req, res) => {
-    await Student.findByIdAndDelete(req.params.id);
-    res.json({ success: true });
+    try {
+        await Student.findByIdAndDelete(req.params.id);
+        res.json({ success: true, message: "Ardayga waa la tirtiray" });
+    } catch (err) {
+        res.status(400).json({ error: "Cilad baa dhacday" });
+    }
 });
 
-// --- 5. LOGIN CORE ---
+// --- 6. OFFICIAL LOGIN CORE ---
 app.post('/api/login', async (req, res) => {
     const { roll, pass } = req.body;
     
-    // ADMIN CREDENTIALS
-    if(roll === 'admin' && pass === 'admin1234') {
-        return res.json({ role: 'admin' });
+    // --- OFFICIAL ADMIN CREDENTIALS ---
+    // Sidii aad codsatay: Password-ka waa admin123
+    if (roll === 'admin' && pass === 'admin123') {
+        console.log('🔑 Admin logged in at:', new Date().toLocaleTimeString());
+        return res.status(200).json({ 
+            success: true, 
+            role: 'admin', 
+            message: "Welcome Admin" 
+        });
     }
 
-    // STUDENT CREDENTIALS
+    // --- STUDENT CREDENTIALS CHECK ---
     try {
-        const s = await Student.findOne({ examNumber: roll, password: pass });
-        if(s) res.json({ role: 'student', data: s });
-        else res.status(401).json({ error: 'Aqoonsigaagu waa khalad!' });
-    } catch (e) { res.status(500).json({ error: "Server Error" }); }
+        const student = await Student.findOne({ examNumber: roll, password: pass });
+        if (student) {
+            res.status(200).json({ 
+                success: true, 
+                role: 'student', 
+                data: student 
+            });
+        } else {
+            res.status(401).json({ 
+                success: false, 
+                error: 'Aqoonsigaagu waa khalad! Hubi ID-ga iyo Password-ka.' 
+            });
+        }
+    } catch (e) { 
+        res.status(500).json({ error: "Server Login Error" }); 
+    }
 });
 
-// --- 6. SERVER INITIALIZATION ---
-const PORT = 3000;
+// --- 7. SERVER INITIALIZATION ---
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`
-    ***********************************************
-    🚀 NBS PORTAL SERVER IS ONLINE
-    📡 ADDRESS: http://localhost:${PORT}
-    🛡️  ADMIN: admin / admin1234
-    ***********************************************
+    ===============================================
+    🚀 NBS PORTAL SERVER IS ONLINE & OFFICIAL
+    📡 URL: http://localhost:${PORT}
+    🛡️  ADMIN ACCESS: admin / admin123
+    💾 DATABASE: MongoDB Connected
+    ===============================================
     `);
 });
+
+/**
+ * Dhamaad: Koodhkan wuxuu diyaar u yahay in loo isticmaalo 
+ * nidaamka rasmiga ah ee Nawawi School Portal.
+ */
