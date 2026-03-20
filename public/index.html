@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NBS Portal | Advanced School Management System</title>
+    <title>NBS Portal | Official School Management System</title>
     <style>
         :root { 
             --primary: #2c3e50; 
@@ -175,35 +175,37 @@
         }
 
         .hidden { display: none !important; }
-
-        /* Mobile Adjustments */
-        @media (max-width: 768px) {
-            .sidebar { position: absolute; left: -280px; height: 100%; z-index: 1500; }
-            .sidebar.show { left: 0; }
-            .grid-stats { grid-template-columns: 1fr; }
-        }
     </style>
 </head>
 <body>
 
     <div id="loginSection" class="modal-overlay">
-        <div class="box" style="width: 100%; max-width: 400px; text-align: center;">
-            <h2 style="color: var(--primary);">NBS PORTAL LOGIN</h2>
-            <p>Fadlan geli aqoonsigaaga</p>
+        <div class="box" style="width: 100%; max-width: 450px; text-align: center; border-top: 10px solid var(--accent);">
+            <h2 style="color: var(--primary); margin-bottom: 10px;">NBS PORTAL LOGIN</h2>
+            <p style="color: #666; font-size: 14px;">Maamul ama Arday, fadlan soo gal</p>
+            <hr style="margin: 20px 0; opacity: 0.2;">
+            
+            <label style="display: block; text-align: left; font-size: 12px; font-weight: bold;">DOORO ROLE-KAGA</label>
             <select id="loginRole">
                 <option value="admin">Maamul (Admin)</option>
                 <option value="student">Arday (Student)</option>
             </select>
-            <input type="text" id="username" placeholder="Username / Roll Number">
-            <input type="password" id="password" placeholder="Password">
-            <button onclick="attemptLogin()">GURADA GAL</button>
+            
+            <label style="display: block; text-align: left; font-size: 12px; font-weight: bold; margin-top: 10px;">USERNAME / ID</label>
+            <input type="text" id="username" placeholder="Geli Roll Number ama admin">
+            
+            <label style="display: block; text-align: left; font-size: 12px; font-weight: bold; margin-top: 10px;">PASSWORD</label>
+            <input type="password" id="password" placeholder="••••••••">
+            
+            <button onclick="attemptLogin()" style="margin-top: 20px;">GURADA GAL NIDAAMKA</button>
+            <p id="loginError" style="color: var(--danger); font-size: 12px; margin-top: 10px; font-weight: bold;"></p>
         </div>
     </div>
 
     <div class="sidebar" id="mainSidebar" style="display: none;">
         <div class="sidebar-header">
             <h3>NBS PORTAL</h3>
-            <small id="userRoleDisplay" style="color: #bdc3c7;"></small>
+            <small id="userRoleDisplay" style="color: #bdc3c7; font-weight: bold;"></small>
         </div>
         <div class="nav-menu">
             <div id="adminLinks" class="hidden">
@@ -225,33 +227,31 @@
         <section id="dashPage" class="page-view">
             <div class="header-flex">
                 <h2>School Dashboard</h2>
-                <div id="currentDate"></div>
+                <div id="currentDate" style="font-weight: bold; color: var(--info);"></div>
             </div>
             <div class="grid-stats">
                 <div class="stat-card" style="background: var(--primary);">
-                    <small>Total Students</small>
+                    <small>Ardayda Wadarta</small>
                     <h1 id="countStudents">0</h1>
                 </div>
                 <div class="stat-card" style="background: var(--accent);">
-                    <small>Active Subjects</small>
+                    <small>Maadooyinka (Subjects)</small>
                     <h1>11</h1>
                 </div>
                 <div class="stat-card" style="background: var(--info);">
-                    <small>Term Status</small>
+                    <small>Semester-ka</small>
                     <h1>Semester 2</h1>
                 </div>
             </div>
-            
             <div class="box" style="margin-top: 30px;">
-                <h3>Recent Activity</h3>
-                <p>Nidaamka waa diyaar. Waxaad bilaabi kartaa xadirinta ama diiwaangelinta.</p>
+                <h3>Nawawi School System</h3>
+                <p>Ku soo dhowow nidaamka NBS. Halkan waxaad ka maamuli kartaa xogta ardayda, xadirinta, iyo natiijooyinka imtixaanka.</p>
             </div>
         </section>
 
         <section id="attPage" class="page-view hidden">
             <div class="box">
                 <h2>Xadirinta Fasallada</h2>
-                <p>Dooro fasalka aad rabto inaad xadiriso hadda.</p>
                 <div class="grid-stats" style="grid-template-columns: 2fr 2fr 1fr;">
                     <select id="attGrade">
                         <option value="9">Grade 9</option><option value="10">Grade 10</option>
@@ -267,26 +267,22 @@
                 <div class="table-container">
                     <table>
                         <thead>
-                            <tr>
-                                <th>Ardayga</th>
-                                <th>Roll Number</th>
-                                <th>Status (Present = 10pts)</th>
-                            </tr>
+                            <tr><th>Ardayga</th><th>Roll Number</th><th>Status (Present = 10pts Bonus)</th></tr>
                         </thead>
                         <tbody id="attendanceTableBody">
-                            <tr><td colspan="3" style="text-align:center;">Fadlan marka hore dooro fasalka</td></tr>
+                            <tr><td colspan="3" style="text-align:center;">Fadlan dooro fasal</td></tr>
                         </tbody>
                     </table>
                 </div>
-                <button onclick="submitAttendance()" style="margin-top: 20px; max-width: 250px;">KEYDI XADIRINTA</button>
+                <button onclick="submitAttendance()" style="margin-top: 20px; max-width: 250px;">KEYDI XADIRINTA MAANTA</button>
             </div>
         </section>
 
         <section id="examPage" class="page-view hidden">
             <div class="box">
                 <div class="header-flex">
-                    <h2>Maareynta Imtixaanka</h2>
-                    <input type="text" id="searchExam" placeholder="Search student..." style="max-width: 300px;" onkeyup="filterExamTable()">
+                    <h2>Natiijooyinka Imtixaanka</h2>
+                    <input type="text" id="searchExam" placeholder="Raadi arday..." style="max-width: 300px;" onkeyup="filterExamTable()">
                 </div>
                 <div class="table-container">
                     <table>
@@ -294,10 +290,11 @@
                             <tr>
                                 <th>Roll No</th>
                                 <th>Full Name</th>
-                                <th>Total (1100)</th>
+                                <th>Exam Total</th>
+                                <th>Bonus</th>
                                 <th>Average</th>
                                 <th>Grade</th>
-                                <th>Actions</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody id="examTableBody"></tbody>
@@ -312,12 +309,18 @@
                 <div class="grid-stats">
                     <div>
                         <label>Magaca oo Dhammaystiran</label>
-                        <input type="text" id="regName" placeholder="Ahmed Mohamed Ali">
+                        <input type="text" id="regName" placeholder="Tus: Ahmed Ali">
                     </div>
                     <div>
                         <label>Roll Number (ID)</label>
-                        <input type="text" id="regRoll" placeholder="NBS100">
+                        <input type="text" id="regRoll" placeholder="NBS/2026/001">
                     </div>
+                    <div>
+                        <label>Password (Student)</label>
+                        <input type="text" id="regPass" value="123456">
+                    </div>
+                </div>
+                <div class="grid-stats" style="margin-top: 15px;">
                     <div>
                         <label>Fasalka (Grade)</label>
                         <select id="regGrade">
@@ -332,20 +335,34 @@
                         </select>
                     </div>
                 </div>
-                <button onclick="registerNewStudent()" style="margin-top: 20px; max-width: 300px;">KEYDI ARDAYGA</button>
+                <button onclick="registerNewStudent()" style="margin-top: 25px; max-width: 350px;">KEYDI XOGTA ARDAYGA</button>
+            </div>
+        </section>
+
+        <section id="managePage" class="page-view hidden">
+            <div class="box">
+                <h2>Maareynta Nidaamka</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr><th>Magaca</th><th>ID Number</th><th>Fasalka</th><th>Action</th></tr>
+                        </thead>
+                        <tbody id="manageTableBody"></tbody>
+                    </table>
+                </div>
             </div>
         </section>
 
         <section id="resultPage" class="page-view hidden">
-            <div class="box" style="text-align: center;">
+            <div class="box" style="text-align: center; border-bottom: 5px solid var(--accent);">
                 <h1 id="stNameHead">---</h1>
-                <p id="stRollHead" style="font-weight: bold; color: var(--primary);"></p>
+                <p id="stRollHead" style="font-weight: bold; color: var(--info);"></p>
                 <div class="grid-stats" style="margin: 30px 0;">
-                    <div class="box">Total Score: <h2 id="stTotal">0</h2></div>
-                    <div class="box">Average: <h2 id="stAvg">0%</h2></div>
-                    <div class="box">Rank: <h2 id="stRank">#1</h2></div>
+                    <div class="box">Wadarta: <h2 id="stTotal">0</h2></div>
+                    <div class="box">Boqolkiiba: <h2 id="stAvg">0%</h2></div>
+                    <div class="box">Natiijada: <h2 id="stRank">Pass</h2></div>
                 </div>
-                <h3>Maadooyinka & Dhibcaha</h3>
+                <h3>Dhibcaha Maado kasta</h3>
                 <div class="table-container">
                     <table>
                         <thead>
@@ -361,9 +378,9 @@
 
     <div id="scoreModal" class="modal-overlay hidden">
         <div class="modal-card">
-            <h3>Geli Dhibcaha: <span id="modalStudentName" style="color: var(--accent);"></span></h3>
-            <hr>
-            <div id="scoreInputsGrid" class="grid-stats" style="grid-template-columns: repeat(3, 1fr); margin-top: 20px;">
+            <h3 style="margin: 0;">Geli Dhibcaha: <span id="modalStudentName" style="color: var(--accent);"></span></h3>
+            <hr style="margin: 15px 0; opacity: 0.1;">
+            <div id="scoreInputsGrid" class="grid-stats" style="grid-template-columns: repeat(3, 1fr);">
                 </div>
             <div style="margin-top: 30px; display: flex; gap: 15px;">
                 <button class="btn-danger" onclick="closeScoreModal()">KA NOQO</button>
@@ -373,9 +390,8 @@
     </div>
 
     <script>
-        // --- DATA & CONFIG ---
         const SUBJECTS = ["Math", "English", "Arabic", "Tarbiya", "Chemistry", "Physics", "History", "Geography", "Somali", "ICT", "Biology"];
-        let students = [];
+        let students = JSON.parse(localStorage.getItem('nbs_students')) || [];
         let currentEditingId = null;
 
         // --- AUTHENTICATION ---
@@ -383,18 +399,24 @@
             const role = document.getElementById('loginRole').value;
             const user = document.getElementById('username').value;
             const pass = document.getElementById('password').value;
+            const errorP = document.getElementById('loginError');
 
-            if (user === "admin" && pass === "123" && role === "admin") {
-                startSystem("admin");
-            } else if (role === "student") {
-                const found = students.find(s => s.roll === user);
+            // ADMIN LOGIN (As requested: admin / admin123)
+            if (role === "admin") {
+                if (user === "admin" && pass === "admin123") {
+                    startSystem("admin");
+                } else {
+                    errorP.innerText = "Admin Username ama Password waa khalad!";
+                }
+            } 
+            // STUDENT LOGIN
+            else {
+                const found = students.find(s => s.roll === user && s.password === pass);
                 if (found) {
                     startSystem("student", found);
                 } else {
-                    alert("Roll Number-ka lama helin!");
+                    errorP.innerText = "Roll Number-ka ama Password-ka waa khalad!";
                 }
-            } else {
-                alert("Xogta aad gelisay waa khalad!");
             }
         }
 
@@ -402,7 +424,7 @@
             document.getElementById('loginSection').classList.add('hidden');
             document.getElementById('mainSidebar').style.display = 'flex';
             document.getElementById('mainContent').style.display = 'block';
-            document.getElementById('userRoleDisplay').innerText = role === "admin" ? "ADMINISTRATOR" : "STUDENT PORTAL";
+            document.getElementById('userRoleDisplay').innerText = role.toUpperCase();
 
             if (role === "admin") {
                 document.getElementById('adminLinks').classList.remove('hidden');
@@ -426,21 +448,24 @@
             }
 
             if (pageId === 'examPage') renderExamTable();
+            if (pageId === 'managePage') renderManageTable();
         }
 
-        // --- STUDENT REGISTRATION ---
+        // --- REGISTRATION ---
         function registerNewStudent() {
             const name = document.getElementById('regName').value;
             const roll = document.getElementById('regRoll').value;
+            const pass = document.getElementById('regPass').value;
             const grade = document.getElementById('regGrade').value;
             const section = document.getElementById('regSection').value;
 
-            if (!name || !roll) return alert("Fadlan buuxi meelaha banaan!");
+            if (!name || !roll) return alert("Fadlan buuxi magaca iyo Roll-ka!");
 
             const newStudent = {
-                id: Date.now().toString(),
+                id: "ST-" + Date.now(),
                 fullName: name,
                 roll: roll,
+                password: pass,
                 grade: grade,
                 section: section,
                 scores: {},
@@ -448,16 +473,15 @@
                 attendancePoints: 0
             };
 
-            // Init subjects with 0
             SUBJECTS.forEach(s => newStudent.scores[s] = 0);
-            
             students.push(newStudent);
+            saveData();
             alert("Ardayga waa la diiwaangeliyay!");
             updateStats();
             showPage('dashPage');
         }
 
-        // --- ATTENDANCE LOGIC ---
+        // --- ATTENDANCE ---
         function fetchAttendanceList() {
             const g = document.getElementById('attGrade').value;
             const s = document.getElementById('attSection').value;
@@ -465,7 +489,7 @@
             
             const tbody = document.getElementById('attendanceTableBody');
             if (filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Arday laga helay fasalkaas ma jirto.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Arday looma hayo fasalkaas.</td></tr>';
                 return;
             }
 
@@ -475,8 +499,8 @@
                     <td>${st.roll}</td>
                     <td>
                         <div class="att-toggle">
-                            <button class="btn-check present ${st.presentToday ? 'active' : ''}" onclick="setAttendance('${st.id}', true, this)">SAX</button>
-                            <button class="btn-check absent ${!st.presentToday ? 'active' : ''}" onclick="setAttendance('${st.id}', false, this)">KHALAD</button>
+                            <button class="btn-check present ${st.presentToday ? 'active' : ''}" onclick="setAttendance('${st.id}', true, this)">JOOGA</button>
+                            <button class="btn-check absent ${!st.presentToday ? 'active' : ''}" onclick="setAttendance('${st.id}', false, this)">MA JOOGO</button>
                         </div>
                     </td>
                 </tr>
@@ -488,24 +512,23 @@
             st.presentToday = isPresent;
             st.attendancePoints = isPresent ? 10 : 0;
             
-            // UI Toggle
             const parent = btn.parentElement;
             parent.querySelectorAll('.btn-check').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
+            saveData();
         }
 
         function submitAttendance() {
-            alert("Xadirinta waa la keydiyay! (Bonus 10 points for present students)");
+            alert("Xadirinta waa la keydiyay!");
             renderExamTable();
         }
 
-        // --- EXAM & GRADING LOGIC ---
+        // --- EXAM LOGIC ---
         function calculateSummary(st) {
-            let examTotal = 0;
-            SUBJECTS.forEach(s => examTotal += (st.scores[s] || 0));
-            
-            const finalTotal = examTotal + st.attendancePoints;
-            const avg = Math.round(finalTotal / (SUBJECTS.length + 0.1)); // Adjusted for max 1110 points
+            let examSum = 0;
+            SUBJECTS.forEach(s => examSum += (st.scores[s] || 0));
+            const finalTotal = examSum + st.attendancePoints;
+            const avg = Math.round(finalTotal / (SUBJECTS.length + 0.1));
 
             let grade = "F";
             if (avg >= 90) grade = "A";
@@ -513,7 +536,7 @@
             else if (avg >= 70) grade = "C";
             else if (avg >= 50) grade = "D";
 
-            return { total: finalTotal, average: avg, grade: grade };
+            return { total: finalTotal, average: avg, grade: grade, examOnly: examSum };
         }
 
         function renderExamTable() {
@@ -524,10 +547,11 @@
                     <tr>
                         <td>${st.roll}</td>
                         <td>${st.fullName}</td>
-                        <td><b>${res.total}</b></td>
-                        <td>${res.average}%</td>
+                        <td>${res.examOnly}</td>
+                        <td>+${st.attendancePoints}</td>
+                        <td><b>${res.average}%</b></td>
                         <td><span class="badge ${res.grade === 'F' ? 'bg-f' : 'bg-a'}">${res.grade}</span></td>
-                        <td><button style="width:auto;" onclick="openScoreModal('${st.id}')">EDIT</button></td>
+                        <td><button style="width:auto; padding:5px 10px;" onclick="openScoreModal('${st.id}')">GELI DHIBCAHA</button></td>
                     </tr>
                 `;
             }).join('');
@@ -537,55 +561,75 @@
             currentEditingId = id;
             const st = students.find(x => x.id === id);
             document.getElementById('modalStudentName').innerText = st.fullName;
-            
             const grid = document.getElementById('scoreInputsGrid');
             grid.innerHTML = SUBJECTS.map(s => `
-                <div>
-                    <label style="font-size:12px;">${s}</label>
-                    <input type="number" class="score-input-val" data-subj="${s}" value="${st.scores[s] || 0}" max="100">
+                <div style="margin-bottom:10px;">
+                    <label style="font-size:11px; font-weight:bold;">${s}</label>
+                    <input type="number" class="score-input-val" data-subj="${s}" value="${st.scores[s] || 0}">
                 </div>
             `).join('');
-
             document.getElementById('scoreModal').classList.remove('hidden');
         }
 
         function saveStudentScores() {
             const st = students.find(x => x.id === currentEditingId);
             const inputs = document.querySelectorAll('.score-input-val');
-            
             inputs.forEach(input => {
                 const subj = input.getAttribute('data-subj');
                 st.scores[subj] = parseInt(input.value) || 0;
             });
-
+            saveData();
             closeScoreModal();
             renderExamTable();
             alert("Natiijada waa la cusboonaysiiyay!");
         }
 
-        function closeScoreModal() {
-            document.getElementById('scoreModal').classList.add('hidden');
+        function closeScoreModal() { document.getElementById('scoreModal').classList.add('hidden'); }
+
+        // --- MANAGE SYSTEM ---
+        function renderManageTable() {
+            const tbody = document.getElementById('manageTableBody');
+            tbody.innerHTML = students.map(st => `
+                <tr>
+                    <td>${st.fullName}</td>
+                    <td>${st.roll}</td>
+                    <td>Grade ${st.grade}${st.section}</td>
+                    <td><button class="btn-danger" style="width:auto; padding:5px;" onclick="deleteStudent('${st.id}')">Tirtir</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function deleteStudent(id) {
+            if (confirm("Ma hubtaa inaad tirtirto ardaygan?")) {
+                students = students.filter(s => s.id !== id);
+                saveData();
+                renderManageTable();
+                updateStats();
+            }
         }
 
         // --- STUDENT PORTAL ---
         function renderStudentPortal(st) {
             const res = calculateSummary(st);
             document.getElementById('stNameHead').innerText = st.fullName;
-            document.getElementById('stRollHead').innerText = `ROLL: ${st.roll} | CLASS: ${st.grade}${st.section}`;
+            document.getElementById('stRollHead').innerText = `ID: ${st.roll} | FASALKA: ${st.grade}${st.section}`;
             document.getElementById('stTotal').innerText = res.total;
             document.getElementById('stAvg').innerText = res.average + "%";
+            document.getElementById('stRank').innerText = res.average >= 50 ? "PASS" : "FAIL";
             
             document.getElementById('stDetailTable').innerHTML = SUBJECTS.map(s => `
                 <tr>
                     <td>${s}</td>
                     <td>${st.scores[s] || 0}</td>
-                    <td style="color:${st.scores[s] >= 50 ? 'green' : 'red'}">${st.scores[s] >= 50 ? 'Pass' : 'Fail'}</td>
+                    <td style="color:${st.scores[s] >= 50 ? 'var(--accent)' : 'var(--danger)'}; font-weight:bold;">
+                        ${st.scores[s] >= 50 ? 'Pass' : 'Fail'}
+                    </td>
                 </tr>
             `).join('') + `
                 <tr style="background:#e8f5e9;">
-                    <td><b>Attendance Bonus</b></td>
+                    <td><b>Bonus (Attendance)</b></td>
                     <td><b>${st.attendancePoints}</b></td>
-                    <td>Bonus</td>
+                    <td>Added</td>
                 </tr>
             `;
         }
@@ -596,12 +640,16 @@
             document.getElementById('currentDate').innerText = new Date().toDateString();
         }
 
-        // Dummy Data for Testing
-        students.push({
-            id: "1", fullName: "Ahmed Mohamed Ali", roll: "NBS001", grade: "10", section: "A",
-            scores: {"Math":85, "English":90, "Arabic":70, "Tarbiya":95, "Chemistry":80, "Physics":75, "History":88, "Geography":82, "Somali":92, "ICT":100, "Biology":85},
-            presentToday: true, attendancePoints: 10
-        });
+        function saveData() { localStorage.setItem('nbs_students', JSON.stringify(students)); }
+
+        // Search Filter
+        function filterExamTable() {
+            const val = document.getElementById('searchExam').value.toLowerCase();
+            const rows = document.querySelectorAll('#examTableBody tr');
+            rows.forEach(row => {
+                row.style.display = row.innerText.toLowerCase().includes(val) ? '' : 'none';
+            });
+        }
     </script>
 </body>
 </html>
