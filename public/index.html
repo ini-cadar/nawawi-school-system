@@ -98,7 +98,7 @@
 
         .grid-stats { 
             display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
             gap: 20px; 
         }
 
@@ -109,7 +109,9 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
+            transition: transform 0.3s;
         }
+        .stat-card:hover { transform: scale(1.03); }
 
         /* Forms and Controls */
         input, select, button { 
@@ -239,13 +241,17 @@
                     <h1>11</h1>
                 </div>
                 <div class="stat-card" style="background: var(--info);">
-                    <small>Semester-ka</small>
-                    <h1>Semester 2</h1>
+                    <small>Dhibcaha Guud</small>
+                    <h1>655+</h1>
+                </div>
+                <div class="stat-card" style="background: var(--warning);">
+                    <small>Academic Year</small>
+                    <h1>2025/2026</h1>
                 </div>
             </div>
-            <div class="box" style="margin-top: 30px;">
-                <h3>Nawawi School System</h3>
-                <p>Ku soo dhowow nidaamka NBS. Halkan waxaad ka maamuli kartaa xogta ardayda, xadirinta, iyo natiijooyinka imtixaanka.</p>
+            <div class="box" style="margin-top: 30px; border-left: 5px solid var(--accent);">
+                <h3>Nawawi School Management System (Official)</h3>
+                <p>Ku soo dhowow nidaamka casriga ah ee NBS. Halkan waxaad ku maamuli kartaa dhamaan xogta muhiimka ah ee dugsiga.</p>
             </div>
         </section>
 
@@ -267,7 +273,7 @@
                 <div class="table-container">
                     <table>
                         <thead>
-                            <tr><th>Ardayga</th><th>Roll Number</th><th>Status (Present = 10pts Bonus)</th></tr>
+                            <tr><th>Ardayga (A-Z)</th><th>Roll Number</th><th>Status (Present = 10pts Bonus)</th></tr>
                         </thead>
                         <tbody id="attendanceTableBody">
                             <tr><td colspan="3" style="text-align:center;">Fadlan dooro fasal</td></tr>
@@ -358,9 +364,9 @@
                 <h1 id="stNameHead">---</h1>
                 <p id="stRollHead" style="font-weight: bold; color: var(--info);"></p>
                 <div class="grid-stats" style="margin: 30px 0;">
-                    <div class="box">Wadarta: <h2 id="stTotal">0</h2></div>
-                    <div class="box">Boqolkiiba: <h2 id="stAvg">0%</h2></div>
-                    <div class="box">Natiijada: <h2 id="stRank">Pass</h2></div>
+                    <div class="box">Total Score: <h2 id="stTotal">0</h2></div>
+                    <div class="box">Percentage: <h2 id="stAvg">0%</h2></div>
+                    <div class="box">Result: <h2 id="stRank">Pass</h2></div>
                 </div>
                 <h3>Dhibcaha Maado kasta</h3>
                 <div class="table-container">
@@ -401,7 +407,6 @@
             const pass = document.getElementById('password').value;
             const errorP = document.getElementById('loginError');
 
-            // ADMIN LOGIN (As requested: admin / admin123)
             if (role === "admin") {
                 if (user === "admin" && pass === "admin123") {
                     startSystem("admin");
@@ -409,7 +414,6 @@
                     errorP.innerText = "Admin Username ama Password waa khalad!";
                 }
             } 
-            // STUDENT LOGIN
             else {
                 const found = students.find(s => s.roll === user && s.password === pass);
                 if (found) {
@@ -437,7 +441,6 @@
             updateStats();
         }
 
-        // --- NAVIGATION ---
         function showPage(pageId, element = null) {
             document.querySelectorAll('.page-view').forEach(p => p.classList.add('hidden'));
             document.getElementById(pageId).classList.remove('hidden');
@@ -451,7 +454,6 @@
             if (pageId === 'managePage') renderManageTable();
         }
 
-        // --- REGISTRATION ---
         function registerNewStudent() {
             const name = document.getElementById('regName').value;
             const roll = document.getElementById('regRoll').value;
@@ -481,11 +483,13 @@
             showPage('dashPage');
         }
 
-        // --- ATTENDANCE ---
         function fetchAttendanceList() {
             const g = document.getElementById('attGrade').value;
             const s = document.getElementById('attSection').value;
-            const filtered = students.filter(st => st.grade === g && st.section === s);
+            
+            // SORTED A-Z
+            const filtered = students.filter(st => st.grade === g && st.section === s)
+                            .sort((a, b) => a.fullName.localeCompare(b.fullName));
             
             const tbody = document.getElementById('attendanceTableBody');
             if (filtered.length === 0) {
@@ -523,12 +527,11 @@
             renderExamTable();
         }
 
-        // --- EXAM LOGIC ---
         function calculateSummary(st) {
             let examSum = 0;
             SUBJECTS.forEach(s => examSum += (st.scores[s] || 0));
             const finalTotal = examSum + st.attendancePoints;
-            const avg = Math.round(finalTotal / (SUBJECTS.length + 0.1));
+            const avg = Math.round((finalTotal / (SUBJECTS.length * 100)) * 100);
 
             let grade = "F";
             if (avg >= 90) grade = "A";
@@ -541,7 +544,10 @@
 
         function renderExamTable() {
             const tbody = document.getElementById('examTableBody');
-            tbody.innerHTML = students.map(st => {
+            // SORTED A-Z
+            const sortedStudents = [...students].sort((a, b) => a.fullName.localeCompare(b.fullName));
+            
+            tbody.innerHTML = sortedStudents.map(st => {
                 const res = calculateSummary(st);
                 return `
                     <tr>
@@ -565,7 +571,7 @@
             grid.innerHTML = SUBJECTS.map(s => `
                 <div style="margin-bottom:10px;">
                     <label style="font-size:11px; font-weight:bold;">${s}</label>
-                    <input type="number" class="score-input-val" data-subj="${s}" value="${st.scores[s] || 0}">
+                    <input type="number" class="score-input-val" data-subj="${s}" value="${st.scores[s] || 0}" max="100">
                 </div>
             `).join('');
             document.getElementById('scoreModal').classList.remove('hidden');
@@ -586,10 +592,10 @@
 
         function closeScoreModal() { document.getElementById('scoreModal').classList.add('hidden'); }
 
-        // --- MANAGE SYSTEM ---
         function renderManageTable() {
             const tbody = document.getElementById('manageTableBody');
-            tbody.innerHTML = students.map(st => `
+            const sorted = [...students].sort((a, b) => a.fullName.localeCompare(b.fullName));
+            tbody.innerHTML = sorted.map(st => `
                 <tr>
                     <td>${st.fullName}</td>
                     <td>${st.roll}</td>
@@ -608,7 +614,6 @@
             }
         }
 
-        // --- STUDENT PORTAL ---
         function renderStudentPortal(st) {
             const res = calculateSummary(st);
             document.getElementById('stNameHead').innerText = st.fullName;
@@ -634,7 +639,6 @@
             `;
         }
 
-        // --- UTILS ---
         function updateStats() {
             document.getElementById('countStudents').innerText = students.length;
             document.getElementById('currentDate').innerText = new Date().toDateString();
@@ -642,7 +646,6 @@
 
         function saveData() { localStorage.setItem('nbs_students', JSON.stringify(students)); }
 
-        // Search Filter
         function filterExamTable() {
             const val = document.getElementById('searchExam').value.toLowerCase();
             const rows = document.querySelectorAll('#examTableBody tr');
