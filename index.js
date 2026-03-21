@@ -1,158 +1,274 @@
 /**
- * WEYRAX PORTAL v10.0 - CORE ENGINE
- * Developer: Weyrax
+ * ============================================================================
+ * NBS PORTAL - OFFICIAL ADVANCED BACKEND SYSTEM v4.0
+ * ============================================================================
+ * Features:
+ * 1. Admin Login (Username: admin / Password: admin123)
+ * 2. Dynamic Subject Management (CRUD)
+ * 3. Student Management (Grade & Section Filtering)
+ * 4. Automatic Attendance Bonus (10 Points)
+ * 5. Auto-Calculation (Total, Average, Grade Letter)
+ * 6. Official Database Connectivity (MongoDB Atlas)
+ * ============================================================================
  */
 
-// --- GLOBAL VARIABLES & CONFIG ---
-const API_URL = "http://localhost:5000/api/v1"; // Bedel marka aad Deploy garayso
-const SUBJECTS = ["Math", "English", "Arabic", "Tarbiya", "Chemistry", "Physics", "History", "Geography", "Somali", "ICT", "Biology"];
-let currentUser = null;
-let allStudents = [];
+const express = require('express');
+const mongoose = require('mongoose');
+const path = require('path');
+const cors = require('cors');
+require('dotenv').config();
 
-// --- 1. AUTHENTICATION (LOGIN) ---
-async function attemptLogin() {
-    const role = document.getElementById('loginRole').value;
-    const user = document.getElementById('username').value;
-    const pass = document.getElementById('password').value;
-    const errorBtn = document.getElementById('loginError');
+const app = express();
 
+// --- 1. MIDDLEWARES & SECURITY ---
+app.use(express.json());
+app.use(cors());
+app.use(express.static('public'));
+
+// --- 2. DATABASE CONNECTION ---
+// Hubi in xogtaada MongoDB ay si sax ah ugu xidhan tahay Cluster-kaaga
+const MONGO_URI = "mongodb+srv://raazicadar_db_user:inicadar1234.@cluster0.z93llyc.mongodb.net/school_db?retryWrites=true&w=majority";
+
+mongoose.connect(MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    autoIndex: true
+})
+.then(() => {
+    console.log('----------------------------------------------------');
+    console.log('✅ NBS DATABASE: Connected Successfully!');
+    console.log('📅 Time:', new Date().toLocaleString());
+    console.log('----------------------------------------------------');
+})
+.catch(err => {
+    console.error('❌ CRITICAL DB ERROR:', err);
+    process.exit(1); // Jooji server-ka haddii database-ku diido
+});
+
+// --- 3. MODELS & SCHEMAS ---
+
+// Schema-da Maadooyinka (Subjects)
+const subjectSchema = new mongoose.Schema({
+    name: { type: String, unique: true, required: true, trim: true },
+    code: { type: String, uppercase: true }, 
+    createdAt: { type: Date, default: Date.now }
+});
+const Subject = mongoose.model('Subject', subjectSchema);
+
+// Schema-da Ardayga (Detailed Student Schema)
+const studentSchema = new mongoose.Schema({
+    fullName: { type: String, required: true, trim: true },
+    examNumber: { type: String, unique: true, required: true, uppercase: true },
+    password: { type: String, default: '123456' },
+    grade: { type: String, required: true }, // Grade 9, 10, 11, 12
+    section: { type: String, enum: ['A', 'B', 'C', 'D'], required: true },
+    
+    // Status & Academic Performance
+    feePaid: { type: Boolean, default: false },
+    presentToday: { type: Boolean, default: false },
+    attScore: { type: Number, default: 0 }, // Attendance Bonus logic
+
+    // Results Array
+    examScores: [{ 
+        subject: String, 
+        score: { type: Number, default: 0 }, 
+        gradeLetter: { type: String, default: 'F' } 
+    }],
+
+    // Auto-Calculated Fields
+    totalScore: { type: Number, default: 0 },
+    average: { type: Number, default: 0 },
+    overallStatus: { type: String, default: 'Fail' },
+    lastUpdated: { type: Date, default: Date.now }
+}, { timestamps: true });
+
+/**
+ * AUTOMATIC CALCULATION MIDDLEWARE
+ * Logic-gan wuxuu xisaabiyaa natiijada mar kasta oo arday xogtiisa la kaydinayo
+ */
+studentSchema.pre('save', function(next) {
+    let totalMarks = 0;
+    
+    // 1. Loop dhexmar maado kasta si loo helo Grade-ka (A, B, C...)
+    this.examScores.forEach(s => {
+        if (s.score >= 90) s.gradeLetter = 'A';
+        else if (s.score >= 80) s.gradeLetter = 'B';
+        else if (s.score >= 70) s.gradeLetter = 'C';
+        else if (s.score >= 50) s.gradeLetter = 'D';
+        else s.gradeLetter = 'F';
+        
+        totalMarks += s.score;
+    });
+
+    // 2. Ku dar Attendance Bonus (haddii uu 'Present' yahay)
+    this.attScore = this.presentToday ? 10 : 0;
+    this.totalScore = totalMarks + this.attScore;
+
+    // 3. Xisaabi Average-ka (Isugeyn / Maadooyinka)
+    const subCount = this.examScores.length > 0 ? this.examScores.length : 1;
+    this.average = Math.round(this.totalScore / (subCount + 0.1));
+
+    // 4. Go'aami Pass ama Fail (Official pass mark is 50)
+    this.overallStatus = (this.average >= 50) ? 'Pass' : 'Fail';
+    this.lastUpdated = Date.now();
+
+    next();
+});
+
+const Student = mongoose.model('Student', studentSchema);
+
+// --- 4. SUBJECT API (CRUD OPERATIONS) ---
+
+app.get('/api/subjects', async (req, res) => {
     try {
-        const response = await fetch(`${API_URL}/auth/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ role, username: user, password: pass })
+        const subjects = await Subject.find().sort({ name: 1 });
+        res.status(200).json(subjects);
+    } catch (err) {
+        res.status(500).json({ error: "Maadooyinka lama soo kicin karo" });
+    }
+});
+
+app.post('/api/subjects', async (req, res) => {
+    try {
+        const newSub = new Subject(req.body);
+        await newSub.save();
+        res.status(201).json({ success: true, message: "Maadada waa la daray!" });
+    } catch (e) { 
+        res.status(400).json({ error: "Maadadani way jirtaa ama xogta waa khalad!" }); 
+    }
+});
+
+app.delete('/api/subjects/:id', async (req, res) => {
+    try {
+        await Subject.findByIdAndDelete(req.params.id);
+        res.json({ success: true, message: "Maadada waa la tirtiray" });
+    } catch (err) {
+        res.status(400).json({ error: "Tirtiristu ma suuragalin" });
+    }
+});
+
+// --- 5. STUDENT API (MANAGEMENT & SEARCH) ---
+
+// Filtered Search (Grade, Section, Name)
+app.get('/api/students', async (req, res) => {
+    try {
+        const { search, grade, section } = req.query; 
+        let query = {};
+
+        if (search) {
+            query.$or = [
+                { fullName: { $regex: search, $options: 'i' } },
+                { examNumber: { $regex: search, $options: 'i' } }
+            ];
+        }
+        if (grade && grade !== "all") query.grade = grade;
+        if (section && section !== "all") query.section = section;
+
+        const students = await Student.find(query).sort({ totalScore: -1 });
+        res.status(200).json(students);
+    } catch (err) { 
+        res.status(500).json({ error: "Cilad ayaa ku timid soo kicinta ardayda" }); 
+    }
+});
+
+// Registration with Auto-Subject Mapping
+app.post('/api/register', async (req, res) => {
+    try {
+        const subs = await Subject.find();
+        // Ardayga cusub si otomaatig ah ayaa loogu darayaa maadooyinka jira iyagoo eber ah
+        const initialScores = subs.map(s => ({ 
+            subject: s.name, 
+            score: 0, 
+            gradeLetter: 'F' 
+        }));
+        
+        const newStudent = new Student({ 
+            ...req.body, 
+            examScores: initialScores 
         });
 
-        const result = await response.json();
+        await newStudent.save();
+        res.status(201).json({ success: true, message: "Ardayga waa la keydiyay!" });
+    } catch (e) { 
+        res.status(400).json({ error: "ID-ga ardayga hore ayaa loo isticmaalay!" }); 
+    }
+});
 
-        if (result.success) {
-            currentUser = result.data;
-            startSystem(result.role, result.data);
-        } else {
-            errorBtn.innerText = "❌ ID ama Password khaldan!";
-        }
+// Multi-Purpose Update (Attendance, Exam, Profile)
+app.put('/api/student/:id', async (req, res) => {
+    try {
+        const student = await Student.findById(req.params.id);
+        if(!student) return res.status(404).json({ error: "Ardayga lama helin" });
+
+        // Cusboonaysii xogta la soo diray (Profile, Exam, or Attendance)
+        Object.assign(student, req.body);
+        
+        // Middleware-ka kore ayaa xisaabinaya natiijada markale ka hor save-ka
+        await student.save(); 
+        res.status(200).json({ success: true, data: student });
+    } catch (e) { 
+        res.status(500).json({ error: "Cusboonaysiintu ma suuragalin: " + e.message }); 
+    }
+});
+
+app.delete('/api/student/:id', async (req, res) => {
+    try {
+        await Student.findByIdAndDelete(req.params.id);
+        res.json({ success: true, message: "Ardayga waa la tirtiray" });
     } catch (err) {
-        errorBtn.innerText = "⚠️ Server-ka ma shaqaynayo!";
-        console.error(err);
+        res.status(400).json({ error: "Cilad baa dhacday" });
     }
-}
+});
 
-function startSystem(role, data) {
-    document.getElementById('loginSection').classList.add('hidden');
-    document.getElementById('mainSidebar').style.display = 'flex';
-    document.getElementById('mainContent').style.display = 'block';
-    document.getElementById('userRoleDisplay').innerText = role.toUpperCase();
-
-    if (role === 'admin') {
-        document.getElementById('adminLinks').classList.remove('hidden');
-        showPage('dashPage');
-        fetchAllStudents();
-    } else {
-        document.getElementById('studentLinks').classList.remove('hidden');
-        renderStudentPortal(data);
-        showPage('resultPage');
-    }
-}
-
-// --- 2. DATA MANAGEMENT (FETCH & REGISTER) ---
-async function fetchAllStudents() {
-    const res = await fetch(`${API_URL}/students/all`);
-    allStudents = await res.json();
-    updateStats();
-    updateDashContacts();
-}
-
-async function registerNewStudent() {
-    const studentData = {
-        fullName: document.getElementById('regName').value,
-        roll: document.getElementById('regRoll').value,
-        grade: document.getElementById('regGrade').value,
-        section: document.getElementById('regSection').value,
-        motherName: document.getElementById('regMother').value,
-        phones: [document.getElementById('regP1').value, document.getElementById('regP2').value],
-        photo: document.getElementById('previewImg').src, // Base64
-        password: document.getElementById('regPass').value || "123456"
-    };
-
-    if(!studentData.fullName || !studentData.roll) return alert("Fadlan buuxi magaca iyo ID-ga!");
-
-    const res = await fetch(`${API_URL}/students/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(studentData)
-    });
-
-    if (res.ok) {
-        alert("✅ Ardayga waa la diiwaangeliyey!");
-        showPage('dashPage');
-        fetchAllStudents();
-    }
-}
-
-// --- 3. ACADEMICS & EXAMS ---
-function renderExamTable() {
-    const tbody = document.getElementById('examTableBody');
-    const gradeVal = document.getElementById('exGrade').value;
-    const searchVal = document.getElementById('searchExam').value.toLowerCase();
-
-    const filtered = allStudents.filter(s => 
-        (gradeVal === 'all' || s.grade === gradeVal) && 
-        s.fullName.toLowerCase().includes(searchVal)
-    );
-
-    tbody.innerHTML = filtered.map(s => {
-        const total = Object.values(s.scores).reduce((a, b) => a + b, 0);
-        const avg = Math.round(total / SUBJECTS.length);
-        return `
-            <tr>
-                <td>${s.roll}</td>
-                <td>${s.fullName}</td>
-                <td>${total}</td>
-                <td>${s.attendancePoints || 0}</td>
-                <td>${avg}%</td>
-                <td><span class="badge ${avg >= 50 ? 'bg-a' : 'bg-f'}">${avg >= 50 ? 'PASS' : 'FAIL'}</span></td>
-                <td><button onclick="openScoreModal('${s._id}')" style="width:auto; padding:5px 10px;">GELI</button></td>
-            </tr>
-        `;
-    }).join('');
-}
-
-async function saveStudentScores() {
-    const inputs = document.querySelectorAll('.sc-in');
-    const scores = {};
-    inputs.forEach(i => scores[i.dataset.s] = parseInt(i.value) || 0);
-
-    const res = await fetch(`${API_URL}/students/update-scores/${currentEditingId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ scores })
-    });
-
-    if (res.ok) {
-        closeScoreModal();
-        fetchAllStudents();
-        renderExamTable();
-        alert("Dhibcaha waa la keydiyey!");
-    }
-}
-
-// --- 4. UTILS & UI ---
-function updateStats() {
-    document.getElementById('countStudents').innerText = allStudents.length;
-}
-
-function showPage(pageId, element = null) {
-    document.querySelectorAll('.page-view').forEach(p => p.classList.add('hidden'));
-    document.getElementById(pageId).classList.remove('hidden');
-
-    if (element) {
-        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('nav-active'));
-        element.classList.add('nav-active');
+// --- 6. OFFICIAL LOGIN CORE ---
+app.post('/api/login', async (req, res) => {
+    const { roll, pass } = req.body;
+    
+    // --- OFFICIAL ADMIN CREDENTIALS ---
+    // Sidii aad codsatay: Password-ka waa admin123
+    if (roll === 'admin' && pass === 'admin123') {
+        console.log('🔑 Admin logged in at:', new Date().toLocaleTimeString());
+        return res.status(200).json({ 
+            success: true, 
+            role: 'admin', 
+            message: "Welcome Admin" 
+        });
     }
 
-    if (pageId === 'examPage') renderExamTable();
-    if (pageId === 'managePage') renderManageTable();
-}
+    // --- STUDENT CREDENTIALS CHECK ---
+    try {
+        const student = await Student.findOne({ examNumber: roll, password: pass });
+        if (student) {
+            res.status(200).json({ 
+                success: true, 
+                role: 'student', 
+                data: student 
+            });
+        } else {
+            res.status(401).json({ 
+                success: false, 
+                error: 'Aqoonsigaagu waa khalad! Hubi ID-ga iyo Password-ka.' 
+            });
+        }
+    } catch (e) { 
+        res.status(500).json({ error: "Server Login Error" }); 
+    }
+});
 
-// --- 5. INITIALIZATION ---
-document.getElementById('currentDate').innerText = new Date().toDateString();
+// --- 7. SERVER INITIALIZATION ---
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`
+    ===============================================
+    🚀 NBS PORTAL SERVER IS ONLINE & OFFICIAL
+    📡 URL: http://localhost:${PORT}
+    🛡️  ADMIN ACCESS: admin / admin123
+    💾 DATABASE: MongoDB Connected
+    ===============================================
+    `);
+});
+
+/**
+ * Dhamaad: Koodhkan wuxuu diyaar u yahay in loo isticmaalo 
+ * nidaamka rasmiga ah ee Nawawi School Portal.
+ */

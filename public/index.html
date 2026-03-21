@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WEYRAX PORTAL | Weyrax School Management System v10.0</title>
+    <title>WEYRAX PORTAL | Weyrax School Management System v9.0</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { 
@@ -47,27 +47,9 @@
             background: #1a252f; 
         }
 
-        /* LOGO STYLE */
-        .school-logo-img {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid var(--accent);
-            margin-bottom: 10px;
-            background: white;
-        }
+        .sidebar-header h3 { margin: 0; letter-spacing: 2px; color: var(--accent); }
 
-        .sidebar-header h3 { 
-            margin: 0; 
-            letter-spacing: 2px; 
-            color: var(--accent); 
-        }
-
-        .nav-menu { 
-            flex: 1; 
-            margin-top: 20px; 
-        }
+        .nav-menu { flex: 1; margin-top: 20px; }
 
         .nav-item { 
             padding: 15px 25px; 
@@ -118,30 +100,30 @@
 
         /* Responsive Sidebar */
         @media (max-width: 768px) {
-            .sidebar { 
-                position: fixed; 
-                left: -280px; 
-                height: 100%; 
+            .sidebar {
+                position: fixed;
+                left: -280px;
+                height: 100%;
             }
-            .sidebar.open { 
-                left: 0; 
+            .sidebar.open {
+                left: 0;
             }
-            .mobile-header { 
-                display: flex; 
+            .mobile-header {
+                display: flex;
             }
-            .main { 
-                margin-top: 60px; 
-                padding: 15px; 
+            .main {
+                margin-top: 60px;
+                padding: 15px;
             }
-            .sidebar-overlay { 
-                display: none; 
-                position: fixed; 
-                inset: 0; 
-                background: rgba(0,0,0,0.5); 
-                z-index: 1000; 
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(0,0,0,0.5);
+                z-index: 1000;
             }
-            .sidebar-overlay.show { 
-                display: block; 
+            .sidebar-overlay.show {
+                display: block;
             }
         }
 
@@ -161,27 +143,6 @@
             box-shadow: 0 8px 20px rgba(0,0,0,0.06); 
             margin-bottom: 25px; 
             border: 1px solid #e1e8ed; 
-        }
-
-        /* Photo Upload Styling */
-        .photo-container {
-            width: 120px;
-            height: 120px;
-            border: 2px dashed #ccc;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-top: 10px;
-            overflow: hidden;
-            background: #f9f9f9;
-        }
-        
-        #previewImg, #logoPreview { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: cover; 
-            display: none; 
         }
 
         .header-flex {
@@ -206,10 +167,7 @@
             justify-content: center;
             transition: transform 0.3s;
         }
-        
-        .stat-card:hover { 
-            transform: scale(1.03); 
-        }
+        .stat-card:hover { transform: scale(1.03); }
 
         /* Forms and Controls */
         input, select, button { 
@@ -243,106 +201,35 @@
         .btn-danger { background: var(--danger); }
 
         /* Table Styling */
-        .table-container { 
-            overflow-x: auto; 
-            margin-top: 15px; 
-        }
-        
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            min-width: 800px; 
-        }
-        
-        th, td { 
-            padding: 15px; 
-            text-align: left; 
-            border-bottom: 1px solid #f1f3f5; 
-        }
-        
-        th { 
-            background: #f8f9fa; 
-            color: var(--primary); 
-            font-weight: 600; 
-            text-transform: uppercase; 
-            font-size: 13px; 
-        }
-        
-        tr:hover { 
-            background-color: #fcfcfc; 
-        }
+        .table-container { overflow-x: auto; margin-top: 15px; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #f1f3f5; }
+        th { background: #f8f9fa; color: var(--primary); font-weight: 600; text-transform: uppercase; font-size: 13px; }
+        tr:hover { background-color: #fcfcfc; }
 
         /* Attendance Toggles */
-        .att-toggle { 
-            display: flex; 
-            gap: 5px; 
-        }
-        
+        .att-toggle { display: flex; gap: 5px; }
         .btn-check { 
-            width: auto; 
-            padding: 8px 15px; 
-            margin: 0; 
-            font-size: 12px; 
-            border-radius: 20px; 
-            border: 2px solid #ddd; 
-            background: white; 
-            color: #555;
+            width: auto; padding: 8px 15px; margin: 0; font-size: 12px; border-radius: 20px; 
+            border: 2px solid #ddd; background: white; color: #555;
         }
-        
-        .btn-check.present { 
-            border-color: var(--accent); 
-            color: var(--accent); 
-        }
-        
-        .btn-check.present.active { 
-            background: var(--accent); 
-            color: white; 
-        }
-        
-        .btn-check.absent { 
-            border-color: var(--danger); 
-            color: var(--danger); 
-        }
-        
-        .btn-check.absent.active { 
-            background: var(--danger); 
-            color: white; 
-        }
+        .btn-check.present { border-color: var(--accent); color: var(--accent); }
+        .btn-check.present.active { background: var(--accent); color: white; }
+        .btn-check.absent { border-color: var(--danger); color: var(--danger); }
+        .btn-check.absent.active { background: var(--danger); color: white; }
 
         /* Grades Badges */
-        .badge { 
-            padding: 5px 12px; 
-            border-radius: 6px; 
-            font-weight: bold; 
-            font-size: 12px; 
-            color: white; 
-        }
-        
-        .bg-a { background: #2ecc71; } 
-        .bg-b { background: #3498db; } 
-        .bg-c { background: #f1c40f; } 
-        .bg-f { background: #e74c3c; }
+        .badge { padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 12px; color: white; }
+        .bg-a { background: #2ecc71; } .bg-b { background: #3498db; } .bg-c { background: #f1c40f; } .bg-f { background: #e74c3c; }
 
         /* Modal Overlay */
         .modal-overlay { 
-            position: fixed; 
-            inset: 0; 
-            background: rgba(0,0,0,0.7); 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            z-index: 2000; 
-            padding: 20px; 
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7); 
+            display: flex; align-items: center; justify-content: center; z-index: 2000; padding: 20px; 
         }
-        
         .modal-card { 
-            background: white; 
-            width: 100%; 
-            max-width: 900px; 
-            max-height: 90vh; 
-            border-radius: 15px; 
-            overflow-y: auto; 
-            padding: 30px; 
+            background: white; width: 100%; max-width: 900px; max-height: 90vh; 
+            border-radius: 15px; overflow-y: auto; padding: 30px; 
         }
 
         .hidden { display: none !important; }
@@ -359,25 +246,25 @@
             align-items: center;
             flex-wrap: wrap;
         }
-        
-        .filter-bar select, .filter-bar input { 
-            margin: 0; 
-            width: auto; 
-            min-width: 150px; 
+        .filter-bar select, .filter-bar input {
+            margin: 0;
+            width: auto;
+            min-width: 150px;
         }
 
-        /* Custom Scrollbar */
+        /* Custom Scrollbar for better UX */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #bbb; }
 
     </style>
 </head>
-<body onload="loadSchoolSettings()">
+<body>
 
     <div class="mobile-header" id="mobileHeader" style="display: none;">
         <button class="menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
-        <span id="mobileTitle" style="font-weight: bold;">WEYRAX PORTAL</span>
+        <span style="font-weight: bold;">WEYRAX PORTAL</span>
         <div style="width: 30px;"></div>
     </div>
 
@@ -385,8 +272,7 @@
 
     <div id="loginSection" class="modal-overlay">
         <div class="box" style="width: 100%; max-width: 450px; text-align: center; border-top: 10px solid var(--accent);">
-            <img id="loginLogo" src="https://via.placeholder.com/80" class="school-logo-img" style="display:none;">
-            <h2 id="loginTitle" style="color: var(--primary); margin-bottom: 10px;">WEYRAX PORTAL LOGIN</h2>
+            <h2 style="color: var(--primary); margin-bottom: 10px;">WEYRAX PORTAL LOGIN</h2>
             <p style="color: #666; font-size: 14px;">Maamul ama Arday, fadlan soo gal</p>
             <hr style="margin: 20px 0; opacity: 0.2;">
             
@@ -409,8 +295,7 @@
 
     <div class="sidebar" id="mainSidebar" style="display: none;">
         <div class="sidebar-header">
-            <img id="sidebarLogo" src="https://via.placeholder.com/80" class="school-logo-img" style="display:none;">
-            <h3 id="sidebarSchoolName">WEYRAX PORTAL</h3>
+            <h3>WEYRAX PORTAL</h3>
             <small id="userRoleDisplay" style="color: #bdc3c7; font-weight: bold;"></small>
         </div>
         <div class="nav-menu">
@@ -420,7 +305,6 @@
                 <div class="nav-item" onclick="showPage('examPage', this)">📝 Exam & Results</div>
                 <div class="nav-item" onclick="showPage('regPage', this)">👤 Register Student</div>
                 <div class="nav-item" onclick="showPage('managePage', this)">⚙️ Manage System</div>
-                <div class="nav-item" onclick="showPage('settingsPage', this)">🛠️ System Settings</div>
             </div>
             <div id="studentLinks" class="hidden">
                 <div class="nav-item nav-active" onclick="showPage('resultPage', this)">👤 My Report Card</div>
@@ -459,12 +343,7 @@
                 <div class="table-container">
                     <table>
                         <thead>
-                            <tr>
-                                <th>Ardayga</th>
-                                <th>Fasalka</th>
-                                <th>Section</th>
-                                <th>Lanbarada Waalidka</th>
-                            </tr>
+                            <tr><th>Ardayga</th><th>Fasalka</th><th>Section</th><th>Lanbarada Waalidka</th></tr>
                         </thead>
                         <tbody id="dashContactList"></tbody>
                     </table>
@@ -477,31 +356,25 @@
                 <h2>Xadirinta Fasallada</h2>
                 <div class="filter-bar">
                     <select id="attGrade">
-                        <option value="9">Grade 9</option>
-                        <option value="10">Grade 10</option>
-                        <option value="11">Grade 11</option>
-                        <option value="12">Grade 12</option>
+                        <option value="9">Grade 9</option><option value="10">Grade 10</option>
+                        <option value="11">Grade 11</option><option value="12">Grade 12</option>
                     </select>
                     <select id="attSection">
-                        <option value="A">Section A</option>
-                        <option value="B">Section B</option>
-                        <option value="C">Section C</option>
+                        <option value="A">Section A</option><option value="B">Section B</option><option value="C">Section C</option>
                     </select>
                     <button onclick="fetchAttendanceList()" style="width: auto;">SOO BANDHIG LIST-KA</button>
                 </div>
                 <div class="table-container">
                     <table>
                         <thead>
-                            <tr>
-                                <th>Ardayga (A-Z)</th>
-                                <th>Roll Number</th>
-                                <th>Status</th>
-                            </tr>
+                            <tr><th>Ardayga (A-Z)</th><th>Roll Number</th><th>Status</th></tr>
                         </thead>
-                        <tbody id="attendanceTableBody"></tbody>
+                        <tbody id="attendanceTableBody">
+                            <tr><td colspan="3" style="text-align:center;">Fadlan dooro fasal</td></tr>
+                        </tbody>
                     </table>
                 </div>
-                <button onclick="alert('Xadirinta waa la keydiyay!')" style="margin-top: 20px; max-width: 250px;">KEYDI XADIRINTA MAANTA</button>
+                <button onclick="submitAttendance()" style="margin-top: 20px; max-width: 250px;">KEYDI XADIRINTA MAANTA</button>
             </div>
         </section>
 
@@ -511,25 +384,19 @@
                 <div class="filter-bar">
                     <select id="exGrade" onchange="renderExamTable()">
                         <option value="all">Dhamaan Grade</option>
-                        <option value="9">9</option>
-                        <option value="10">10</option>
-                        <option value="11">11</option>
-                        <option value="12">12</option>
+                        <option value="9">Grade 9</option><option value="10">Grade 10</option>
+                        <option value="11">Grade 11</option><option value="12">Grade 12</option>
                     </select>
-                    <input type="text" id="searchExam" placeholder="Raadi magac..." onkeyup="renderExamTable()">
+                    <select id="exSection" onchange="renderExamTable()">
+                        <option value="all">Dhamaan Section</option>
+                        <option value="A">A</option><option value="B">B</option><option value="C">C</option>
+                    </select>
+                    <input type="text" id="searchExam" placeholder="Raadi magac ama ID..." onkeyup="renderExamTable()">
                 </div>
                 <div class="table-container">
                     <table>
                         <thead>
-                            <tr>
-                                <th>Roll No</th>
-                                <th>Full Name</th>
-                                <th>Exam Total</th>
-                                <th>Bonus</th>
-                                <th>Average</th>
-                                <th>Grade</th>
-                                <th>Action</th>
-                            </tr>
+                            <tr><th>Roll No</th><th>Full Name</th><th>Exam Total</th><th>Bonus</th><th>Average</th><th>Grade</th><th>Action</th></tr>
                         </thead>
                         <tbody id="examTableBody"></tbody>
                     </table>
@@ -542,73 +409,48 @@
                 <h2>Diiwaangeli Arday Cusub</h2>
                 <div class="grid-stats">
                     <div>
-                        <label>Magaca Ardayga</label>
-                        <input type="text" id="regName" placeholder="Magaca oo buuxa">
+                        <label>Magaca Ardayga (Full Name)</label>
+                        <input type="text" id="regName" placeholder="Tus: Ahmed Ali Mohamed">
                     </div>
                     <div>
-                        <label>ID Number (Roll)</label>
-                        <input type="text" id="regRoll" placeholder="NBS/2026/000">
+                        <label>Magaca Hooyada (Mother's Name)</label>
+                        <input type="text" id="regMother" placeholder="Tus: Maryam Ali Islow">
                     </div>
                     <div>
-                        <label>Sawirka Ardayga</label>
-                        <input type="file" accept="image/*" onchange="previewFile(this, 'previewImg')">
-                        <div class="photo-container"><img id="previewImg"></div>
+                        <label>Roll Number (ID)</label>
+                        <input type="text" id="regRoll" placeholder="NBS/2026/001">
                     </div>
                 </div>
                 <div class="grid-stats" style="margin-top: 15px;">
-                    <div>
-                        <label>Fasalka</label>
-                        <select id="regGrade">
-                            <option value="9">Grade 9</option>
-                            <option value="10">Grade 10</option>
-                            <option value="11">Grade 11</option>
-                            <option value="12">Grade 12</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label>Section</label>
-                        <select id="regSection">
-                            <option value="A">A</option>
-                            <option value="B">B</option>
-                            <option value="C">C</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label>Magaca Hooyada</label>
-                        <input type="text" id="regMother">
-                    </div>
+                    <div><label>Fasalka (Grade)</label><select id="regGrade"><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select></div>
+                    <div><label>Qaybta (Section)</label><select id="regSection"><option value="A">A</option><option value="B">B</option><option value="C">C</option></select></div>
+                    <div><label>Password-ka Ardayga</label><input type="text" id="regPass" value="123456"></div>
                 </div>
                 <div class="grid-stats" style="margin-top: 15px;">
-                    <div>
-                        <label>Phone 1 (Primary)</label>
-                        <input type="text" id="regP1">
-                    </div>
-                    <div>
-                        <label>Phone 2 (Secondary)</label>
-                        <input type="text" id="regP2">
-                    </div>
-                    <div>
-                        <label>Password-ka Portal-ka</label>
-                        <input type="text" id="regPass" value="123456">
-                    </div>
+                    <div><label>Lanbar Waalid 1 (Primary)</label><input type="text" id="regP1" placeholder="061xxxxxxx"></div>
+                    <div><label>Lanbar Waalid 2 (Secondary)</label><input type="text" id="regP2" placeholder="061xxxxxxx"></div>
                 </div>
-                <button onclick="registerNewStudent()" style="margin-top: 25px; max-width: 350px;">DIIWAANGELI ARDAYGA</button>
+                <button onclick="registerNewStudent()" style="margin-top: 25px; max-width: 350px;">KEYDI XOGTA OFFICIAL-KA AH</button>
             </div>
         </section>
 
         <section id="managePage" class="page-view hidden">
             <div class="box">
                 <h2>Maareynta Nidaamka</h2>
+                <div class="filter-bar">
+                    <select id="mGrade" onchange="renderManageTable()">
+                        <option value="all">Dhamaan Grade</option>
+                        <option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+                    </select>
+                    <select id="mSection" onchange="renderManageTable()">
+                        <option value="all">Dhamaan Section</option>
+                        <option value="A">A</option><option value="B">B</option><option value="C">C</option>
+                    </select>
+                </div>
                 <div class="table-container">
                     <table>
                         <thead>
-                            <tr>
-                                <th>Sawir</th>
-                                <th>Magaca Ardayga</th>
-                                <th>ID Number</th>
-                                <th>Fasalka</th>
-                                <th>Action</th>
-                            </tr>
+                            <tr><th>Magaca</th><th>Hooyada</th><th>ID Number</th><th>Fasalka</th><th>Section</th><th>Action</th></tr>
                         </thead>
                         <tbody id="manageTableBody"></tbody>
                     </table>
@@ -616,67 +458,36 @@
             </div>
         </section>
 
-        <section id="settingsPage" class="page-view hidden">
-            <div class="box">
-                <h2>System Settings</h2>
-                <div class="grid-stats">
-                    <div>
-                        <label>Magaca Dugsiga (School Name)</label>
-                        <input type="text" id="setSchoolName" placeholder="Tus: Nawawi School">
-                    </div>
-                    <div>
-                        <label>Logo-da Dugsiga</label>
-                        <input type="file" accept="image/*" onchange="previewFile(this, 'logoPreview')">
-                        <div class="photo-container" style="border-radius: 50%;"><img id="logoPreview"></div>
-                    </div>
-                </div>
-                <button onclick="saveSchoolSettings()" style="margin-top: 20px; max-width: 300px;">UPDATE SYSTEM INFO</button>
-            </div>
-        </section>
-
         <section id="resultPage" class="page-view hidden">
-            <div class="box" style="text-align: center;">
-                <img id="stPhoto" src="https://via.placeholder.com/120" style="width:120px;height:120px;border-radius:50%;border:4px solid var(--accent);margin-bottom:15px;object-fit:cover;">
+            <div class="box" style="text-align: center; border-bottom: 5px solid var(--accent);">
                 <h1 id="stNameHead">---</h1>
                 <p id="stRollHead" style="font-weight: bold; color: var(--info);"></p>
                 <div class="grid-stats" style="margin: 30px 0;">
-                    <div class="box">
-                        <small>Total Score</small>
-                        <h2 id="stTotal">0</h2>
-                    </div>
-                    <div class="box">
-                        <small>Percentage</small>
-                        <h2 id="stAvg">0%</h2>
-                    </div>
-                    <div class="box">
-                        <small>Rank / Status</small>
-                        <h2 id="stRank">---</h2>
-                    </div>
+                    <div class="box">Total Score: <h2 id="stTotal">0</h2></div>
+                    <div class="box">Percentage: <h2 id="stAvg">0%</h2></div>
+                    <div class="box">Result: <h2 id="stRank">Pass</h2></div>
                 </div>
+                <h3>Dhibcaha Maado kasta</h3>
                 <div class="table-container">
                     <table>
                         <thead>
-                            <tr>
-                                <th>Maadada</th>
-                                <th>Dhibcaha</th>
-                                <th>Status</th>
-                            </tr>
+                            <tr><th>Maadada</th><th>Dhibcaha</th><th>Status</th></tr>
                         </thead>
                         <tbody id="stDetailTable"></tbody>
                     </table>
                 </div>
-                <button onclick="window.print()" style="margin-top:20px; background:var(--primary); width:auto; padding:10px 30px;">PRINT REPORT CARD</button>
             </div>
         </section>
 
         <footer style="text-align: center; padding: 20px; color: #888; font-size: 13px;">
-            <p>Developed by <b>Weyrax</b> | v10.0 Professional Edition | &copy; 2026</p>
+            <p>Designed and Developed by <b>Weyrax</b> | &copy; 2026</p>
         </footer>
+
     </main>
 
     <div id="scoreModal" class="modal-overlay hidden">
         <div class="modal-card">
-            <h3>Natiijada: <span id="modalStudentName"></span></h3>
+            <h3 style="margin: 0;">Geli Dhibcaha: <span id="modalStudentName" style="color: var(--accent);"></span></h3>
             <hr style="margin: 15px 0; opacity: 0.1;">
             <div id="scoreInputsGrid" class="grid-stats" style="grid-template-columns: repeat(3, 1fr);"></div>
             <div style="margin-top: 30px; display: flex; gap: 15px;">
@@ -687,17 +498,11 @@
     </div>
 
     <script>
-        // --- GLOBAL CONSTANTS ---
-        const SUBJECTS = [
-            "Math", "English", "Arabic", "Tarbiya", "Chemistry", 
-            "Physics", "History", "Geography", "Somali", "ICT", "Biology"
-        ];
-        
-        // --- DATA LOAD ---
+        const SUBJECTS = ["Math", "English", "Arabic", "Tarbiya", "Chemistry", "Physics", "History", "Geography", "Somali", "ICT", "Biology"];
         let students = JSON.parse(localStorage.getItem('nbs_official_v9_master')) || [];
         let currentEditingId = null;
 
-        // --- UI FUNCTIONS ---
+        // Toggle Sidebar Function
         function toggleSidebar() {
             const sidebar = document.getElementById('mainSidebar');
             const overlay = document.getElementById('sidebarOverlay');
@@ -705,336 +510,255 @@
             overlay.classList.toggle('show');
         }
 
-        function showPage(pageId, element = null) {
-            const allPages = document.querySelectorAll('.page-view');
-            allPages.forEach(function(page) {
-                page.classList.add('hidden');
-            });
-            
-            document.getElementById(pageId).classList.remove('hidden');
-            
-            if (element) {
-                const navItems = document.querySelectorAll('.nav-item');
-                navItems.forEach(function(item) {
-                    item.classList.remove('nav-active');
-                });
-                element.classList.add('nav-active');
-            }
-            
-            if (pageId === 'managePage') { renderManageTable(); }
-            if (pageId === 'examPage') { renderExamTable(); }
-            if (pageId === 'dashPage') { updateDashContacts(); }
-        }
-
-        // --- PHOTO LOGIC ---
-        function previewFile(input, targetId) {
-            const preview = document.getElementById(targetId);
-            const file = input.files[0];
-            const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                preview.src = e.target.result;
-                preview.style.display = 'block';
-            };
-            
-            if (file) {
-                reader.readAsDataURL(file);
-            }
-        }
-
-        // --- SETTINGS LOGIC ---
-        function saveSchoolSettings() {
-            const name = document.getElementById('setSchoolName').value;
-            const logo = document.getElementById('logoPreview').src;
-            
-            const settingsObject = {
-                name: name,
-                logo: logo
-            };
-            
-            localStorage.setItem('school_settings', JSON.stringify(settingsObject));
-            loadSchoolSettings();
-            alert("System Settings have been updated successfully!");
-        }
-
-        function loadSchoolSettings() {
-            const savedSettings = JSON.parse(localStorage.getItem('school_settings'));
-            if (savedSettings) {
-                if (savedSettings.name) {
-                    document.getElementById('sidebarSchoolName').innerText = savedSettings.name;
-                    document.getElementById('loginTitle').innerText = savedSettings.name + " LOGIN";
-                    const mobileTitle = document.getElementById('mobileTitle');
-                    if (mobileTitle) {
-                        mobileTitle.innerText = savedSettings.name;
-                    }
-                }
-                if (savedSettings.logo && savedSettings.logo.startsWith('data')) {
-                    const sbLogo = document.getElementById('sidebarLogo');
-                    const lgLogo = document.getElementById('loginLogo');
-                    sbLogo.src = savedSettings.logo;
-                    sbLogo.style.display = 'inline-block';
-                    lgLogo.src = savedSettings.logo;
-                    lgLogo.style.display = 'inline-block';
-                }
-            }
-        }
-
-        // --- AUTHENTICATION ---
+        // --- AUTHENTICATION LOGIC ---
         function attemptLogin() {
             const role = document.getElementById('loginRole').value;
             const user = document.getElementById('username').value;
             const pass = document.getElementById('password').value;
-            const errorElement = document.getElementById('loginError');
+            const errorP = document.getElementById('loginError');
 
             if (role === "admin") {
                 if (user === "admin" && pass === "admin123") {
                     startSystem("admin");
                 } else {
-                    errorElement.innerText = "Invalid Admin Credentials!";
+                    errorP.innerText = "Admin Username ama Password waa khalad!";
                 }
-            } else {
-                const foundStudent = students.find(function(s) {
-                    return s.roll === user && s.password === pass;
-                });
-                
-                if (foundStudent) {
-                    startSystem("student", foundStudent);
+            } 
+            else {
+                const found = students.find(s => s.roll === user && s.password === pass);
+                if (found) {
+                    startSystem("student", found);
                 } else {
-                    errorElement.innerText = "Invalid Student Roll Number or Password!";
+                    errorP.innerText = "Roll Number-ka ama Password-ka waa khalad!";
                 }
             }
         }
 
-        function startSystem(role, studentData = null) {
+        function startSystem(role, data = null) {
             document.getElementById('loginSection').classList.add('hidden');
             document.getElementById('mainSidebar').style.display = 'flex';
             document.getElementById('mainContent').style.display = 'block';
             document.getElementById('userRoleDisplay').innerText = role.toUpperCase();
             
+            // Show Mobile Header if on mobile
+            if (window.innerWidth <= 768) {
+                document.getElementById('mobileHeader').style.display = 'flex';
+            }
+
             if (role === "admin") {
                 document.getElementById('adminLinks').classList.remove('hidden');
                 showPage('dashPage');
             } else {
                 document.getElementById('studentLinks').classList.remove('hidden');
-                renderStudentPortal(studentData);
+                renderStudentPortal(data);
                 showPage('resultPage');
             }
             updateStats();
         }
 
-        // --- CORE STUDENT LOGIC ---
-        function registerNewStudent() {
-            const nameValue = document.getElementById('regName').value;
-            const rollValue = document.getElementById('regRoll').value;
-            const photoSrc = document.getElementById('previewImg').src;
+        function showPage(pageId, element = null) {
+            document.querySelectorAll('.page-view').forEach(p => p.classList.add('hidden'));
+            document.getElementById(pageId).classList.remove('hidden');
             
-            if (!nameValue || !rollValue) {
-                alert("Please enter both Name and Roll Number!");
-                return;
+            if (element) {
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('nav-active'));
+                element.classList.add('nav-active');
             }
+
+            // Close sidebar on mobile after clicking link
+            if (window.innerWidth <= 768) {
+                const sidebar = document.getElementById('mainSidebar');
+                const overlay = document.getElementById('sidebarOverlay');
+                sidebar.classList.remove('open');
+                overlay.classList.remove('show');
+            }
+
+            if (pageId === 'examPage') renderExamTable();
+            if (pageId === 'managePage') renderManageTable();
+            if (pageId === 'dashPage') updateDashContacts();
+        }
+
+        // --- CORE STUDENT MANAGEMENT ---
+        function registerNewStudent() {
+            const name = document.getElementById('regName').value;
+            const roll = document.getElementById('regRoll').value;
+            const mother = document.getElementById('regMother').value;
+            const p1 = document.getElementById('regP1').value;
+            const p2 = document.getElementById('regP2').value;
+
+            if (!name || !roll) return alert("Fadlan buuxi magaca iyo Roll-ka!");
 
             const newStudent = {
                 id: "ST-" + Date.now(),
-                fullName: nameValue,
-                roll: rollValue,
-                motherName: document.getElementById('regMother').value,
+                fullName: name,
+                motherName: mother,
+                roll: roll,
                 password: document.getElementById('regPass').value,
                 grade: document.getElementById('regGrade').value,
                 section: document.getElementById('regSection').value,
-                phones: [
-                    document.getElementById('regP1').value, 
-                    document.getElementById('regP2').value
-                ],
-                photo: photoSrc.startsWith('data') ? photoSrc : 'https://via.placeholder.com/120',
+                phones: [p1, p2],
                 scores: {},
+                presentToday: false,
                 attendancePoints: 0
             };
 
-            for (let i = 0; i < SUBJECTS.length; i++) {
-                newStudent.scores[SUBJECTS[i]] = 0;
-            }
-
+            SUBJECTS.forEach(s => newStudent.scores[s] = 0);
             students.push(newStudent);
-            saveDataToLocal();
-            alert("New student registered successfully!");
+            saveData();
+            alert("Ardayga si guul leh ayaa loo diiwaangeliyay!");
             updateStats();
             showPage('dashPage');
+            
+            // Clear inputs
+            document.getElementById('regName').value = "";
+            document.getElementById('regRoll').value = "";
+            document.getElementById('regMother').value = "";
+            document.getElementById('regP1').value = "";
+            document.getElementById('regP2').value = "";
         }
 
         function fetchAttendanceList() {
-            const gradeFilter = document.getElementById('attGrade').value;
-            const sectionFilter = document.getElementById('attSection').value;
+            const g = document.getElementById('attGrade').value;
+            const s = document.getElementById('attSection').value;
             
-            const filteredList = students.filter(function(st) {
-                return st.grade === gradeFilter && st.section === sectionFilter;
-            });
+            const filtered = students.filter(st => st.grade === g && st.section === s)
+                            .sort((a, b) => a.fullName.localeCompare(b.fullName));
             
             const tbody = document.getElementById('attendanceTableBody');
-            let htmlContent = "";
-            
-            for (let i = 0; i < filteredList.length; i++) {
-                const st = filteredList[i];
-                htmlContent += "<tr>";
-                htmlContent += "<td>" + st.fullName + "</td>";
-                htmlContent += "<td>" + st.roll + "</td>";
-                htmlContent += "<td><div class='att-toggle'>";
-                htmlContent += "<button class='btn-check present active'>JOOGA</button>";
-                htmlContent += "<button class='btn-check absent'>MA JOOGO</button>";
-                htmlContent += "</div></td></tr>";
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Arday looma hayo fasalkaas.</td></tr>';
+                return;
             }
-            
-            tbody.innerHTML = htmlContent;
+
+            tbody.innerHTML = filtered.map(st => `
+                <tr>
+                    <td>${st.fullName}</td>
+                    <td>${st.roll}</td>
+                    <td>
+                        <div class="att-toggle">
+                            <button class="btn-check present ${st.presentToday ? 'active' : ''}" onclick="setAttendance('${st.id}', true, this)">JOOGA</button>
+                            <button class="btn-check absent ${!st.presentToday ? 'active' : ''}" onclick="setAttendance('${st.id}', false, this)">MA JOOGO</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function setAttendance(id, isPresent, btn) {
+            const st = students.find(x => x.id === id);
+            st.presentToday = isPresent;
+            st.attendancePoints = isPresent ? 10 : 0;
+            const parent = btn.parentElement;
+            parent.querySelectorAll('.btn-check').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            saveData();
+        }
+
+        function submitAttendance() { alert("Xadirinta waa la keydiyay!"); renderExamTable(); }
+
+        // --- CALCULATIONS & TABLES ---
+        function calculateSummary(st) {
+            let examSum = 0;
+            SUBJECTS.forEach(s => examSum += (st.scores[s] || 0));
+            const finalTotal = examSum + (st.attendancePoints || 0);
+            const avg = Math.round((finalTotal / (SUBJECTS.length * 100)) * 100);
+            let grade = "F";
+            if (avg >= 90) grade = "A"; else if (avg >= 80) grade = "B";
+            else if (avg >= 70) grade = "C"; else if (avg >= 50) grade = "D";
+            return { total: finalTotal, average: avg, grade: grade, examOnly: examSum };
         }
 
         function renderExamTable() {
-            const searchVal = document.getElementById('searchExam').value.toLowerCase();
-            const gradeVal = document.getElementById('exGrade').value;
+            const g = document.getElementById('exGrade').value;
+            const s = document.getElementById('exSection').value;
+            const q = document.getElementById('searchExam').value.toLowerCase();
             
-            const filteredList = students.filter(function(st) {
-                const matchGrade = (gradeVal === 'all' || st.grade === gradeVal);
-                const matchSearch = st.fullName.toLowerCase().includes(searchVal);
-                return matchGrade && matchSearch;
-            });
+            const filtered = students.filter(st => (g === 'all' || st.grade === g) && (s === 'all' || st.section === s) && st.fullName.toLowerCase().includes(q))
+                            .sort((a, b) => a.fullName.localeCompare(b.fullName));
 
             const tbody = document.getElementById('examTableBody');
-            let htmlContent = "";
-
-            for (let i = 0; i < filteredList.length; i++) {
-                const st = filteredList[i];
-                let sum = 0;
-                for (let j = 0; j < SUBJECTS.length; j++) {
-                    sum += (st.scores[SUBJECTS[j]] || 0);
-                }
-                let avg = Math.round((sum / (SUBJECTS.length * 100)) * 100);
-                
-                htmlContent += "<tr>";
-                htmlContent += "<td>" + st.roll + "</td>";
-                htmlContent += "<td>" + st.fullName + "</td>";
-                htmlContent += "<td>" + sum + "</td>";
-                htmlContent += "<td>+" + (st.attendancePoints || 0) + "</td>";
-                htmlContent += "<td>" + avg + "%</td>";
-                htmlContent += "<td><span class='badge bg-a'>A</span></td>";
-                htmlContent += "<td><button style='width:auto;padding:5px 10px;' onclick='openScoreModal(\"" + st.id + "\")'>GELI</button></td>";
-                htmlContent += "</tr>";
-            }
-            
-            tbody.innerHTML = htmlContent;
+            tbody.innerHTML = filtered.map(st => {
+                const res = calculateSummary(st);
+                return `
+                    <tr>
+                        <td>${st.roll}</td>
+                        <td>${st.fullName}</td>
+                        <td>${res.examOnly}</td>
+                        <td>+${st.attendancePoints || 0}</td>
+                        <td><b>${res.average}%</b></td>
+                        <td><span class="badge ${res.grade === 'F' ? 'bg-f' : 'bg-a'}">${res.grade}</span></td>
+                        <td><button style="width:auto; padding:5px 10px;" onclick="openScoreModal('${st.id}')">GELI DHIBCAHA</button></td>
+                    </tr>
+                `;
+            }).join('');
         }
 
-        function openScoreModal(studentId) {
-            currentEditingId = studentId;
-            const student = students.find(function(x) {
-                return x.id === studentId;
-            });
-            
-            document.getElementById('modalStudentName').innerText = student.fullName;
-            
-            let gridHtml = "";
-            for (let i = 0; i < SUBJECTS.length; i++) {
-                const sub = SUBJECTS[i];
-                gridHtml += "<div>";
-                gridHtml += "<label>" + sub + "</label>";
-                gridHtml += "<input type='number' class='sc-in' data-s='" + sub + "' value='" + (student.scores[sub] || 0) + "'>";
-                gridHtml += "</div>";
-            }
-            
-            document.getElementById('scoreInputsGrid').innerHTML = gridHtml;
+        function openScoreModal(id) {
+            currentEditingId = id;
+            const st = students.find(x => x.id === id);
+            document.getElementById('modalStudentName').innerText = st.fullName;
+            const grid = document.getElementById('scoreInputsGrid');
+            grid.innerHTML = SUBJECTS.map(s => `
+                <div style="margin-bottom:10px;">
+                    <label style="font-size:11px; font-weight:bold;">${s}</label>
+                    <input type="number" class="score-input-val" data-subj="${s}" value="${st.scores[s] || 0}" max="100">
+                </div>
+            `).join('');
             document.getElementById('scoreModal').classList.remove('hidden');
         }
 
         function saveStudentScores() {
-            const student = students.find(function(x) {
-                return x.id === currentEditingId;
+            const st = students.find(x => x.id === currentEditingId);
+            document.querySelectorAll('.score-input-val').forEach(input => {
+                st.scores[input.getAttribute('data-subj')] = parseInt(input.value) || 0;
             });
-            
-            const inputs = document.querySelectorAll('.sc-in');
-            inputs.forEach(function(input) {
-                const subjectName = input.getAttribute('data-s');
-                student.scores[subjectName] = parseInt(input.value) || 0;
-            });
-            
-            saveDataToLocal();
-            closeScoreModal();
-            renderExamTable();
-            alert("Student scores have been updated!");
+            saveData(); closeScoreModal(); renderExamTable(); alert("Natiijada waa la cusboonaysiiyay!");
         }
 
-        function closeScoreModal() {
-            document.getElementById('scoreModal').classList.add('hidden');
-        }
+        function closeScoreModal() { document.getElementById('scoreModal').classList.add('hidden'); }
 
         function renderManageTable() {
-            const tbody = document.getElementById('manageTableBody');
-            let htmlContent = "";
+            const g = document.getElementById('mGrade').value;
+            const s = document.getElementById('mSection').value;
+            const filtered = students.filter(st => (g === 'all' || st.grade === g) && (s === 'all' || st.section === s))
+                            .sort((a, b) => a.fullName.localeCompare(b.fullName));
 
-            for (let i = 0; i < students.length; i++) {
-                const st = students[i];
-                htmlContent += "<tr>";
-                htmlContent += "<td><img src='" + st.photo + "' style='width:40px;height:40px;border-radius:50%;object-fit:cover;'></td>";
-                htmlContent += "<td>" + st.fullName + "</td>";
-                htmlContent += "<td>" + st.roll + "</td>";
-                htmlContent += "<td>Grade " + st.grade + "</td>";
-                htmlContent += "<td><button class='btn-danger' style='width:auto;padding:5px 12px;' onclick='deleteStudent(\"" + st.id + "\")'>Tirtir</button></td>";
-                htmlContent += "</tr>";
-            }
-            
-            tbody.innerHTML = htmlContent;
+            document.getElementById('manageTableBody').innerHTML = filtered.map(st => `
+                <tr>
+                    <td>${st.fullName}</td>
+                    <td>${st.motherName || '---'}</td>
+                    <td>${st.roll}</td>
+                    <td>Grade ${st.grade}</td>
+                    <td>Section ${st.section}</td>
+                    <td><button class="btn-danger" style="width:auto; padding:5px;" onclick="deleteStudent('${st.id}')">Tirtir</button></td>
+                </tr>
+            `).join('');
         }
 
-        function deleteStudent(id) {
-            if (confirm("Are you sure you want to delete this student?")) {
-                students = students.filter(function(s) {
-                    return s.id !== id;
-                });
-                saveDataToLocal();
-                renderManageTable();
-                updateStats();
-            }
-        }
+        function deleteStudent(id) { if (confirm("Ma hubtaa inaad tirtirto ardaygan iyo dhammaan xogtiisa?")) { students = students.filter(s => s.id !== id); saveData(); renderManageTable(); updateStats(); } }
 
         function renderStudentPortal(st) {
-            document.getElementById('stPhoto').src = st.photo;
+            const res = calculateSummary(st);
             document.getElementById('stNameHead').innerText = st.fullName;
-            document.getElementById('stRollHead').innerText = "ID: " + st.roll + " | Grade: " + st.grade;
-            
-            let sum = 0;
-            for (let i = 0; i < SUBJECTS.length; i++) {
-                sum += (st.scores[SUBJECTS[i]] || 0);
-            }
-            
-            document.getElementById('stTotal').innerText = sum;
-            document.getElementById('stAvg').innerText = Math.round((sum / (SUBJECTS.length * 100)) * 100) + "%";
-            document.getElementById('stRank').innerText = sum >= 550 ? "PASS" : "FAIL";
-            
-            let tableHtml = "";
-            for (let i = 0; i < SUBJECTS.length; i++) {
-                const sub = SUBJECTS[i];
-                const score = st.scores[sub];
-                tableHtml += "<tr><td>" + sub + "</td><td>" + score + "</td><td>" + (score >= 50 ? 'Pass' : 'Fail') + "</td></tr>";
-            }
-            
-            document.getElementById('stDetailTable').innerHTML = tableHtml;
+            document.getElementById('stRollHead').innerText = `ID: ${st.roll} | FASALKA: ${st.grade}${st.section}`;
+            document.getElementById('stTotal').innerText = res.total;
+            document.getElementById('stAvg').innerText = res.average + "%";
+            document.getElementById('stRank').innerText = res.average >= 50 ? "PASS" : "FAIL";
+            document.getElementById('stDetailTable').innerHTML = SUBJECTS.map(s => `<tr><td>${s}</td><td>${st.scores[s] || 0}</td><td style="color:${st.scores[s] >= 50 ? 'var(--accent)' : 'var(--danger)'}; font-weight:bold;">${st.scores[s] >= 50 ? 'Pass' : 'Fail'}</td></tr>`).join('');
         }
 
-        // --- UTILS ---
+        // --- UTILITIES ---
         function updateStats() {
             document.getElementById('countStudents').innerText = students.length;
             document.getElementById('currentDate').innerText = new Date().toDateString();
         }
 
         function updateDashContacts() {
-            const latest = students.slice(-5);
-            let html = "";
-            for (let i = 0; i < latest.length; i++) {
-                const st = latest[i];
-                html += "<tr><td>" + st.fullName + "</td><td>" + st.grade + "</td><td>" + st.section + "</td><td>" + st.phones.join(',') + "</td></tr>";
-            }
-            document.getElementById('dashContactList').innerHTML = html;
+            const recent = [...students].reverse().slice(0, 10);
+            document.getElementById('dashContactList').innerHTML = recent.map(st => `<tr><td>${st.fullName}</td><td>Grade ${st.grade}</td><td>${st.section}</td><td>${(st.phones || []).filter(p => p).join(', ') || 'N/A'}</td></tr>`).join('');
         }
 
-        function saveDataToLocal() {
-            localStorage.setItem('nbs_official_v9_master', JSON.stringify(students));
-        }
+        function saveData() { localStorage.setItem('nbs_official_v9_master', JSON.stringify(students)); }
     </script>
 </body>
 </html>
