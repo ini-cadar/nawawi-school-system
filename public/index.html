@@ -3,334 +3,230 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WEYRAX ULTIMATE v10 | Enterprise School Portal</title>
+    <title>WEYRAX SMART ERP | University Management System v2026</title>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
-        /* --- CORE DESIGN SYSTEM --- */
-        :root { 
-            --primary: #0f172a; 
-            --primary-light: #1e293b;
-            --accent: #10b981; 
-            --accent-hover: #059669;
-            --danger: #ef4444; 
+        :root {
+            --primary: #0f172a;
+            --secondary: #1e293b;
+            --accent: #2563eb;
+            --success: #10b981;
+            --danger: #ef4444;
             --warning: #f59e0b;
-            --info: #3b82f6;
-            --bg-body: #f8fafc;
-            --text-dark: #1e293b;
-            --text-muted: #64748b;
             --white: #ffffff;
-            --sidebar-width: 290px;
-            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1);
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --light: #f8fafc;
+            --border: #e2e8f0;
+            --sidebar-w: 280px;
+            --radius-lg: 16px;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
 
-        * { box-sizing: border-box; outline: none; }
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            margin: 0; 
-            display: flex; 
-            height: 100vh; 
-            background: var(--bg-body); 
-            color: var(--text-dark); 
-            overflow: hidden; 
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--light); color: var(--primary); display: flex; height: 100vh; overflow: hidden; }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: var(--sidebar-w); background: var(--primary); color: white;
+            display: flex; flex-direction: column; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1001; flex-shrink: 0;
+        }
+        .sidebar-header { padding: 35px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .univ-logo-main { width: 70px; height: 70px; border-radius: 50%; background: white; margin-bottom: 15px; border: 3px solid var(--accent); object-fit: contain; }
+
+        .nav-menu { flex: 1; padding: 20px 10px; overflow-y: auto; }
+        .nav-label { font-size: 11px; color: #64748b; font-weight: 800; text-transform: uppercase; padding: 15px; letter-spacing: 1.2px; }
+        .nav-item {
+            padding: 14px 18px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 14px;
+            color: #94a3b8; transition: 0.2s; margin-bottom: 4px; font-weight: 500;
+        }
+        .nav-item:hover, .nav-active { background: var(--accent); color: white; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
+
+        /* --- MAIN AREA --- */
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+        .top-nav {
+            height: 75px; background: white; border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between; padding: 0 30px;
         }
 
-        /* --- LOADING OVERLAY --- */
-        #loader {
-            position: fixed; inset: 0; background: var(--primary); z-index: 10000;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; color: white;
-            transition: opacity 0.5s ease;
+        .scroll-body { flex: 1; padding: 30px; overflow-y: auto; scroll-behavior: smooth; }
+
+        /* --- UI CARDS --- */
+        .card { background: white; border-radius: var(--radius-lg); padding: 25px; box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 25px; }
+        .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        
+        .stat-box { padding: 25px; border-radius: var(--radius-lg); color: white; position: relative; overflow: hidden; }
+        .stat-box i { position: absolute; right: -10px; bottom: -10px; font-size: 80px; opacity: 0.15; }
+
+        /* --- FORMS --- */
+        input, select, textarea { 
+            width: 100%; padding: 14px 18px; border-radius: 10px; border: 1.5px solid var(--border); 
+            outline: none; margin-top: 8px; transition: 0.3s; font-size: 14px;
         }
-        .spinner { width: 50px; height: 50px; border: 5px solid #334155; border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        input:focus { border-color: var(--accent); ring: 2px solid rgba(37, 99, 235, 0.1); }
 
-        /* --- AUTHENTICATION UI --- */
-        #loginSection {
-            position: fixed; inset: 0; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px;
+        .btn { 
+            padding: 14px 28px; border-radius: 10px; border: none; cursor: pointer; font-weight: 700;
+            display: inline-flex; align-items: center; gap: 10px; transition: 0.3s; justify-content: center;
         }
-
-        .login-card {
-            background: var(--white); width: 100%; max-width: 440px; padding: 50px; border-radius: 24px;
-            box-shadow: var(--shadow-lg); text-align: center; animation: slideUp 0.6s ease;
-        }
-        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-        .login-card h1 { font-weight: 800; font-size: 2rem; color: var(--primary); margin-bottom: 8px; letter-spacing: -1px; }
-        .login-card p { color: var(--text-muted); margin-bottom: 35px; }
-
-        .input-group { text-align: left; margin-bottom: 20px; }
-        .input-group label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 8px; color: var(--primary); }
-        .input-group input, .input-group select {
-            width: 100%; padding: 14px 18px; border-radius: 12px; border: 1.5px solid #e2e8f0;
-            font-size: 15px; transition: var(--transition); background: #fcfdfe;
-        }
-        .input-group input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1); }
-
-        .btn-login {
-            width: 100%; padding: 16px; background: var(--accent); color: white; border: none;
-            border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; transition: var(--transition);
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); margin-top: 10px;
-        }
-        .btn-login:hover { background: var(--accent-hover); transform: translateY(-2px); }
-
-        /* --- SIDEBAR STYLING --- */
-        .sidebar { 
-            width: var(--sidebar-width); background: var(--primary); color: var(--white); 
-            display: flex; flex-direction: column; flex-shrink: 0; position: relative;
-        }
-        .sidebar-brand { padding: 40px 30px; display: flex; align-items: center; gap: 12px; }
-        .brand-logo { width: 40px; height: 40px; background: var(--accent); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
-        .brand-name { font-weight: 800; font-size: 1.3rem; letter-spacing: -0.5px; }
-
-        .nav-list { flex: 1; padding: 10px 15px; overflow-y: auto; }
-        .nav-header { padding: 15px 20px 10px; font-size: 11px; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 1px; }
-        .nav-link {
-            padding: 14px 20px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 14px;
-            color: #94a3b8; font-weight: 600; font-size: 14px; transition: var(--transition); margin-bottom: 4px;
-        }
-        .nav-link:hover { color: var(--white); background: rgba(255,255,255,0.05); }
-        .nav-link.active { background: var(--accent); color: var(--white); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); }
-        .nav-link i { font-size: 18px; width: 24px; text-align: center; }
-
-        .sidebar-footer { padding: 20px; border-top: 1px solid #1e293b; }
-        .user-pill {
-            background: #1e293b; padding: 12px; border-radius: 12px; display: flex; align-items: center; gap: 12px;
-        }
-        .user-avatar { width: 35px; height: 35px; border-radius: 8px; background: var(--info); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; }
-
-        /* --- CONTENT AREA --- */
-        .content { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
-        .top-bar {
-            height: 80px; background: var(--white); padding: 0 40px; display: flex; align-items: center;
-            justify-content: space-between; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 100;
-        }
-        .page-title h2 { margin: 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px; }
-
-        .main-container { padding: 40px; max-width: 1400px; margin: 0 auto; width: 100%; }
-
-        /* --- CARDS & GRIDS --- */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 40px; }
-        .card-stat {
-            background: var(--white); padding: 30px; border-radius: 20px; box-shadow: var(--shadow-sm);
-            border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between;
-            transition: var(--transition);
-        }
-        .card-stat:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); }
-        .stat-info h3 { margin: 0; color: var(--text-muted); font-size: 14px; font-weight: 700; margin-bottom: 8px; }
-        .stat-info p { margin: 0; font-size: 28px; font-weight: 800; color: var(--primary); }
-        .stat-icon { width: 60px; height: 60px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
 
         /* --- TABLES --- */
-        .data-card { background: var(--white); border-radius: 24px; border: 1px solid #e2e8f0; box-shadow: var(--shadow-sm); overflow: hidden; }
-        .card-header { padding: 25px 30px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between; }
-        .card-header h4 { margin: 0; font-size: 18px; font-weight: 800; }
+        .table-container { width: 100%; overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        th { background: #f1f5f9; padding: 18px; text-align: left; font-size: 12px; color: #475569; font-weight: 700; }
+        td { padding: 16px; border-bottom: 1px solid var(--border); font-size: 14px; }
 
-        .table-wrapper { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; }
-        th { background: #f8fafc; padding: 18px 30px; text-align: left; font-size: 12px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-        td { padding: 18px 30px; border-bottom: 1px solid #f8fafc; font-size: 14px; font-weight: 500; }
-        tr:last-child td { border: none; }
-        .badge { padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; }
-        .badge-success { background: #dcfce7; color: #166534; }
-        .badge-warning { background: #fef9c3; color: #854d0e; }
-
-        /* --- MODALS & FORMS --- */
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .full-width { grid-column: span 2; }
-        .btn-primary { background: var(--primary); color: white; border: none; padding: 14px 25px; border-radius: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: var(--transition); }
-        .btn-primary:hover { background: #1e293b; transform: scale(1.02); }
-
-        /* --- ID CARDS RENDER --- */
-        .id-render-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 30px; }
-        .id-preview {
-            width: 400px; height: 240px; background: #fff; border-radius: 20px; position: relative; overflow: hidden;
-            display: flex; border: 1px solid #e2e8f0; box-shadow: var(--shadow-lg);
+        /* --- ID CARD SYSTEM --- */
+        .id-card-preview {
+            width: 380px; height: 230px; background: white; border-radius: 15px; border: 2px solid #ddd;
+            display: flex; position: relative; overflow: hidden; box-shadow: 0 15px 30px rgba(0,0,0,0.15);
         }
-        .id-bar { width: 15px; height: 100%; background: var(--primary); }
-        .id-body { flex: 1; padding: 25px; display: flex; flex-direction: column; }
-        .id-head { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; }
-        .id-logo { width: 35px; height: 35px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; }
-        .id-content { display: flex; gap: 20px; }
-        .id-photo { width: 100px; height: 110px; border-radius: 12px; background: #f1f5f9; object-fit: cover; border: 2px solid #e2e8f0; }
-        .id-text h5 { margin: 0; font-size: 11px; color: var(--text-muted); text-transform: uppercase; }
-        .id-text p { margin: 2px 0 12px; font-size: 14px; font-weight: 700; color: var(--primary); }
+        .id-accent-bar { width: 110px; background: var(--primary); color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px; }
+        .id-st-photo { width: 85px; height: 100px; border-radius: 6px; border: 3px solid white; object-fit: cover; background: #eee; }
+        .id-details { flex: 1; padding: 20px; }
+        .id-univ-title { font-size: 14px; font-weight: 800; color: var(--accent); margin-bottom: 15px; text-transform: uppercase; }
 
-        /* --- REPORT CARDS --- */
-        .report-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-top: 20px; }
-        .report-box { background: #f8fafc; padding: 15px; border-radius: 12px; text-align: center; }
-        .report-box h6 { margin: 0; font-size: 12px; color: var(--text-muted); }
-        .report-box p { margin: 5px 0 0; font-size: 20px; font-weight: 800; color: var(--primary); }
+        /* --- MOBILE RESPONSIVENESS --- */
+        @media (max-width: 768px) {
+            .sidebar { position: fixed; left: -100%; height: 100%; }
+            .sidebar.active { left: 0; }
+            .top-nav { padding: 0 15px; }
+            .scroll-body { padding: 15px; }
+            .mobile-menu-btn { display: block !important; }
+        }
 
         .hidden { display: none !important; }
 
+        /* PRINTING */
         @media print {
-            .sidebar, .top-bar, .no-print, .btn-primary { display: none !important; }
-            .content { overflow: visible; }
-            .main-container { padding: 0; }
-            .id-preview { break-inside: avoid; margin-bottom: 40px; box-shadow: none; border: 1px solid #000; }
+            .sidebar, .top-nav, .no-print, .btn { display: none !important; }
+            .main-content, .scroll-body { padding: 0; overflow: visible; }
+            .id-card-preview { margin: 20px auto; border: 1px solid #000; break-inside: avoid; }
         }
     </style>
 </head>
 <body>
 
-    <div id="loader">
-        <div class="spinner"></div>
-        <h2 style="margin-top: 20px; letter-spacing: 2px;">WEYRAX ULTIMATE</h2>
-        <p>Loading System Modules...</p>
-    </div>
-
-    <div id="loginSection">
-        <div class="login-card">
-            <div class="brand-logo" style="width: 60px; height: 60px; margin: 0 auto 20px; font-size: 30px;">W</div>
-            <h1>Kusoo Dhowoow</h1>
-            <p>Weyrax Official Management Portal</p>
-            
-            <div class="input-group">
-                <label>Dooro Door-taada (Role)</label>
-                <select id="loginRole">
-                    <option value="admin">Maamulka (Admin)</option>
-                    <option value="teacher">Macallinka (Teacher)</option>
-                    <option value="student">Ardayga (Student)</option>
-                </select>
-            </div>
-            <div class="input-group">
-                <label>Username ama ID Number</label>
-                <input type="text" id="username" placeholder="Geli ID-gaaga">
-            </div>
-            <div class="input-group">
-                <label>Password</label>
-                <input type="password" id="password" placeholder="••••••••">
-            </div>
-            <button class="btn-login" onclick="handleLogin()">GURADA GAL</button>
-            <p id="loginError" style="color: var(--danger); margin-top: 15px; font-weight: 700; font-size: 14px;"></p>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img id="sideLogo" src="https://via.placeholder.com/70" class="univ-logo-main">
+            <h3 id="sideUnivName" style="font-size: 16px; letter-spacing: 1px;">WEYRAX UNIVERSITY</h3>
+            <small style="color: #64748b; font-weight: 700;">ERP SYSTEM v2.0</small>
         </div>
-    </div>
-
-    <aside class="sidebar" id="mainSidebar" style="display: none;">
-        <div class="sidebar-brand">
-            <div class="brand-logo">W</div>
-            <div class="brand-name">WEYRAX PRO</div>
-        </div>
-
-        <nav class="nav-list">
-            <div id="adminNav" class="hidden">
-                <div class="nav-header">Maamulka</div>
-                <div class="nav-link active" onclick="navigate('dash', this)"><i class="fas fa-grid-2"></i> Dashboard</div>
-                <div class="nav-link" onclick="navigate('students', this)"><i class="fas fa-user-graduate"></i> Ardayda</div>
-                <div class="nav-link" onclick="navigate('finance', this)"><i class="fas fa-money-check-dollar"></i> Lacagaha</div>
-                <div class="nav-link" onclick="navigate('ids', this)"><i class="fas fa-id-card"></i> ID Cards</div>
+        
+        <nav class="nav-menu">
+            <div id="adminMenu">
+                <div class="nav-label">Main Console</div>
+                <div class="nav-item nav-active" onclick="showPage('dashPage', this)"><i class="fas fa-chart-pie"></i> Dashboard</div>
                 
-                <div class="nav-header">Akadeemiyada</div>
-                <div class="nav-link" onclick="navigate('attendance', this)"><i class="fas fa-calendar-check"></i> Xadirinta</div>
-                <div class="nav-link" onclick="navigate('exams', this)"><i class="fas fa-file-signature"></i> Imtixaanada</div>
+                <div class="nav-label">Academic Management</div>
+                <div class="nav-item" onclick="showPage('regPage', this)"><i class="fas fa-user-plus"></i> Admission Office</div>
+                <div class="nav-item" onclick="showPage('stListPage', this)"><i class="fas fa-address-book"></i> Student Records</div>
+                <div class="nav-item" onclick="showPage('idGenPage', this)"><i class="fas fa-id-badge"></i> ID Card Center</div>
+
+                <div class="nav-label">Financial Office</div>
+                <div class="nav-item" onclick="showPage('feePage', this)"><i class="fas fa-file-invoice-dollar"></i> Tuition Fees</div>
+                
+                <div class="nav-label">Configuration</div>
+                <div class="nav-item" onclick="showPage('settingPage', this)"><i class="fas fa-university"></i> Campus Branding</div>
             </div>
 
-            <div id="studentNav" class="hidden">
-                <div class="nav-header">Portal-ka Ardayga</div>
-                <div class="nav-link active" onclick="navigate('st-dash', this)"><i class="fas fa-house-user"></i> Dashboard-kayga</div>
-                <div class="nav-link" onclick="navigate('st-results', this)"><i class="fas fa-chart-line"></i> Natiijooyinka</div>
-                <div class="nav-link" onclick="navigate('st-fees', this)"><i class="fas fa-receipt"></i> Lacagaha</div>
+            <div id="studentMenu" class="hidden">
+                <div class="nav-label">Student Portal</div>
+                <div class="nav-item nav-active" onclick="showPage('stPortalPage', this)"><i class="fas fa-user-circle"></i> My Profile</div>
             </div>
         </nav>
 
-        <div class="sidebar-footer">
-            <div class="user-pill">
-                <div class="user-avatar" id="userAvatar">A</div>
-                <div style="flex:1">
-                    <div style="font-size:13px; font-weight:800;" id="userDisplayName">Admin User</div>
-                    <div style="font-size:11px; color:#94a3b8;" id="userDisplayRole">System Manager</div>
-                </div>
-                <i class="fas fa-sign-out-alt" style="cursor:pointer; color:var(--danger)" onclick="logout()"></i>
-            </div>
+        <div style="padding: 20px; border-top: 1px solid rgba(255,255,255,0.05);">
+            <button class="btn btn-danger" style="width: 100%;" onclick="location.reload()">LOGOUT SYSTEM</button>
         </div>
     </aside>
 
-    <div class="content" id="mainContent" style="display: none;">
-        <header class="top-bar">
-            <div class="page-title">
-                <h2 id="pageTitleText">Dashboard Overview</h2>
+    <div class="main-content">
+        <header class="top-nav">
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <i class="fas fa-bars mobile-menu-btn" onclick="toggleSidebar()" style="display: none; cursor: pointer; font-size: 22px;"></i>
+                <h2 id="pageHeading" style="font-weight: 800; font-size: 22px;">Dashboard Overview</h2>
             </div>
-            <div style="display:flex; gap:20px; align-items:center;">
-                <div id="currentDate" style="font-weight:700; font-size:14px; color:var(--text-muted)"></div>
-                <button class="btn-primary" style="padding:10px 15px" onclick="backupData()"><i class="fas fa-cloud-arrow-up"></i> Backup</button>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div style="text-align: right;" class="no-print">
+                    <p style="font-weight: 800; font-size: 14px;" id="userName">Admin Account</p>
+                    <small style="color: var(--success); font-weight: 700;">● Online</small>
+                </div>
+                <img src="https://via.placeholder.com/45" style="width: 45px; height: 45px; border-radius: 12px; border: 2px solid var(--border);">
             </div>
         </header>
 
-        <main class="main-container">
+        <div class="scroll-body">
             
-            <section id="dashPage" class="view-section">
-                <div class="stats-grid">
-                    <div class="card-stat">
-                        <div class="stat-info">
-                            <h3>Guud ahaan Ardayda</h3>
-                            <p id="stat-total-students">0</p>
-                        </div>
-                        <div class="stat-icon" style="background:#eef2ff; color:#6366f1;"><i class="fas fa-users"></i></div>
+            <section id="dashPage" class="page-view">
+                <div class="grid-stats">
+                    <div class="stat-box" style="background: linear-gradient(135deg, #2563eb, #1d4ed8);">
+                        <p>Total Enrollment</p><h1 id="stat-st-count">0</h1><i class="fas fa-user-graduate"></i>
                     </div>
-                    <div class="card-stat">
-                        <div class="stat-info">
-                            <h3>Dakhliga Bishan</h3>
-                            <p id="stat-revenue">$0.00</p>
-                        </div>
-                        <div class="stat-icon" style="background:#f0fdf4; color:#22c55e;"><i class="fas fa-dollar-sign"></i></div>
+                    <div class="stat-box" style="background: linear-gradient(135deg, #10b981, #059669);">
+                        <p>Total Revenue</p><h1 id="stat-fees-total">$0.00</h1><i class="fas fa-money-bill-wave"></i>
                     </div>
-                    <div class="card-stat">
-                        <div class="stat-info">
-                            <h3>Maanta Maqnaanshaha</h3>
-                            <p id="stat-absent">0</p>
-                        </div>
-                        <div class="stat-icon" style="background:#fff1f2; color:#f43f5e;"><i class="fas fa-user-xmark"></i></div>
+                    <div class="stat-box" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                        <p>Active Programs</p><h1>14</h1><i class="fas fa-book"></i>
                     </div>
                 </div>
 
-                <div class="data-card">
-                    <div class="card-header">
-                        <h4>Ardaydii u dambaysay</h4>
-                        <button class="btn-primary" onclick="navigate('students')">Eeg Dhammaan</button>
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 25px; margin-top: 30px;" class="no-print">
+                    <div class="card">
+                        <h3>Attendance & Finance Trends</h3>
+                        <canvas id="mainChart" height="130"></canvas>
                     </div>
-                    <div class="table-wrapper">
-                        <table>
-                            <thead>
-                                <tr><th>Ardayga</th><th>Roll No</th><th>Fasalka</th><th>Status</th></tr>
-                            </thead>
-                            <tbody id="recentStudentsList">
-                                </tbody>
-                        </table>
+                    <div class="card">
+                        <h3>Campus Log</h3>
+                        <div id="activityLog" style="font-size: 13px; line-height: 2;">
+                            <p><i class="fas fa-check-circle" style="color: var(--success);"></i> System Boot Successful</p>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <section id="studentsPage" class="view-section hidden">
-                <div class="data-card no-print">
-                    <div class="card-header"><h4>Diiwaangeli Arday Cusub</h4></div>
-                    <div style="padding:30px;">
-                        <div class="form-grid">
-                            <div class="input-group"><label>Magaca oo Buuxa</label><input type="text" id="regName"></div>
-                            <div class="input-group"><label>Roll Number (ID)</label><input type="text" id="regRoll"></div>
-                            <div class="input-group">
-                                <label>Fasalka</label>
-                                <select id="regGrade">
-                                    <option value="9">Grade 9</option><option value="10">Grade 10</option>
-                                    <option value="11">Grade 11</option><option value="12">Grade 12</option>
+            <section id="regPage" class="page-view hidden">
+                <div class="card">
+                    <h2>Admission Form (New Student)</h2>
+                    <div style="display: grid; grid-template-columns: 1fr 2.5fr; gap: 40px; margin-top: 25px;">
+                        <div style="text-align: center;">
+                            <img id="reg-photo-preview" src="https://via.placeholder.com/150" style="width: 150px; height: 180px; border-radius: 15px; object-fit: cover; border: 3px dashed var(--border);">
+                            <input type="file" id="st-photo-upload" style="margin-top: 15px;" onchange="handlePhoto(event)">
+                        </div>
+                        <div class="grid-stats" style="grid-template-columns: 1fr 1fr;">
+                            <div><label>Full Name</label><input type="text" id="reg-name" placeholder="Magaca oo saddexan"></div>
+                            <div><label>ID Number</label><input type="text" id="reg-id" placeholder="e.g. SN-5001"></div>
+                            <div><label>Faculty</label>
+                                <select id="reg-faculty">
+                                    <option>ICT & Computer Science</option><option>Medicine & Health</option><option>Engineering</option><option>Business Admin</option>
                                 </select>
                             </div>
-                            <div class="input-group"><label>Password (Default: 123)</label><input type="password" id="regPass" value="123"></div>
+                            <div><label>Semester</label><input type="number" id="reg-sem" value="1"></div>
+                            <div><label>Phone</label><input type="text" id="reg-phone" placeholder="061xxxxxxx"></div>
+                            <div><label>Portal Password</label><input type="text" id="reg-pass" value="123456"></div>
                         </div>
-                        <button class="btn-primary" onclick="registerNewStudent()"><i class="fas fa-plus"></i> Save Student Record</button>
                     </div>
+                    <button class="btn btn-primary" style="margin-top: 30px; width: 250px;" onclick="addStudent()">CONFIRM ADMISSION</button>
                 </div>
+            </section>
 
-                <div class="data-card" style="margin-top:30px;">
-                    <div class="card-header"><h4>Liiska Ardayda</h4></div>
-                    <div class="table-wrapper">
-                        <table id="allStudentsTable">
+            <section id="stListPage" class="page-view hidden">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3>Official Student Registry</h3>
+                        <input type="text" placeholder="Search by name or ID..." style="width: 350px; margin: 0;" onkeyup="searchStudent(this.value)">
+                    </div>
+                    <div class="table-container">
+                        <table id="stTable">
                             <thead>
-                                <tr><th>Sawir</th><th>Magaca</th><th>ID No</th><th>Fasalka</th><th>Action</th></tr>
+                                <tr><th>Photo</th><th>ID Number</th><th>Full Name</th><th>Faculty</th><th>Semester</th><th>Status</th><th>Action</th></tr>
                             </thead>
                             <tbody></tbody>
                         </table>
@@ -338,346 +234,285 @@
                 </div>
             </section>
 
-            <section id="financePage" class="view-section hidden">
-                <div class="stats-grid">
-                    <div class="card-stat">
-                        <div class="stat-info"><h3>Total Fees Collected</h3><p id="totalCollected">$0.00</p></div>
-                        <div class="stat-icon" style="background:#fefce8; color:#ca8a04;"><i class="fas fa-bank"></i></div>
+            <section id="idGenPage" class="page-view hidden">
+                <div class="card no-print">
+                    <h3>ID Card Production Center</h3>
+                    <div style="display: flex; gap: 15px; margin-top: 15px;">
+                        <select id="id-st-select" style="max-width: 400px;" onchange="previewID()"></select>
+                        <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-print"></i> PRINT ID CARD</button>
                     </div>
                 </div>
-                <div class="data-card">
-                    <div class="card-header"><h4>Gali Lacag-bixin Cusub</h4></div>
-                    <div style="padding:30px; display:flex; gap:20px; align-items:flex-end;">
-                        <div class="input-group" style="flex:1;"><label>ID-ga Ardayga</label><input type="text" id="feeStudentID"></div>
-                        <div class="input-group" style="flex:1;"><label>Lacagta ($)</label><input type="number" id="feeAmount"></div>
-                        <div class="input-group" style="flex:1;">
-                            <label>Bisha</label>
-                            <select id="feeMonth">
-                                <option>January</option><option>February</option><option>March</option>
-                                <option>April</option><option>May</option><option>June</option>
-                            </select>
-                        </div>
-                        <button class="btn-primary" style="margin-bottom:20px;" onclick="processFee()"><i class="fas fa-check"></i> Gub</button>
+                <div id="id-print-area" style="display: flex; justify-content: center; margin-top: 40px;">
+                    </div>
+            </section>
+
+            <section id="feePage" class="page-view hidden">
+                <div class="card">
+                    <h3>Financial Payment Entry</h3>
+                    <div class="grid-stats" style="grid-template-columns: 2fr 1fr 1fr;">
+                        <div><label>Select Student</label><select id="fee-st-select"></select></div>
+                        <div><label>Amount Paid ($)</label><input type="number" id="fee-amount" placeholder="0.00"></div>
+                        <div><label>Method</label><select id="fee-method"><option>EVC Plus</option><option>Zaad</option><option>Cash</option></select></div>
+                    </div>
+                    <button class="btn btn-success" style="margin-top: 20px;" onclick="payFee()">POST PAYMENT</button>
+                </div>
+                <div class="card">
+                    <h3>Transaction History</h3>
+                    <div class="table-container">
+                        <table id="feeTable">
+                            <thead><tr><th>Ref #</th><th>Student</th><th>Amount</th><th>Date</th><th>Method</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
                     </div>
                 </div>
             </section>
 
-            <section id="idsPage" class="view-section hidden">
-                <div class="no-print" style="margin-bottom:30px; display:flex; gap:20px;">
-                    <select id="idGradeSelect" style="max-width:300px; padding:12px; border-radius:10px;">
-                        <option value="9">Grade 9</option><option value="10">Grade 10</option>
-                        <option value="11">Grade 11</option><option value="12">Grade 12</option>
-                    </select>
-                    <button class="btn-primary" onclick="generateBatchIDs()"><i class="fas fa-sync"></i> Generate IDs</button>
-                    <button class="btn-primary" style="background:var(--info)" onclick="window.print()"><i class="fas fa-print"></i> Print All</button>
-                </div>
-                <div id="idCardsContainer" class="id-render-grid">
+            <section id="settingPage" class="page-view hidden">
+                <div class="card">
+                    <h3>Campus Configuration</h3>
+                    <div class="grid-stats">
+                        <div><label>University Name</label><input type="text" id="set-name" value="Weyrax University"></div>
+                        <div><label>Campus Address</label><input type="text" id="set-addr" value="Bosaso, Somalia"></div>
                     </div>
-            </section>
-
-            <section id="examsPage" class="view-section hidden">
-                <div class="data-card">
-                    <div class="card-header"><h4>Dhibcaha Imtixaanka (Exams)</h4></div>
-                    <div style="padding:30px;">
-                        <div style="display:flex; gap:15px; margin-bottom:20px;">
-                            <input type="text" id="examStID" placeholder="ID-ga Ardayga" style="max-width:200px;">
-                            <select id="examSubject" style="max-width:200px;">
-                                <option>Math</option><option>English</option><option>ICT</option><option>Somali</option><option>Arabic</option>
-                            </select>
-                            <input type="number" id="examScore" placeholder="Dhibcaha (0-100)" style="max-width:150px;">
-                            <button class="btn-primary" onclick="saveExamScore()">Save Score</button>
-                        </div>
+                    <div style="margin-top: 20px;">
+                        <label>Upload Campus Logo</label>
+                        <input type="file" onchange="updateLogo(event)">
                     </div>
+                    <button class="btn btn-primary" style="margin-top: 25px;" onclick="saveSettings()">UPDATE BRANDING</button>
                 </div>
             </section>
 
-            <section id="st-dashPage" class="view-section hidden">
-                <div class="st-header">
-                    <h1 id="st-hello">Kusoo dhowoow</h1>
-                    <p id="st-info-sub">ID: --- | Fasal: ---</p>
-                </div>
-                <div class="stats-grid">
-                    <div class="card-stat">
-                        <div class="stat-info"><h3>Guud ahaan Dhibcaha</h3><p id="st-total-marks">0</p></div>
-                        <div class="stat-icon" style="background:#e0f2fe; color:#0ea5e9;"><i class="fas fa-medal"></i></div>
-                    </div>
-                    <div class="card-stat">
-                        <div class="stat-info"><h3>Celcelis (GPA)</h3><p id="st-avg">0%</p></div>
-                        <div class="stat-icon" style="background:#f0fdf4; color:#22c55e;"><i class="fas fa-star"></i></div>
-                    </div>
-                    <div class="card-stat">
-                        <div class="stat-info"><h3>Darajadaada</h3><p id="st-grade">N/A</p></div>
-                        <div class="stat-icon" style="background:#fff7ed; color:#f97316;"><i class="fas fa-graduation-cap"></i></div>
+            <section id="stPortalPage" class="page-view hidden">
+                <div class="card" style="text-align: center;">
+                    <img id="p-photo" src="" class="univ-logo-main" style="width: 130px; height: 130px; border: 5px solid var(--accent);">
+                    <h1 id="p-name">---</h1>
+                    <p id="p-id" style="font-weight: 800; color: var(--accent); margin-bottom: 30px;"></p>
+                    
+                    <div class="grid-stats">
+                        <div class="card" style="background: #f8fafc;"><h4>My Faculty</h4><h2 id="p-faculty">---</h2></div>
+                        <div class="card" style="background: #f8fafc;"><h4>Semester</h4><h2 id="p-sem">---</h2></div>
                     </div>
                 </div>
             </section>
 
-        </main>
+        </div>
     </div>
 
     <script>
-        // --- DATA & STATE ---
-        const SUBJECTS = ["Math", "English", "ICT", "Somali", "Arabic"];
-        let students = JSON.parse(localStorage.getItem('nbs_v10_students')) || [];
-        let finances = JSON.parse(localStorage.getItem('nbs_v10_finances')) || [];
-        let currentUser = null;
-
-        // --- AUTH SYSTEM ---
-        function handleLogin() {
-            const role = document.getElementById('loginRole').value;
-            const user = document.getElementById('username').value;
-            const pass = document.getElementById('password').value;
-
-            if (role === "admin") {
-                if (user === "admin" && pass === "admin123") {
-                    loginSuccess("admin", {fullName: "System Admin"});
-                } else {
-                    showLoginError("Invalid Admin Credentials");
-                }
-            } else if (role === "student") {
-                const st = students.find(s => s.roll === user && s.password === pass);
-                if (st) {
-                    loginSuccess("student", st);
-                } else {
-                    showLoginError("Ardaygan lama hayo ama password-ka ayaa khalad");
-                }
-            }
-        }
-
-        function loginSuccess(role, data) {
-            currentUser = data;
-            document.getElementById('loginSection').style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById('loginSection').style.display = 'none';
-                document.getElementById('mainSidebar').style.display = 'flex';
-                document.getElementById('mainContent').style.display = 'flex';
-                
-                // Set UI based on role
-                if (role === 'admin') {
-                    document.getElementById('adminNav').classList.remove('hidden');
-                    updateAdminStats();
-                    renderRecentStudents();
-                } else {
-                    document.getElementById('studentNav').classList.remove('hidden');
-                    renderStudentDashboard(data);
-                    navigate('st-dash');
-                }
-                
-                document.getElementById('userDisplayName').innerText = data.fullName;
-                document.getElementById('userDisplayRole').innerText = role.toUpperCase();
-                document.getElementById('userAvatar').innerText = data.fullName.charAt(0);
-            }, 500);
-        }
-
-        function showLoginError(msg) {
-            const err = document.getElementById('loginError');
-            err.innerText = msg;
-            err.style.animation = 'shake 0.3s';
-            setTimeout(() => err.style.animation = '', 300);
-        }
+        // --- DATA PERSISTENCE ---
+        let students = JSON.parse(localStorage.getItem('wx_students_db')) || [];
+        let fees = JSON.parse(localStorage.getItem('wx_fees_db')) || [];
+        let settings = JSON.parse(localStorage.getItem('wx_settings_db')) || {
+            name: "WEYRAX UNIVERSITY",
+            logo: "https://via.placeholder.com/70",
+            addr: "Bosaso, Somalia"
+        };
+        let tempPhoto = "";
 
         // --- NAVIGATION ---
-        function navigate(pageId, element = null) {
-            document.querySelectorAll('.view-section').forEach(s => s.classList.add('hidden'));
-            document.getElementById(pageId + 'Page').classList.remove('hidden');
-            document.getElementById('pageTitleText').innerText = pageId.toUpperCase();
+        function showPage(id, el) {
+            document.querySelectorAll('.page-view').forEach(p => p.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+            
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('nav-active'));
+            if(el) el.classList.add('nav-active');
 
-            if (element) {
-                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-                element.classList.add('active');
-            }
-
-            // Specific page triggers
-            if (pageId === 'students') renderAllStudents();
-            if (pageId === 'ids') generateBatchIDs();
+            const titles = {
+                dashPage: "Dashboard Overview",
+                regPage: "Student Admission",
+                stListPage: "Student Registry",
+                idGenPage: "ID Card Production",
+                feePage: "Finance Department",
+                settingPage: "Campus Settings",
+                stPortalPage: "My Student Portal"
+            };
+            document.getElementById('pageHeading').innerText = titles[id];
+            
+            if(id === 'stListPage') renderStudents();
+            if(id === 'idGenPage' || id === 'feePage') populateSelectors();
+            if(window.innerWidth <= 768) toggleSidebar();
         }
 
-        // --- STUDENT MANAGEMENT ---
-        function registerNewStudent() {
-            const name = document.getElementById('regName').value;
-            const roll = document.getElementById('regRoll').value;
-            const grade = document.getElementById('regGrade').value;
-            const pass = document.getElementById('regPass').value;
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
 
-            if (!name || !roll) return alert("Fadlan buuxi magaca iyo ID-ga");
+        // --- ADMISSION LOGIC ---
+        function handlePhoto(e) {
+            const reader = new FileReader();
+            reader.onload = () => {
+                tempPhoto = reader.result;
+                document.getElementById('reg-photo-preview').src = tempPhoto;
+            };
+            reader.readAsDataURL(e.target.files[0]);
+        }
+
+        function addStudent() {
+            const name = document.getElementById('reg-name').value;
+            const sid = document.getElementById('reg-id').value;
+            if(!name || !sid) return alert("Fadlan geli Magaca iyo ID-ga!");
 
             const st = {
-                id: Date.now(),
-                fullName: name,
-                roll: roll,
-                grade: grade,
-                password: pass,
-                photo: null,
-                marks: {},
-                attendance: []
+                uid: Date.now(),
+                name, sid, 
+                faculty: document.getElementById('reg-faculty').value,
+                sem: document.getElementById('reg-sem').value,
+                phone: document.getElementById('reg-phone').value,
+                pass: document.getElementById('reg-pass').value,
+                photo: tempPhoto || "https://via.placeholder.com/150",
+                status: "Active"
             };
 
             students.push(st);
-            saveData();
-            alert("Ardayga waa la diiwaangeliyay!");
-            renderAllStudents();
-            updateAdminStats();
+            localStorage.setItem('wx_students_db', JSON.stringify(students));
+            alert("Admission Complete!");
+            showPage('stListPage');
+            updateStats();
         }
 
-        function renderAllStudents() {
-            const tbody = document.querySelector('#allStudentsTable tbody');
+        function renderStudents() {
+            const tbody = document.querySelector('#stTable tbody');
             tbody.innerHTML = students.map(s => `
                 <tr>
-                    <td><div class="user-avatar" style="background:#f1f5f9; color:var(--primary)">${s.fullName.charAt(0)}</div></td>
-                    <td><b>${s.fullName}</b></td>
-                    <td>${s.roll}</td>
-                    <td>Grade ${s.grade}</td>
-                    <td>
-                        <i class="fas fa-trash" style="color:var(--danger); cursor:pointer" onclick="deleteStudent(${s.id})"></i>
-                    </td>
+                    <td><img src="${s.photo}" style="width:35px; height:45px; border-radius:6px; object-fit:cover;"></td>
+                    <td><b>${s.sid}</b></td>
+                    <td>${s.name}</td>
+                    <td>${s.faculty}</td>
+                    <td>Semester ${s.sem}</td>
+                    <td><span style="background:#dcfce7; color:#166534; padding:5px 10px; border-radius:20px; font-size:11px; font-weight:800;">${s.status}</span></td>
+                    <td><i class="fas fa-trash-alt" style="color:var(--danger); cursor:pointer;" onclick="deleteStudent(${s.uid})"></i></td>
                 </tr>
             `).join('');
         }
 
-        function deleteStudent(id) {
-            if (confirm("Ma hubtaa inaad tirtirto ardaygan?")) {
-                students = students.filter(s => s.id !== id);
-                saveData();
-                renderAllStudents();
-                updateAdminStats();
+        function deleteStudent(uid) {
+            if(confirm("Ma hubtaa inaad tirtirto?")) {
+                students = students.filter(s => s.uid !== uid);
+                localStorage.setItem('wx_students_db', JSON.stringify(students));
+                renderStudents();
+                updateStats();
             }
         }
 
         // --- FINANCE LOGIC ---
-        function processFee() {
-            const sid = document.getElementById('feeStudentID').value;
-            const amt = document.getElementById('feeAmount').value;
-            const month = document.getElementById('feeMonth').value;
+        function payFee() {
+            const sid = document.getElementById('fee-st-select').value;
+            const amount = document.getElementById('fee-amount').value;
+            if(!sid || !amount) return alert("Select student & amount!");
 
-            if (!sid || !amt) return alert("Macluumaadku ma dhammaystira");
+            const st = students.find(x => x.uid == sid);
+            const entry = {
+                ref: "TX-" + Math.floor(1000 + Math.random() * 9000),
+                name: st.name,
+                sid: st.sid,
+                amount: parseFloat(amount),
+                date: new Date().toLocaleDateString(),
+                method: document.getElementById('fee-method').value
+            };
 
-            const st = students.find(s => s.roll === sid);
-            if (!st) return alert("Ardayga lama helin!");
-
-            const fee = { id: Date.now(), studentRoll: sid, amount: parseFloat(amt), month: month, date: new Date().toLocaleDateString() };
-            finances.push(fee);
-            saveData();
-            alert("Lacagta waa la qabtay!");
-            updateAdminStats();
+            fees.push(entry);
+            localStorage.setItem('wx_fees_db', JSON.stringify(fees));
+            alert("Payment Recorded!");
+            renderFees();
+            updateStats();
         }
 
-        // --- EXAM LOGIC ---
-        function saveExamScore() {
-            const sid = document.getElementById('examStID').value;
-            const sub = document.getElementById('examSubject').value;
-            const score = document.getElementById('examScore').value;
-
-            const st = students.find(s => s.roll === sid);
-            if (!st) return alert("Ardayga lama helin!");
-
-            st.marks[sub] = parseFloat(score);
-            saveData();
-            alert("Dhibcaha waa la keydiyay!");
-        }
-
-        // --- ID CARD GENERATOR ---
-        function generateBatchIDs() {
-            const grade = document.getElementById('idGradeSelect').value;
-            const filtered = students.filter(s => s.grade === grade);
-            const container = document.getElementById('idCardsContainer');
-            
-            container.innerHTML = filtered.map(s => `
-                <div class="id-preview">
-                    <div class="id-bar"></div>
-                    <div class="id-body">
-                        <div class="id-head">
-                            <div class="id-logo">W</div>
-                            <div style="font-weight:800; font-size:14px; color:var(--primary)">WEYRAX SMART SCHOOL</div>
-                        </div>
-                        <div class="id-content">
-                            <img src="https://via.placeholder.com/100" class="id-photo">
-                            <div class="id-text">
-                                <h5>Student Name</h5>
-                                <p>${s.fullName.toUpperCase()}</p>
-                                <h5>ID / Roll Number</h5>
-                                <p>${s.roll}</p>
-                                <h5>Academic Class</h5>
-                                <p>Grade ${s.grade}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // --- STUDENT DASHBOARD RENDERING ---
-        function renderStudentDashboard(st) {
-            document.getElementById('st-hello').innerText = `Kusoo dhowoow, ${st.fullName}`;
-            document.getElementById('st-info-sub').innerText = `ID: ${st.roll} | Class: Grade ${st.grade}`;
-            
-            let total = 0;
-            let count = 0;
-            for (let sub in st.marks) {
-                total += st.marks[sub];
-                count++;
-            }
-
-            const avg = count > 0 ? (total / count).toFixed(1) : 0;
-            document.getElementById('st-total-marks').innerText = total;
-            document.getElementById('st-avg').innerText = avg + "%";
-            
-            let gradeChar = "N/A";
-            if (avg >= 90) gradeChar = "A+";
-            else if (avg >= 80) gradeChar = "A";
-            else if (avg >= 70) gradeChar = "B";
-            else if (avg >= 60) gradeChar = "C";
-            else if (avg > 0) gradeChar = "F";
-            document.getElementById('st-grade').innerText = gradeChar;
-        }
-
-        // --- UTILS ---
-        function updateAdminStats() {
-            document.getElementById('stat-total-students').innerText = students.length;
-            let totalRev = 0;
-            finances.forEach(f => totalRev += f.amount);
-            document.getElementById('stat-revenue').innerText = "$" + totalRev.toFixed(2);
-            document.getElementById('totalCollected').innerText = "$" + totalRev.toFixed(2);
-        }
-
-        function renderRecentStudents() {
-            const list = document.getElementById('recentStudentsList');
-            const recent = [...students].reverse().slice(0, 5);
-            list.innerHTML = recent.map(s => `
+        function renderFees() {
+            const tbody = document.querySelector('#feeTable tbody');
+            tbody.innerHTML = fees.slice().reverse().map(f => `
                 <tr>
-                    <td><b>${s.fullName}</b></td>
-                    <td>${s.roll}</td>
-                    <td>Grade ${s.grade}</td>
-                    <td><span class="badge badge-success">Active</span></td>
+                    <td>${f.ref}</td>
+                    <td>${f.name} (${f.sid})</td>
+                    <td><b>$${f.amount.toFixed(2)}</b></td>
+                    <td>${f.date}</td>
+                    <td>${f.method}</td>
                 </tr>
             `).join('');
         }
 
-        function saveData() {
-            localStorage.setItem('nbs_v10_students', JSON.stringify(students));
-            localStorage.setItem('nbs_v10_finances', JSON.stringify(finances));
+        // --- ID CARD PREVIEW ---
+        function previewID() {
+            const uid = document.getElementById('id-st-select').value;
+            const s = students.find(x => x.uid == uid);
+            if(!s) return;
+
+            document.getElementById('id-print-area').innerHTML = `
+                <div class="id-card-preview">
+                    <div class="id-accent-bar">
+                        <img src="${s.photo}" class="id-st-photo">
+                        <small style="margin-top:15px; font-size:9px;">EXP: 12/2028</small>
+                    </div>
+                    <div class="id-details">
+                        <div class="id-univ-title">${settings.name}</div>
+                        <div style="font-size:16px; font-weight:800; margin-bottom:5px;">${s.name.toUpperCase()}</div>
+                        <div style="font-size:12px; line-height:1.6;">
+                            <p><b>ID NO:</b> ${s.sid}</p>
+                            <p><b>FACULTY:</b> ${s.faculty}</p>
+                            <p><b>PHONE:</b> ${s.phone}</p>
+                        </div>
+                        <img src="${settings.logo}" style="width:40px; position:absolute; bottom:15px; right:15px; opacity:0.3;">
+                    </div>
+                </div>
+            `;
         }
 
-        function backupData() {
-            const data = JSON.stringify({students, finances});
-            const blob = new Blob([data], {type: 'application/json'});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'weyrax_backup.json';
-            a.click();
+        // --- UTILS ---
+        function populateSelectors() {
+            const options = students.map(s => `<option value="${s.uid}">${s.name} (${s.sid})</option>`).join('');
+            document.getElementById('id-st-select').innerHTML = options;
+            document.getElementById('fee-st-select').innerHTML = options;
         }
 
-        function logout() { location.reload(); }
+        function updateStats() {
+            document.getElementById('stat-st-count').innerText = students.length;
+            const total = fees.reduce((sum, f) => sum + f.amount, 0);
+            document.getElementById('stat-fees-total').innerText = "$" + total.toLocaleString();
+        }
 
-        // --- INIT ---
+        function saveSettings() {
+            settings.name = document.getElementById('set-name').value;
+            settings.addr = document.getElementById('set-addr').value;
+            localStorage.setItem('wx_settings_db', JSON.stringify(settings));
+            alert("Branding Updated!");
+            location.reload();
+        }
+
+        function updateLogo(e) {
+            const reader = new FileReader();
+            reader.onload = () => {
+                settings.logo = reader.result;
+                localStorage.setItem('wx_settings_db', JSON.stringify(settings));
+            };
+            reader.readAsDataURL(e.target.files[0]);
+        }
+
+        // --- CHARTS ---
+        function initChart() {
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Financial Inflow ($)',
+                        data: [1200, 1900, 1500, 2500, 2200, 3000],
+                        borderColor: '#2563eb',
+                        tension: 0.4,
+                        fill: true,
+                        backgroundColor: 'rgba(37, 99, 235, 0.05)'
+                    }]
+                },
+                options: { plugins: { legend: { display: false } } }
+            });
+        }
+
         window.onload = () => {
-            setTimeout(() => {
-                document.getElementById('loader').style.opacity = '0';
-                setTimeout(() => document.getElementById('loader').style.display = 'none', 500);
-            }, 1500);
-            document.getElementById('currentDate').innerText = new Date().toDateString();
+            document.getElementById('sideUnivName').innerText = settings.name;
+            document.getElementById('sideLogo').src = settings.logo;
+            updateStats();
+            renderFees();
+            initChart();
         };
-
     </script>
 </body>
 </html>
