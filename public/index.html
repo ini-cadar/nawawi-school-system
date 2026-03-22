@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WEYRAX PORTAL | Weyrax School Management System v9.0</title>
+    <title>WEYRAX PORTAL | Weyrax School Management System </title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { 
@@ -77,7 +77,7 @@
         .mobile-header {
             display: none;
             background: var(--primary);
-            color: white;
+            color: rgb(11, 11, 11);
             padding: 15px;
             justify-content: space-between;
             align-items: center;
@@ -280,7 +280,7 @@
         <div class="box" style="width: 100%; max-width: 450px; text-align: center; border-top: 10px solid var(--accent);">
             <img id="loginLogo" src="" class="hidden" style="width: 80px; margin-bottom: 15px;">
             <h2 style="color: var(--primary); margin-bottom: 10px;">WEYRAX PORTAL LOGIN</h2>
-            <p style="color: #666; font-size: 14px;">Maamul ama Arday, fadlan soo gal</p>
+            <p style="color: #666; font-size: 14px;">kusoo dhowoow weyrax school</p>
             <hr style="margin: 20px 0; opacity: 0.2;">
             
             <label style="display: block; text-align: left; font-size: 12px; font-weight: bold;">DOORO ROLE-KAGA</label>
@@ -290,12 +290,12 @@
             </select>
             
             <label style="display: block; text-align: left; font-size: 12px; font-weight: bold; margin-top: 10px;">USERNAME / ID</label>
-            <input type="text" id="username" placeholder="Geli Roll Number ama admin">
+            <input type="text" id="username" placeholder="Geli Roll Number ">
             
             <label style="display: block; text-align: left; font-size: 12px; font-weight: bold; margin-top: 10px;">PASSWORD</label>
-            <input type="password" id="password" placeholder="••••••••">
+            <input type="password" id="password" placeholder="password">
             
-            <button onclick="attemptLogin()" style="margin-top: 20px;">GURADA GAL NIDAAMKA</button>
+            <button onclick="attemptLogin()" style="margin-top: 20px;"> ENTER</button>
             <p id="loginError" style="color: var(--danger); font-size: 12px; margin-top: 10px; font-weight: bold;"></p>
         </div>
     </div>
@@ -343,7 +343,8 @@
                 </div>
                 <div class="stat-card" style="background: var(--warning);">
                     <small>Academic Year</small>
-                    <h1>2025/2026</h1>
+                    <h1><span id="academicYear"></span>
+                    <script>year.textcontent=new Date().getFullYear()</script></h1>
                 </div>
             </div>
 
