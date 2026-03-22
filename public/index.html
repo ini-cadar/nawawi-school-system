@@ -3,481 +3,442 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WEYRAX PORTAL V17 | Enterprise Edition 2026</title>
+    <title>WEYRAX PORTAL V35 | Mega School System</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chart.js/3.9.1/chart.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 
     <style>
-        /* CSS Variables for Global Styling */
         :root {
-            --primary: #1e293b;
-            --secondary: #334155;
+            --sidebar-bg: #0f172a;
+            --main-bg: #f8fafc;
+            --card-dark: #1e293b;
+            --card-green: #10b981;
+            --card-blue: #0ea5e9;
+            --card-orange: #f59e0b;
             --accent: #10b981;
             --danger: #ef4444;
-            --warning: #f59e0b;
-            --info: #3b82f6;
-            --light: #f8fafc;
-            --white: #ffffff;
             --border: #e2e8f0;
-            --shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-            --radius: 12px;
+            --text: #334155;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: var(--light); color: #0f172a; display: flex; height: 100vh; overflow: hidden; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: var(--main-bg); display: flex; height: 100vh; overflow: hidden; color: var(--text); }
 
-        /* --- SIDEBAR STYLING --- */
-        .sidebar { 
-            width: 280px; background: var(--primary); color: white; 
-            display: flex; flex-direction: column; transition: 0.3s; z-index: 1000;
-        }
-        .sidebar-header { padding: 30px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .sidebar-header h2 { color: var(--accent); font-size: 1.5rem; letter-spacing: 2px; }
+        /* --- SIDEBAR --- */
+        .sidebar { width: 270px; background: var(--sidebar-bg); color: white; display: flex; flex-direction: column; flex-shrink: 0; z-index: 100; }
+        .sidebar-header { padding: 30px 25px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .sidebar-header h2 { color: var(--accent); letter-spacing: 2px; font-weight: 900; }
 
-        .nav-menu { flex: 1; overflow-y: auto; padding: 20px 0; }
-        .nav-label { padding: 10px 25px; font-size: 10px; text-transform: uppercase; color: #64748b; letter-spacing: 2px; }
-        .nav-item { 
-            padding: 14px 25px; display: flex; align-items: center; gap: 15px; cursor: pointer;
-            color: #cbd5e1; transition: 0.2s; border-left: 4px solid transparent;
+        .nav-links { flex: 1; padding: 20px 0; overflow-y: auto; }
+        .nav-label { padding: 15px 25px 5px; font-size: 10px; text-transform: uppercase; color: #64748b; font-weight: 800; }
+        .nav-link { 
+            padding: 13px 25px; display: flex; align-items: center; gap: 12px; 
+            color: #94a3b8; cursor: pointer; transition: 0.3s; font-size: 14px;
         }
-        .nav-item:hover, .nav-active { background: var(--secondary); color: white; border-left-color: var(--accent); }
+        .nav-link:hover, .nav-active { background: #1e293b; color: white; border-left: 5px solid var(--accent); }
 
         /* --- MAIN WRAPPER --- */
-        .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .top-bar { 
-            height: 70px; background: white; border-bottom: 1px solid var(--border);
-            display: flex; align-items: center; justify-content: space-between; padding: 0 30px;
-        }
+        .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+        .top-bar { height: 75px; background: white; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 35px; }
 
-        .content-area { flex: 1; overflow-y: auto; padding: 30px; }
+        .scroll-content { flex: 1; overflow-y: auto; padding: 35px; }
 
-        /* --- DASHBOARD WIDGETS --- */
-        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .card { background: white; padding: 25px; border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); }
-        .stat-box { display: flex; align-items: center; justify-content: space-between; }
-        .icon-circle { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
+        /* --- DASHBOARD CARDS (Sawirkaagii camal) --- */
+        .mega-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
+        .mega-card { border-radius: 15px; padding: 25px; color: white; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); transition: 0.3s; }
+        .mega-card:hover { transform: translateY(-5px); }
+        .mega-card p { font-size: 12px; font-weight: 700; opacity: 0.8; margin-bottom: 10px; text-transform: uppercase; }
+        .mega-card h2 { font-size: 2.2rem; }
 
-        /* --- TABLES & FORMS --- */
-        .data-table-card { background: white; border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; margin-bottom: 30px; }
-        .table-header { padding: 20px; background: #fafafa; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        
+        /* --- TABLES & CARDS --- */
+        .section-card { background: white; border-radius: 15px; padding: 25px; margin-bottom: 30px; border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .card-title { font-size: 1.1rem; font-weight: 800; color: var(--card-dark); margin-bottom: 20px; border-bottom: 1px solid #f1f5f9; padding-bottom: 15px; }
+
         table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 15px; font-size: 12px; background: #f8fafc; color: #64748b; text-transform: uppercase; }
-        td { padding: 15px; border-bottom: 1px solid var(--border); font-size: 14px; }
-        
-        .form-group { margin-bottom: 15px; }
-        label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; color: var(--secondary); }
-        input, select, textarea { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; outline: none; }
-        input:focus { border-color: var(--accent); }
+        th { text-align: left; padding: 15px; background: #f8fafc; font-size: 11px; text-transform: uppercase; color: #64748b; }
+        td { padding: 15px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
 
-        .btn { padding: 12px 20px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; gap: 8px; }
+        /* --- BUTTONS & INPUTS --- */
+        .btn { padding: 10px 20px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; gap: 8px; }
         .btn-primary { background: var(--accent); color: white; }
+        .btn-blue { background: var(--card-blue); color: white; }
         .btn-danger { background: var(--danger); color: white; }
-        .btn-info { background: var(--info); color: white; }
+        
+        .input-box { width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 8px; margin-bottom: 15px; outline: none; }
+        .input-box:focus { border-color: var(--accent); }
 
-        /* --- MODAL --- */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 2000; }
-        .modal-box { background: white; width: 90%; max-width: 600px; padding: 30px; border-radius: var(--radius); }
+        /* --- RESULTS/GRADE BADGE --- */
+        .grade-badge { padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 12px; }
+        .g-a { background: #dcfce7; color: #15803d; }
+        .g-f { background: #fee2e2; color: #991b1b; }
 
-        .hidden { display: none !important; }
-        .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; }
-        .badge-success { background: #dcfce7; color: #15803d; }
+        /* --- ATTENDANCE TOGGLE --- */
+        .att-toggle { display: flex; gap: 5px; }
+        .att-btn { padding: 5px 10px; border-radius: 4px; border: 1px solid #ddd; cursor: pointer; font-size: 10px; font-weight: bold; }
+        .active-p { background: var(--card-green); color: white; border-color: var(--card-green); }
+        .active-a { background: var(--danger); color: white; border-color: var(--danger); }
 
         /* --- LOGIN SCREEN --- */
-        #loginPage { position: fixed; inset: 0; background: var(--primary); z-index: 9999; display: flex; align-items: center; justify-content: center; }
-        .login-card { background: white; padding: 40px; border-radius: 20px; width: 400px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        #loginScreen { position: fixed; inset: 0; background: var(--sidebar-bg); z-index: 10000; display: flex; align-items: center; justify-content: center; }
+        .login-box { background: white; padding: 45px; border-radius: 25px; width: 400px; text-align: center; }
 
+        .hidden { display: none !important; }
+        
         @media print { .no-print { display: none !important; } .sidebar { display: none; } }
     </style>
 </head>
 <body>
 
-    <div id="loginPage">
-        <div class="login-card">
-            <h1 style="color: var(--primary); margin-bottom: 5px;">WEYRAX V17</h1>
-            <p style="color: #64748b; margin-bottom: 30px;">School Management Portal</p>
+    <div id="loginScreen">
+        <div class="login-box">
+            <h1 style="color: var(--sidebar-bg); margin-bottom: 5px;">WEYRAX V35</h1>
+            <p style="color: #64748b; margin-bottom: 30px; font-weight: 600;">System Access Control</p>
             
-            <div class="form-group" style="text-align: left;">
-                <label>Dooro Role-ka</label>
-                <select id="loginRole">
+            <div style="text-align: left;">
+                <label style="font-size: 12px; font-weight: 700;">Select Role</label>
+                <select id="role" class="input-box">
                     <option value="admin">Maamulka (Admin)</option>
                     <option value="student">Ardayga (Student)</option>
                 </select>
-            </div>
-            <div class="form-group" style="text-align: left;">
-                <label>ID / Username</label>
-                <input type="text" id="loginUser" placeholder="Geli Roll Number">
-            </div>
-            <div class="form-group" style="text-align: left;">
-                <label>Password</label>
-                <input type="password" id="loginPass" placeholder="••••••••">
+                <label style="font-size: 12px; font-weight: 700;">Username / ID</label>
+                <input type="text" id="user" class="input-box" placeholder="Geli ID-gaaga">
+                <label style="font-size: 12px; font-weight: 700;">Security Password</label>
+                <input type="password" id="pass" class="input-box" placeholder="••••••••">
             </div>
             
-            <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;" onclick="handleAuth()">
-                SOO GAL SYSTEM-KA <i class="fas fa-sign-in-alt"></i>
-            </button>
-            <p id="loginError" style="color: var(--danger); font-size: 12px; margin-top: 15px; font-weight: bold;"></p>
+            <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 15px;" onclick="handleLogin()">GURADA GAL SYSTEM-KA</button>
+            <p id="loginError" style="color: var(--danger); font-size: 11px; margin-top: 15px; font-weight: 800;"></p>
         </div>
     </div>
 
-    <aside class="sidebar hidden" id="mainSidebar">
+    <aside id="sidebar" class="sidebar hidden">
         <div class="sidebar-header">
             <h2>WEYRAX</h2>
-            <p id="userDisplay" style="font-size: 10px; color: #94a3b8; font-weight: bold;"></p>
+            <p id="userRoleTag" style="font-size: 10px; color: var(--accent); font-weight: bold;"></p>
         </div>
-        <div class="nav-menu">
-            <div id="adminLinks" class="hidden">
-                <div class="nav-label">Main Menu</div>
-                <div class="nav-item nav-active" onclick="switchPage('pageDash', this)"><i class="fas fa-chart-pie"></i> Dashboard</div>
-                <div class="nav-item" onclick="switchPage('pageStudents', this)"><i class="fas fa-user-graduate"></i> Ardayda</div>
-                <div class="nav-item" onclick="switchPage('pageTeachers', this)"><i class="fas fa-chalkboard-teacher"></i> Macallimiinta</div>
+        <div class="nav-links">
+            <div id="adminNav" class="hidden">
+                <div class="nav-label">Core Management</div>
+                <div class="nav-link nav-active" onclick="showTab('tabDash', this)"><i class="fas fa-th-large"></i> School Dashboard</div>
+                <div class="nav-link" onclick="showTab('tabAttendance', this)"><i class="fas fa-calendar-check"></i> Xaadiriska (2 Shifts)</div>
+                <div class="nav-link" onclick="showTab('tabExams', this)"><i class="fas fa-file-invoice"></i> Imtixaannada & Natiijada</div>
                 
-                <div class="nav-label">Academic & Finance</div>
-                <div class="nav-item" onclick="switchPage('pageExams', this)"><i class="fas fa-edit"></i> Imtixaannada</div>
-                <div class="nav-item" onclick="switchPage('pageFees', this)"><i class="fas fa-money-check-alt"></i> Lacagaha (Fees)</div>
-                <div class="nav-item" onclick="switchPage('pageInventory', this)"><i class="fas fa-boxes"></i> Agabka (Inventory)</div>
-                
-                <div class="nav-label">Settings</div>
-                <div class="nav-item" onclick="switchPage('pageID', this)"><i class="fas fa-id-card"></i> ID Card Generator</div>
+                <div class="nav-label">Academic Records</div>
+                <div class="nav-link" onclick="showTab('tabStudents', this)"><i class="fas fa-user-graduate"></i> Ardayda Diiwaangashan</div>
+                <div class="nav-link" onclick="showTab('tabTeachers', this)"><i class="fas fa-chalkboard-teacher"></i> Macallimiinta</div>
             </div>
 
-            <div id="studentLinks" class="hidden">
-                <div class="nav-label">Ardayga</div>
-                <div class="nav-item nav-active" onclick="switchPage('pageStProfile', this)"><i class="fas fa-user-circle"></i> Profile-kayga</div>
-                <div class="nav-item" onclick="switchPage('pageStMarks', this)"><i class="fas fa-poll"></i> Natiijada</div>
-                <div class="nav-item" onclick="switchPage('pageStFinance', this)"><i class="fas fa-file-invoice-dollar"></i> Lacagaha</div>
+            <div id="studentNav" class="hidden">
+                <div class="nav-label">Student Portal</div>
+                <div class="nav-link nav-active" onclick="showTab('tabStProfile', this)"><i class="fas fa-id-badge"></i> My Profile Summary</div>
+                <div class="nav-link" onclick="showTab('tabStResults', this)"><i class="fas fa-award"></i> My Exam Results</div>
+                <div class="nav-link" onclick="showTab('tabStAtt', this)"><i class="fas fa-history"></i> My Attendance Logs</div>
             </div>
         </div>
-        <div style="padding: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
-            <button class="btn btn-danger" style="width: 100%; justify-content: center;" onclick="location.reload()">
-                KA BAX (LOGOUT)
-            </button>
+        <div style="padding: 20px; border-top: 1px solid rgba(255,255,255,0.05);">
+            <button class="btn btn-danger" style="width: 100%; justify-content: center;" onclick="location.reload()">LOGOUT</button>
         </div>
     </aside>
 
-    <div class="main-wrapper hidden" id="mainUI">
+    <div id="mainUI" class="main-wrapper hidden">
         <header class="top-bar">
-            <h3 id="pageTitle">Dashboard Overview</h3>
+            <h3 id="tabTitle">Dashboard Overview</h3>
             <div style="display: flex; align-items: center; gap: 20px;">
-                <span id="liveClock" style="font-weight: 600; color: #64748b;"></span>
-                <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; color: white;">
-                    <i class="fas fa-user"></i>
+                <div style="text-align: right;">
+                    <p id="liveDate" style="font-weight: 800; font-size: 13px;"></p>
+                    <small style="color: var(--accent); font-weight: bold;">OFFICIAL LIVE</small>
+                </div>
+                <div style="width: 45px; height: 45px; border-radius: 12px; background: #f1f5f9; display: flex; align-items: center; justify-content: center; color: var(--sidebar-bg);">
+                    <i class="fas fa-user-shield"></i>
                 </div>
             </div>
         </header>
 
-        <main class="content-area">
-
-            <section id="pageDash" class="page-view">
-                <div class="stat-grid">
-                    <div class="card stat-box">
-                        <div><p style="color:#64748b; font-size:12px;">TOTAL STUDENTS</p><h2 id="countSt">0</h2></div>
-                        <div class="icon-circle" style="background:#e0f2fe; color:#0369a1;"><i class="fas fa-users"></i></div>
+        <div class="scroll-content">
+            
+            <section id="tabDash" class="pane">
+                <div class="mega-grid">
+                    <div class="mega-card" style="background: var(--card-dark);">
+                        <p>Ardayda Wadarta</p>
+                        <h2 id="stCount">0</h2>
                     </div>
-                    <div class="card stat-box">
-                        <div><p style="color:#64748b; font-size:12px;">TEACHERS</p><h2 id="countTe">0</h2></div>
-                        <div class="icon-circle" style="background:#dcfce7; color:#15803d;"><i class="fas fa-user-tie"></i></div>
+                    <div class="mega-card" style="background: var(--card-green);">
+                        <p>Maadooyinka (Subjects)</p>
+                        <h2 id="subCount">12</h2>
                     </div>
-                    <div class="card stat-box">
-                        <div><p style="color:#64748b; font-size:12px;">REVENUE (USD)</p><h2 id="countRev">$0</h2></div>
-                        <div class="icon-circle" style="background:#fef9c3; color:#a16207;"><i class="fas fa-wallet"></i></div>
+                    <div class="mega-card" style="background: var(--card-blue);">
+                        <p>Shift 1 (Subax) Today</p>
+                        <h2 id="attCount1">0</h2>
                     </div>
-                    <div class="card stat-box">
-                        <div><p style="color:#64748b; font-size:12px;">SYSTEM STATUS</p><h2 style="color:var(--accent);">LIVE</h2></div>
-                        <div class="icon-circle" style="background:#f3e8ff; color:#7e22ce;"><i class="fas fa-server"></i></div>
+                    <div class="mega-card" style="background: var(--card-orange);">
+                        <p>Academic Year</p>
+                        <h2>2025/2026</h2>
                     </div>
                 </div>
 
-                <div class="card">
-                    <h3>Waxqabadka Ardayda (Performance Chart)</h3>
-                    <canvas id="performanceChart" height="100"></canvas>
-                </div>
-            </section>
-
-            <section id="pageStudents" class="page-view hidden">
-                <div class="data-table-card">
-                    <div class="table-header">
-                        <h3>Diiwaanka Ardayda</h3>
-                        <button class="btn btn-primary" onclick="toggleModal('studentModal')"><i class="fas fa-plus"></i> Arday Cusub</button>
-                    </div>
-                    <div style="padding: 15px;">
-                        <input type="text" id="searchSt" placeholder="Raadi Arday (Magac ama ID)..." onkeyup="renderStudents()">
-                    </div>
+                <div class="section-card">
+                    <div class="card-title">Xiriirka Waalidiinta & Macluumaadka Ardayda</div>
                     <table>
                         <thead>
-                            <tr><th>Sawir</th><th>ID</th><th>Magaca</th><th>Fasalka</th><th>Status</th><th>Actions</th></tr>
+                            <tr><th>Ardayga</th><th>Fasalka</th><th>Section</th><th>Lanbarada Waalidka</th><th>Status</th></tr>
                         </thead>
-                        <tbody id="studentTbody"></tbody>
+                        <tbody id="parentTable"></tbody>
                     </table>
                 </div>
             </section>
 
-            <section id="pageTeachers" class="page-view hidden">
-                <div class="data-table-card">
-                    <div class="table-header">
-                        <h3>Diiwaanka Macallimiinta</h3>
-                        <button class="btn btn-primary" onclick="toggleModal('teacherModal')"><i class="fas fa-plus"></i> Macallin Cusub</button>
-                    </div>
+            <section id="tabAttendance" class="pane hidden">
+                <div class="section-card">
+                    <div class="card-title">Diiwaangelinta Xaadiriska - <span id="attDate"></span></div>
                     <table>
                         <thead>
-                            <tr><th>Magaca</th><th>Maadada</th><th>Mushaharka</th><th>Contact</th><th>Action</th></tr>
+                            <tr><th>Ardayga</th><th>Shift 1 (Subax)</th><th>Shift 2 (Duhur)</th><th>Last Updated</th></tr>
                         </thead>
-                        <tbody id="teacherTbody"></tbody>
+                        <tbody id="attAdminTable"></tbody>
                     </table>
                 </div>
             </section>
 
-            <section id="pageID" class="page-view hidden">
-                <div class="no-print" style="margin-bottom: 20px; display: flex; gap: 10px;">
-                    <select id="idStudentList" style="flex:1;"></select>
-                    <button class="btn btn-primary" onclick="generateID()">Generate ID</button>
-                    <button class="btn btn-info" onclick="window.print()">Print ID Card</button>
-                </div>
-                <div id="idCardResult" style="display: flex; justify-content: center; padding: 20px;">
+            <section id="tabExams" class="pane hidden">
+                <div class="section-card">
+                    <div class="card-title">Geli Natiijada Imtixaanka</div>
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px;">
+                        <select id="resStudent" class="input-box"></select>
+                        <input type="text" id="resSubject" class="input-box" placeholder="Maadada (t.s Math)">
+                        <input type="number" id="resScore" class="input-box" placeholder="Dhibcaha (0-100)">
+                        <button class="btn btn-primary" style="height: 45px;" onclick="addResult()">Keydi Natiijada</button>
                     </div>
-            </section>
-
-            <section id="pageStProfile" class="page-view hidden">
-                <div class="card" style="text-align: center;">
-                    <img id="stImg" src="https://via.placeholder.com/150" style="width:150px; height:150px; border-radius:50%; border:5px solid var(--accent); margin-bottom: 20px;">
-                    <h1 id="stName">--- ---</h1>
-                    <p id="stRollDisplay" style="color: #64748b; font-weight: bold;"></p>
-                    <div class="stat-grid" style="margin-top: 30px;">
-                        <div class="card"><h4>Grade</h4><h2 id="stGrade">--</h2></div>
-                        <div class="card"><h4>GPA</h4><h2 id="stGPA">0.0</h2></div>
-                        <div class="card"><h4>Finance</h4><h2 id="stFin" style="color:var(--accent);">Paid</h2></div>
-                    </div>
+                    <table>
+                        <thead>
+                            <tr><th>Ardayga</th><th>Maadada</th><th>Dhibcaha</th><th>Grade</th><th>Action</th></tr>
+                        </thead>
+                        <tbody id="resultsTable"></tbody>
+                    </table>
                 </div>
             </section>
 
-        </main>
-    </div>
+            <section id="tabStProfile" class="pane hidden">
+                <div style="display: grid; grid-template-columns: 350px 1fr; gap: 30px;">
+                    <div class="section-card" style="text-align: center;">
+                        <img id="stPhoto" src="" style="width: 150px; height: 150px; border-radius: 50%; border: 5px solid var(--accent); margin-bottom: 20px;">
+                        <h2 id="stName">---</h2>
+                        <p id="stID" style="color: #64748b; font-weight: bold; margin-bottom: 20px;"></p>
+                        <div style="background: #f8fafc; padding: 20px; border-radius: 12px; text-align: left;">
+                            <p><b>Fasalka:</b> <span id="stClass">--</span></p>
+                            <p><b>Admission:</b> 2025/2026</p>
+                            <p><b>Status:</b> Active Student</p>
+                        </div>
+                    </div>
+                    <div class="section-card">
+                        <div class="card-title">Guud ahaan Xaadiriskaaga</div>
+                        <canvas id="attChart" height="150"></canvas>
+                    </div>
+                </div>
+            </section>
 
-    <div id="studentModal" class="modal-overlay hidden">
-        <div class="modal-box">
-            <h3>Diiwaangeli Arday Cusub</h3>
-            <hr style="margin: 15px 0; opacity: 0.1;">
-            <div class="form-group"><label>Magaca Buuxa</label><input type="text" id="regName"></div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                <div class="form-group"><label>Roll Number (ID)</label><input type="text" id="regRoll"></div>
-                <div class="form-group"><label>Fasalka</label><select id="regGrade"><option>Grade 9</option><option>Grade 10</option><option>Grade 11</option><option>Grade 12</option></select></div>
-            </div>
-            <div class="form-group"><label>Password-ka Portal-ka</label><input type="text" id="regPass" value="123456"></div>
-            <div class="form-group"><label>Sawirka (URL)</label><input type="text" id="regPhoto" placeholder="https://..."></div>
-            <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button class="btn btn-danger" onclick="toggleModal('studentModal')">KA NOQO</button>
-                <button class="btn btn-primary" onclick="saveStudent()">KEYDI ARDAYGA</button>
-            </div>
-        </div>
-    </div>
+            <section id="tabStResults" class="pane hidden">
+                <div class="section-card">
+                    <div class="card-title">Natiijada Imtixaannada (Exam Results)</div>
+                    <table>
+                        <thead>
+                            <tr><th>Maadada</th><th>Dhibcaha (Score)</th><th>Grade</th><th>Fallo</th></tr>
+                        </thead>
+                        <tbody id="stResTable"></tbody>
+                    </table>
+                    <div style="margin-top: 30px; text-align: right; font-weight: bold; font-size: 1.2rem;">
+                        GPA: <span id="stGPA" style="color: var(--card-blue);">0.0</span>
+                    </div>
+                </div>
+            </section>
 
-    <div id="teacherModal" class="modal-overlay hidden">
-        <div class="modal-box">
-            <h3>Diiwaangeli Macallin</h3>
-            <hr style="margin: 15px 0; opacity: 0.1;">
-            <div class="form-group"><label>Magaca Macallinka</label><input type="text" id="tName"></div>
-            <div class="form-group"><label>Maadada uu dhigo</label><input type="text" id="tSubj"></div>
-            <div class="form-group"><label>Mushaharka ($)</label><input type="number" id="tSalary"></div>
-            <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button class="btn btn-danger" onclick="toggleModal('teacherModal')">KA NOQO</button>
-                <button class="btn btn-primary" onclick="saveTeacher()">KEYDI MACALLINKA</button>
-            </div>
         </div>
     </div>
 
     <script>
         // --- DATABASE ---
-        let db = JSON.parse(localStorage.getItem('WEYRAX_DB_V17')) || {
-            students: [],
-            teachers: [],
-            marks: [],
-            revenue: 0
+        let db = JSON.parse(localStorage.getItem('WEYRAX_V35_DB')) || {
+            students: [
+                { id: "1001", name: "Ahmed Wali", class: "Grade 11", section: "A", parent: "0615551122", pass: "123", photo: "https://i.pravatar.cc/150?u=1" },
+                { id: "1002", name: "Sumaya Ali", class: "Grade 11", section: "B", parent: "0617778899", pass: "123", photo: "https://i.pravatar.cc/150?u=2" }
+            ],
+            attendance: {},
+            results: [] // { stId, subject, score, grade }
         };
 
-        const sync = () => localStorage.setItem('WEYRAX_DB_V17', JSON.stringify(db));
+        const sync = () => localStorage.setItem('WEYRAX_V35_DB', JSON.stringify(db));
+        const today = new Date().toISOString().split('T')[0];
 
-        // --- AUTHENTICATION ---
-        function handleAuth() {
-            const role = document.getElementById('loginRole').value;
-            const user = document.getElementById('loginUser').value;
-            const pass = document.getElementById('loginPass').value;
+        // --- AUTH ---
+        function handleLogin() {
+            const role = document.getElementById('role').value;
+            const user = document.getElementById('user').value;
+            const pass = document.getElementById('pass').value;
             const err = document.getElementById('loginError');
 
-            if (role === 'admin') {
-                if (user === 'admin' && pass === 'admin123') { launch('admin'); }
-                else { err.innerText = "Admin credentials-ka waa khalad!"; }
+            if(role === 'admin') {
+                if(user === 'admin' && pass === 'admin123') { startApp('admin'); }
+                else { err.innerText = "Admin credentials invalid!"; }
             } else {
-                const s = db.students.find(x => x.roll === user && x.pass === pass);
-                if (s) { window.activeUser = s; launch('student'); }
-                else { err.innerText = "Roll Number ama Password khalad ah!"; }
+                const s = db.students.find(x => x.id === user && x.pass === pass);
+                if(s) { window.activeUser = s; startApp('student'); }
+                else { err.innerText = "Student ID ama Password waa khalad!"; }
             }
         }
 
-        function launch(role) {
-            document.getElementById('loginPage').classList.add('hidden');
-            document.getElementById('mainSidebar').classList.remove('hidden');
+        function startApp(role) {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('sidebar').classList.remove('hidden');
             document.getElementById('mainUI').classList.remove('hidden');
-            document.getElementById('userDisplay').innerText = role.toUpperCase();
+            document.getElementById('userRoleTag').innerText = role.toUpperCase();
 
-            if (role === 'admin') {
-                document.getElementById('adminLinks').classList.remove('hidden');
-                switchPage('pageDash');
-                initChart();
+            if(role === 'admin') {
+                document.getElementById('adminNav').classList.remove('hidden');
+                showTab('tabDash');
             } else {
-                document.getElementById('studentLinks').classList.remove('hidden');
-                loadStudentPortal();
-                switchPage('pageStProfile');
+                document.getElementById('studentNav').classList.remove('hidden');
+                showTab('tabStProfile');
+                renderStudentProfile();
             }
-            updateCounts();
+            refreshStats();
         }
 
-        // --- NAVIGATION ---
-        function switchPage(id, el = null) {
-            document.querySelectorAll('.page-view').forEach(p => p.classList.add('hidden'));
+        // --- NAV ---
+        function showTab(id, el = null) {
+            document.querySelectorAll('.pane').forEach(p => p.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
-            document.getElementById('pageTitle').innerText = id.replace('page', '').toUpperCase();
-
-            if (el) {
-                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('nav-active'));
+            document.getElementById('tabTitle').innerText = id.replace('tab', '').toUpperCase();
+            if(el) {
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('nav-active'));
                 el.classList.add('nav-active');
             }
-
-            if (id === 'pageStudents') renderStudents();
-            if (id === 'pageTeachers') renderTeachers();
-            if (id === 'pageID') populateIDSelect();
+            if(id === 'tabDash') renderParentTable();
+            if(id === 'tabAttendance') renderAdminAttendance();
+            if(id === 'tabExams') renderAdminResults();
+            if(id === 'tabStResults') renderStudentResults();
         }
 
-        // --- STUDENT LOGIC ---
-        function saveStudent() {
-            const s = {
-                id: Date.now(),
-                name: document.getElementById('regName').value,
-                roll: document.getElementById('regRoll').value,
-                grade: document.getElementById('regGrade').value,
-                pass: document.getElementById('regPass').value,
-                photo: document.getElementById('regPhoto').value || 'https://via.placeholder.com/150'
-            };
-            db.students.push(s); sync();
-            toggleModal('studentModal'); renderStudents(); updateCounts();
+        // --- ADMIN: ATTENDANCE ---
+        function renderAdminAttendance() {
+            document.getElementById('attDate').innerText = today;
+            if(!db.attendance[today]) db.attendance[today] = {};
+            const tbody = document.getElementById('attAdminTable');
+            tbody.innerHTML = db.students.map(s => {
+                const rec = db.attendance[today][s.id] || { s1: '', s2: '' };
+                return `
+                    <tr>
+                        <td><b>${s.name}</b><br><small>${s.id}</small></td>
+                        <td>
+                            <div class="att-toggle">
+                                <button class="att-btn ${rec.s1 === 'P' ? 'active-p' : ''}" onclick="setAtt('${s.id}','s1','P')">P</button>
+                                <button class="att-btn ${rec.s1 === 'A' ? 'active-a' : ''}" onclick="setAtt('${s.id}','s1','A')">A</button>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="att-toggle">
+                                <button class="att-btn ${rec.s2 === 'P' ? 'active-p' : ''}" onclick="setAtt('${s.id}','s2','P')">P</button>
+                                <button class="att-btn ${rec.s2 === 'A' ? 'active-a' : ''}" onclick="setAtt('${s.id}','s2','A')">A</button>
+                            </div>
+                        </td>
+                        <td>${new Date().toLocaleTimeString()}</td>
+                    </tr>
+                `;
+            }).join('');
         }
 
-        function renderStudents() {
-            const term = document.getElementById('searchSt').value.toLowerCase();
-            const filtered = db.students.filter(x => x.name.toLowerCase().includes(term) || x.roll.toLowerCase().includes(term));
-            
-            const tbody = document.getElementById('studentTbody');
-            tbody.innerHTML = filtered.map(s => `
+        function setAtt(id, shift, val) {
+            if(!db.attendance[today][id]) db.attendance[today][id] = { s1: '', s2: '' };
+            db.attendance[today][id][shift] = val;
+            sync(); renderAdminAttendance(); refreshStats();
+        }
+
+        // --- ADMIN: RESULTS ---
+        function renderAdminResults() {
+            const sel = document.getElementById('resStudent');
+            sel.innerHTML = db.students.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+            const tbody = document.getElementById('resultsTable');
+            tbody.innerHTML = db.results.map((r, index) => `
                 <tr>
-                    <td><img src="${s.photo}" style="width:35px;height:35px;border-radius:50%;object-fit:cover;"></td>
-                    <td><b>${s.roll}</b></td>
-                    <td>${s.name}</td>
-                    <td>${s.grade}</td>
-                    <td><span class="badge badge-success">Active</span></td>
-                    <td><button class="btn-danger" style="padding:5px 10px;" onclick="deleteItem('students', ${s.id})"><i class="fas fa-trash"></i></button></td>
+                    <td>${db.students.find(x => x.id == r.stId)?.name}</td>
+                    <td>${r.subject}</td>
+                    <td><b>${r.score}</b></td>
+                    <td><span class="grade-badge ${r.score >= 50 ? 'g-a' : 'g-f'}">${calculateGrade(r.score)}</span></td>
+                    <td><button class="btn-danger" style="padding:5px;" onclick="deleteResult(${index})"><i class="fas fa-trash"></i></button></td>
                 </tr>
             `).join('');
         }
 
-        // --- TEACHER LOGIC ---
-        function saveTeacher() {
-            const t = {
-                id: Date.now(),
-                name: document.getElementById('tName').value,
-                subj: document.getElementById('tSubj').value,
-                salary: document.getElementById('tSalary').value
-            };
-            db.teachers.push(t); sync();
-            toggleModal('teacherModal'); renderTeachers(); updateCounts();
+        function addResult() {
+            const stId = document.getElementById('resStudent').value;
+            const subject = document.getElementById('resSubject').value;
+            const score = parseInt(document.getElementById('resScore').value);
+            if(!subject || isNaN(score)) return alert("Fadlan xogta dhamaystir!");
+            db.results.push({ stId, subject, score });
+            sync(); renderAdminResults();
         }
 
-        function renderTeachers() {
-            document.getElementById('teacherTbody').innerHTML = db.teachers.map(t => `
-                <tr>
-                    <td><b>${t.name}</b></td>
-                    <td>${t.subj}</td>
-                    <td>$${t.salary}</td>
-                    <td>061XXXXXXX</td>
-                    <td><button class="btn-danger" style="padding:5px 10px;" onclick="deleteItem('teachers', ${t.id})"><i class="fas fa-trash"></i></button></td>
-                </tr>
-            `).join('');
-        }
-
-        // --- ID GENERATOR ---
-        function populateIDSelect() {
-            const sel = document.getElementById('idStudentList');
-            sel.innerHTML = db.students.map(s => `<option value="${s.id}">${s.name} (${s.roll})</option>`).join('');
-        }
-
-        function generateID() {
-            const id = document.getElementById('idStudentList').value;
-            const s = db.students.find(x => x.id == id);
-            if (!s) return;
-
-            const res = document.getElementById('idCardResult');
-            res.innerHTML = `
-                <div style="width:300px; height:450px; background:white; border-radius:15px; overflow:hidden; border:1px solid #ddd; position:relative; text-align:center; box-shadow:var(--shadow);">
-                    <div style="height:100px; background:var(--primary); padding:20px; color:white;">
-                        <h2 style="color:var(--accent);">WEYRAX</h2>
-                        <small>OFFICIAL STUDENT ID</small>
-                    </div>
-                    <img src="${s.photo}" style="width:120px; height:120px; border-radius:50%; border:5px solid white; margin-top:-60px; object-fit:cover; background:white;">
-                    <div style="padding:20px;">
-                        <h3>${s.name}</h3>
-                        <p style="color:var(--accent); font-weight:bold;">${s.grade}</p>
-                        <div style="text-align:left; background:#f8fafc; padding:10px; border-radius:10px; margin-top:15px; font-size:12px;">
-                            <p><b>ID NO:</b> ${s.roll}</p>
-                            <p><b>EXPIRES:</b> DEC 2026</p>
-                        </div>
-                        <div id="qrcode" style="margin-top:20px; display:flex; justify-content:center;"></div>
-                    </div>
-                </div>
-            `;
-            new QRCode(document.getElementById("qrcode"), { text: s.roll, width: 60, height: 60 });
+        function calculateGrade(s) {
+            if(s >= 90) return 'A+'; if(s >= 80) return 'A'; if(s >= 70) return 'B';
+            if(s >= 60) return 'C'; if(s >= 50) return 'D'; return 'F';
         }
 
         // --- STUDENT PORTAL ---
-        function loadStudentPortal() {
+        function renderStudentProfile() {
             const s = window.activeUser;
-            document.getElementById('stImg').src = s.photo;
+            document.getElementById('stPhoto').src = s.photo;
             document.getElementById('stName').innerText = s.name;
-            document.getElementById('stRollDisplay').innerText = "ROLL: " + s.roll;
-            document.getElementById('stGrade').innerText = s.grade;
-            document.getElementById('stGPA').innerText = "3.8";
+            document.getElementById('stID').innerText = "ID: " + s.id;
+            document.getElementById('stClass').innerText = s.class;
+        }
+
+        function renderStudentResults() {
+            const s = window.activeUser;
+            const results = db.results.filter(r => r.stId === s.id);
+            const tbody = document.getElementById('stResTable');
+            let totalScore = 0;
+            
+            tbody.innerHTML = results.map(r => {
+                totalScore += r.score;
+                return `
+                    <tr>
+                        <td><b>${r.subject}</b></td>
+                        <td>${r.score}</td>
+                        <td><span class="grade-badge ${r.score >= 50 ? 'g-a' : 'g-f'}">${calculateGrade(r.score)}</span></td>
+                        <td>${r.score >= 50 ? 'Passed' : 'Failed'}</td>
+                    </tr>
+                `;
+            }).join('');
+            
+            const gpa = results.length ? (totalScore / (results.length * 25)).toFixed(2) : "0.0";
+            document.getElementById('stGPA').innerText = gpa;
         }
 
         // --- UTILS ---
-        function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
-        function updateCounts() {
-            document.getElementById('countSt').innerText = db.students.length;
-            document.getElementById('countTe').innerText = db.teachers.length;
-            const rev = db.teachers.reduce((sum, t) => sum + parseInt(t.salary), 0);
-            document.getElementById('countRev').innerText = "$" + (rev * 2); 
-        }
-        function deleteItem(type, id) {
-            if (confirm("Ma hubtaa?")) {
-                db[type] = db[type].filter(x => x.id !== id);
-                sync();
-                type === 'students' ? renderStudents() : renderTeachers();
-                updateCounts();
+        function refreshStats() {
+            document.getElementById('stCount').innerText = db.students.length;
+            let countS1 = 0;
+            if(db.attendance[today]) {
+                Object.values(db.attendance[today]).forEach(r => { if(r.s1 === 'P') countS1++; });
             }
+            document.getElementById('attCount1').innerText = countS1;
         }
-        function initChart() {
-            const ctx = document.getElementById('performanceChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'],
-                    datasets: [{
-                        label: 'Average Score',
-                        data: [85, 92, 78, 88],
-                        backgroundColor: '#10b981'
-                    }]
-                }
-            });
+
+        function renderParentTable() {
+            const tbody = document.getElementById('parentTable');
+            tbody.innerHTML = db.students.map(s => `
+                <tr>
+                    <td><b>${s.name}</b></td>
+                    <td>${s.class}</td>
+                    <td>${s.section}</td>
+                    <td style="color:var(--card-blue); font-weight:bold;">${s.parent}</td>
+                    <td><span class="grade-badge g-a">Active</span></td>
+                </tr>
+            `).join('');
         }
-        setInterval(() => { document.getElementById('liveClock').innerText = new Date().toLocaleString(); }, 1000);
+
+        setInterval(() => { document.getElementById('liveDate').innerText = new Date().toLocaleString('so-SO'); }, 1000);
+        
+        function deleteResult(idx) { db.results.splice(idx, 1); sync(); renderAdminResults(); }
     </script>
 </body>
 </html>
