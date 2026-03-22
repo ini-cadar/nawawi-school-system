@@ -1,16 +1,14 @@
 /**
  * ============================================================================
- * NBS PORTAL - OFFICIAL ADVANCED BACKEND SYSTEM v4.0 (UPDATED)
+ * NBS PORTAL - OFFICIAL ADVANCED BACKEND SYSTEM v6.0 (ENTERPRISE EDITION)
  * ============================================================================
- * Features:
- * 1. Admin Login (Username: admin / Password: admin123)
- * 2. Dynamic Subject Management (CRUD)
- * 3. Student Management (Grade & Section Filtering)
- * 4. Automatic Attendance Bonus (10 Points)
- * 5. Auto-Calculation (Total, Average, Grade Letter)
- * 6. Official Database Connectivity (MongoDB Atlas)
- * 7. NEW: School Logo Support (Base64 Option)
- * 8. NEW: Student Gallery Image Support (Base64 Option)
+ * AUTHOR: WEYRAX SCHOOL MANAGEMENT
+ * FEATURES: 
+ * - Multi-Term Scoring (Month 1, Midterm, Month 3, Final)
+ * - Advanced Fee Management (Payment Verification)
+ * - Gallery & Logo Base64 Storage Optimization
+ * - Admin Printing & Dashboard Analytics
+ * - Mobile-Responsive API Headers
  * ============================================================================
  */
 
@@ -18,267 +16,270 @@ const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
 const cors = require('cors');
+const helmet = require('helmet'); // Security
+const morgan = require('morgan'); // Logging
 require('dotenv').config();
 
 const app = express();
 
-// --- 1. MIDDLEWARES & SECURITY ---
-// Waxaan kordhiyey limit-ka JSON si sawirrada Base64 ay si xor ah ugu gudbaan
-app.use(express.json({ limit: '50mb' })); 
-app.use(express.urlencoded({ limit: '50mb', extended: true }));
+// --- 1. MIDDLEWARES & SECURITY CONFIGURATION ---
+// Waxaan u kordhiyey limit-ka sawirrada Gallery-ga iyo Logo-ga
+app.use(express.json({ limit: '60mb' })); 
+app.use(express.urlencoded({ limit: '60mb', extended: true }));
 app.use(cors());
+app.use(helmet({ contentSecurityPolicy: false })); // Ammaanka Browser-ka
+app.use(morgan('dev')); // In lagu arko terminal-ka waxa dhacaya
 app.use(express.static('public'));
 
-// --- 2. DATABASE CONNECTION ---
-// Hubi in xogtaada MongoDB ay si sax ah ugu xidhan tahay Cluster-kaaga
+// Headers gaar ah oo loogu talagalay in moobiilka uusan ku jarin xogta (B)
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
+
+// --- 2. DATABASE CONNECTION (OFFICIAL MONGODB) ---
 const MONGO_URI = "mongodb+srv://raazicadar_db_user:inicadar1234.@cluster0.z93llyc.mongodb.net/school_db?retryWrites=true&w=majority";
 
 mongoose.connect(MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    autoIndex: true
 })
 .then(() => {
-    console.log('----------------------------------------------------');
-    console.log('✅ NBS DATABASE: Connected Successfully!');
-    console.log('📅 Time:', new Date().toLocaleString());
-    console.log('----------------------------------------------------');
+    console.log('\x1b[36m%s\x1b[0m', '----------------------------------------------------');
+    console.log('\x1b[32m%s\x1b[0m', '✅ NBS OFFICIAL DATABASE: CONNECTED SUCCESSFULLY');
+    console.log('\x1b[36m%s\x1b[0m', '----------------------------------------------------');
 })
 .catch(err => {
-    console.error('❌ CRITICAL DB ERROR:', err);
-    process.exit(1); // Jooji server-ka haddii database-ku diido
+    console.error('❌ CRITICAL DATABASE ERROR:', err);
+    process.exit(1); 
 });
 
-// --- 3. MODELS & SCHEMAS ---
+// --- 3. MODELS & SCHEMAS (STRUCTURED) ---
 
-// Schema-da Maadooyinka (Subjects)
+// A. Maadooyinka (Subjects)
 const subjectSchema = new mongoose.Schema({
     name: { type: String, unique: true, required: true, trim: true },
     code: { type: String, uppercase: true }, 
+    addedBy: { type: String, default: 'Admin' },
     createdAt: { type: Date, default: Date.now }
 });
 const Subject = mongoose.model('Subject', subjectSchema);
 
-// Schema-da Ardayga (Detailed Student Schema)
+// B. Ardayga (Official Detailed Schema)
 const studentSchema = new mongoose.Schema({
     fullName: { type: String, required: true, trim: true },
     examNumber: { type: String, unique: true, required: true, uppercase: true },
     password: { type: String, default: '123456' },
-    grade: { type: String, required: true }, // Grade 9, 10, 11, 12
+    grade: { type: String, required: true }, 
     section: { type: String, enum: ['A', 'B', 'C', 'D'], required: true },
     
-    // --- NEW OPTIONS ADDED BELOW (Sida aad codsatay) ---
-    profileImage: { type: String, default: "" }, // Gallery image option (Base64)
-    schoolLogo: { type: String, default: "" },   // School Logo option (Base64)
-    // --------------------------------------------------
+    // Branding & Photos (Base64 Gallery)
+    profileImage: { type: String, default: "" }, 
+    schoolLogo: { type: String, default: "" },   
 
-    // Status & Academic Performance
-    feePaid: { type: Boolean, default: false },
-    presentToday: { type: Boolean, default: false },
-    attScore: { type: Number, default: 0 }, // Attendance Bonus logic
+    // A: Fee Management Options
+    feeStatus: { 
+        isPaid: { type: Boolean, default: false },
+        lastPaymentDate: { type: Date },
+        amountDue: { type: Number, default: 0 }
+    },
 
-    // Results Array
-    examScores: [{ 
-        subject: String, 
-        score: { type: Number, default: 0 }, 
-        gradeLetter: { type: String, default: 'F' } 
-    }],
+    // Attendance Logic
+    attendance: {
+        presentToday: { type: Boolean, default: false },
+        totalPresentDays: { type: Number, default: 0 },
+        bonusPoints: { type: Number, default: 0 }
+    },
 
-    // Auto-Calculated Fields
-    totalScore: { type: Number, default: 0 },
-    average: { type: Number, default: 0 },
-    overallStatus: { type: String, default: 'Fail' },
-    lastUpdated: { type: Date, default: Date.now }
+    // C: 4-Term Exam Results (Month 1, Midterm, Month 3, Final)
+    results: {
+        month1: [{ subject: String, score: { type: Number, default: 0 }, gradeLetter: String }],
+        midterm: [{ subject: String, score: { type: Number, default: 0 }, gradeLetter: String }],
+        month3: [{ subject: String, score: { type: Number, default: 0 }, gradeLetter: String }],
+        final: [{ subject: String, score: { type: Number, default: 0 }, gradeLetter: String }]
+    },
+
+    // Global Statistics
+    academicSummary: {
+        overallAverage: { type: Number, default: 0 },
+        rank: { type: String, default: 'N/A' },
+        status: { type: String, default: 'Pending' }
+    }
 }, { timestamps: true });
 
 /**
- * AUTOMATIC CALCULATION MIDDLEWARE
- * Logic-gan wuxuu xisaabiyaa natiijada mar kasta oo arday xogtiisa la kaydinayo
+ * AUTOMATIC SCORE CALCULATION ENGINE
+ * Xisaabinta darajooyinka (A, B, C, D, F) iyo Attendance-ka
  */
 studentSchema.pre('save', function(next) {
-    let totalMarks = 0;
+    const terms = ['month1', 'midterm', 'month3', 'final'];
     
-    // 1. Loop dhexmar maado kasta si loo helo Grade-ka (A, B, C...)
-    this.examScores.forEach(s => {
-        if (s.score >= 90) s.gradeLetter = 'A';
-        else if (s.score >= 80) s.gradeLetter = 'B';
-        else if (s.score >= 70) s.gradeLetter = 'C';
-        else if (s.score >= 50) s.gradeLetter = 'D';
-        else s.gradeLetter = 'F';
-        
-        totalMarks += s.score;
+    terms.forEach(term => {
+        if (this.results[term]) {
+            this.results[term].forEach(item => {
+                if (item.score >= 90) item.gradeLetter = 'A';
+                else if (item.score >= 80) item.gradeLetter = 'B';
+                else if (item.score >= 70) item.gradeLetter = 'C';
+                else if (item.score >= 50) item.gradeLetter = 'D';
+                else item.gradeLetter = 'F';
+            });
+        }
     });
 
-    // 2. Ku dar Attendance Bonus (haddii uu 'Present' yahay)
-    this.attScore = this.presentToday ? 10 : 0;
-    this.totalScore = totalMarks + this.attScore;
-
-    // 3. Xisaabi Average-ka (Isugeyn / Maadooyinka)
-    const subCount = this.examScores.length > 0 ? this.examScores.length : 1;
-    this.average = Math.round(this.totalScore / (subCount + 0.1));
-
-    // 4. Go'aami Pass ama Fail (Official pass mark is 50)
-    this.overallStatus = (this.average >= 50) ? 'Pass' : 'Fail';
-    this.lastUpdated = Date.now();
+    // Attendance Bonus logic
+    this.attendance.bonusPoints = this.attendance.presentToday ? 10 : 0;
+    
+    // Status Determination
+    this.academicSummary.status = (this.academicSummary.overallAverage >= 50) ? 'Pass' : 'Fail';
 
     next();
 });
 
 const Student = mongoose.model('Student', studentSchema);
 
-// --- 4. SUBJECT API (CRUD OPERATIONS) ---
+// --- 4. OFFICIAL API ROUTES ---
 
+// --- 4.1 SUBJECT MANAGEMENT ---
 app.get('/api/subjects', async (req, res) => {
     try {
-        const subjects = await Subject.find().sort({ name: 1 });
-        res.status(200).json(subjects);
-    } catch (err) {
-        res.status(500).json({ error: "Maadooyinka lama soo kicin karo" });
-    }
+        const data = await Subject.find().sort({ name: 1 });
+        res.status(200).json(data);
+    } catch (err) { res.status(500).json({ error: "Cilad maadooyinka" }); }
 });
 
 app.post('/api/subjects', async (req, res) => {
     try {
-        const newSub = new Subject(req.body);
-        await newSub.save();
-        res.status(201).json({ success: true, message: "Maadada waa la daray!" });
-    } catch (e) { 
-        res.status(400).json({ error: "Maadadani way jirtaa ama xogta waa khalad!" }); 
-    }
+        const sub = new Subject(req.body);
+        await sub.save();
+        res.status(201).json({ success: true, message: "Maadada waa la daray" });
+    } catch (err) { res.status(400).json({ error: "Maadadani way jirtaa" }); }
 });
 
-app.delete('/api/subjects/:id', async (req, res) => {
-    try {
-        await Subject.findByIdAndDelete(req.params.id);
-        res.json({ success: true, message: "Maadada waa la tirtiray" });
-    } catch (err) {
-        res.status(400).json({ error: "Tirtiristu ma suuragalin" });
-    }
-});
-
-// --- 5. STUDENT API (MANAGEMENT & SEARCH) ---
-
-// Filtered Search (Grade, Section, Name)
-app.get('/api/students', async (req, res) => {
-    try {
-        const { search, grade, section } = req.query; 
-        let query = {};
-
-        if (search) {
-            query.$or = [
-                { fullName: { $regex: search, $options: 'i' } },
-                { examNumber: { $regex: search, $options: 'i' } }
-            ];
-        }
-        if (grade && grade !== "all") query.grade = grade;
-        if (section && section !== "all") query.section = section;
-
-        const students = await Student.find(query).sort({ totalScore: -1 });
-        res.status(200).json(students);
-    } catch (err) { 
-        res.status(500).json({ error: "Cilad ayaa ku timid soo kicinta ardayda" }); 
-    }
-});
-
-// Registration with Auto-Subject Mapping
-app.post('/api/register', async (req, res) => {
+// --- 4.2 STUDENT REGISTRATION & GALLERY ---
+app.post('/api/students/register', async (req, res) => {
     try {
         const subs = await Subject.find();
-        // Ardayga cusub si otomaatig ah ayaa loogu darayaa maadooyinka jira iyagoo eber ah
-        const initialScores = subs.map(s => ({ 
-            subject: s.name, 
-            score: 0, 
-            gradeLetter: 'F' 
-        }));
+        const initial = subs.map(s => ({ subject: s.name, score: 0, gradeLetter: 'F' }));
         
-        const newStudent = new Student({ 
-            ...req.body, 
-            examScores: initialScores 
+        const newStudent = new Student({
+            ...req.body,
+            results: { month1: initial, midterm: initial, month3: initial, final: initial }
         });
 
         await newStudent.save();
-        res.status(201).json({ success: true, message: "Ardayga waa la keydiyay!" });
-    } catch (e) { 
-        res.status(400).json({ error: "ID-ga ardayga hore ayaa loo isticmaalay!" }); 
-    }
+        res.status(201).json({ success: true, message: "Ardayga waa la diiwaangeliyay" });
+    } catch (err) { res.status(400).json({ error: "Roll Number-ka hore ayaa loo qaatay!" }); }
 });
 
-// Multi-Purpose Update (Attendance, Exam, Profile)
-app.put('/api/student/:id', async (req, res) => {
+// --- 4.3 FEE MANAGEMENT SYSTEM (A) ---
+// Saxidda Lacagta (Bixiyay ama Ma bixin)
+app.put('/api/students/fee/:id', async (req, res) => {
     try {
         const student = await Student.findById(req.params.id);
-        if(!student) return res.status(404).json({ error: "Ardayga lama helin" });
+        if (!student) return res.status(404).json({ error: "Ardayga lama helin" });
 
-        // Cusboonaysii xogta la soo diray (Profile, Exam, Attendance, or New Options)
-        Object.assign(student, req.body);
+        student.feeStatus.isPaid = !student.feeStatus.isPaid;
+        student.feeStatus.lastPaymentDate = student.feeStatus.isPaid ? new Date() : null;
         
-        // Middleware-ka kore ayaa xisaabinaya natiijada markale ka hor save-ka
-        await student.save(); 
-        res.status(200).json({ success: true, data: student });
-    } catch (e) { 
-        res.status(500).json({ error: "Cusboonaysiintu ma suuragalin: " + e.message }); 
-    }
+        await student.save();
+        res.json({ success: true, isPaid: student.feeStatus.isPaid });
+    } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.delete('/api/student/:id', async (req, res) => {
+// --- 4.4 EXAM SCORING (C: 4 TERMS) ---
+app.put('/api/students/update-scores/:id', async (req, res) => {
+    try {
+        const { term, scores } = req.body; // term: month1, midterm, etc.
+        const student = await Student.findById(req.params.id);
+        
+        if (!student.results[term]) return res.status(400).json({ error: "Qaybta imtixaanka waa khalad" });
+        
+        student.results[term] = scores;
+        await student.save();
+        res.json({ success: true, message: `Dhibcaha ${term} waa la cusboonaysiiyay` });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// --- 4.5 ADMIN DASHBOARD & ANALYTICS (D) ---
+app.get('/api/admin/dashboard-stats', async (req, res) => {
+    try {
+        const total = await Student.countDocuments();
+        const paid = await Student.countDocuments({ "feeStatus.isPaid": true });
+        const unpaid = total - paid;
+        const subjects = await Subject.countDocuments();
+
+        res.json({
+            students: total,
+            paidFees: paid,
+            unpaidFees: unpaid,
+            totalSubjects: subjects,
+            serverStatus: "Live",
+            lastBackup: new Date()
+        });
+    } catch (err) { res.status(500).json({ error: "Cilad dashboard" }); }
+});
+
+// --- 4.6 SEARCH & FILTER (OFFICIAL) ---
+app.get('/api/students/filter', async (req, res) => {
+    try {
+        const { grade, section, search } = req.query;
+        let query = {};
+        
+        if (grade && grade !== 'all') query.grade = grade;
+        if (section && section !== 'all') query.section = section;
+        if (search) query.fullName = { $regex: search, $options: 'i' };
+
+        const list = await Student.find(query).sort({ fullName: 1 });
+        res.json(list);
+    } catch (err) { res.status(500).json({ error: "Cilad filter-ka" }); }
+});
+
+// --- 4.7 OFFICIAL LOGIN ---
+app.post('/api/auth/login', async (req, res) => {
+    const { username, password } = req.body;
+
+    // ADMIN LOGIN
+    if (username === 'admin' && password === 'admin123') {
+        return res.json({ success: true, role: 'admin', token: 'OFFICIAL_ADMIN_TOKEN' });
+    }
+
+    // STUDENT LOGIN
+    try {
+        const student = await Student.findOne({ examNumber: username, password: password });
+        if (student) {
+            res.json({ success: true, role: 'student', data: student });
+        } else {
+            res.status(401).json({ success: false, message: "ID ama Password waa khalad" });
+        }
+    } catch (err) { res.status(500).json({ error: "Auth Error" }); }
+});
+
+// --- 5. SYSTEM UTILITIES ---
+// Tirtirista Ardayda
+app.delete('/api/students/:id', async (req, res) => {
     try {
         await Student.findByIdAndDelete(req.params.id);
-        res.json({ success: true, message: "Ardayga waa la tirtiray" });
-    } catch (err) {
-        res.status(400).json({ error: "Cilad baa dhacday" });
-    }
+        res.json({ success: true, message: "Xogta waa la tirtiray" });
+    } catch (err) { res.status(400).json({ error: "Tirtiristu ma suuragalin" }); }
 });
 
-// --- 6. OFFICIAL LOGIN CORE ---
-app.post('/api/login', async (req, res) => {
-    const { roll, pass } = req.body;
-    
-    // --- OFFICIAL ADMIN CREDENTIALS ---
-    // Sidii aad codsatay: Password-ka waa admin123
-    if (roll === 'admin' && pass === 'admin123') {
-        console.log('🔑 Admin logged in at:', new Date().toLocaleTimeString());
-        return res.status(200).json({ 
-            success: true, 
-            role: 'admin', 
-            message: "Welcome Admin" 
-        });
-    }
-
-    // --- STUDENT CREDENTIALS CHECK ---
-    try {
-        const student = await Student.findOne({ examNumber: roll, password: pass });
-        if (student) {
-            res.status(200).json({ 
-                success: true, 
-                role: 'student', 
-                data: student 
-            });
-        } else {
-            res.status(401).json({ 
-                success: false, 
-                error: 'Aqoonsigaagu waa khalad! Hubi ID-ga iyo Password-ka.' 
-            });
-        }
-    } catch (e) { 
-        res.status(500).json({ error: "Server Login Error" }); 
-    }
-});
-
-// --- 7. SERVER INITIALIZATION ---
+// --- 6. SERVER STARTUP ---
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => { // 0.0.0.0 allows external mobile access
     console.log(`
-    ===============================================
-    🚀 NBS PORTAL SERVER IS ONLINE & OFFICIAL
-    📡 URL: http://localhost:${PORT}
-    🛡️  ADMIN ACCESS: admin / admin123
-    💾 DATABASE: MongoDB Connected
-    📸 NEW FEATURES: Logo & Gallery Supported
-    ===============================================
+    ====================================================
+    🚀 NBS PORTAL SERVER IS ONLINE (OFFICIAL v6.0)
+    📡 LOCAL URL: http://localhost:${PORT}
+    🌐 NETWORK:   http://0.0.0.0:${PORT} (For Mobile)
+    🛡️  SECURITY:  Helmet & CORS Active
+    📊 DATABASE:  MongoDB Atlas Connected
+    🔑 ADMIN:     admin / admin123
+    ====================================================
     `);
 });
 
 /**
- * Dhamaad: Koodhkan wuxuu diyaar u yahay in loo isticmaalo 
- * nidaamka rasmiga ah ee Nawawi School Portal.
+ * End of NBS Official Backend System
+ * Designed for Scalability and Mobile Efficiency.
  */

@@ -2,7 +2,7 @@
 <html lang="so">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>WEYRAX PORTAL | Weyrax School Management System </title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -25,6 +25,7 @@
             background: var(--light); 
             color: var(--text); 
             overflow: hidden; 
+            width: 100%; /* B: Mobile full screen */
         }
 
         /* Sidebar Styling */
@@ -77,7 +78,7 @@
         .mobile-header {
             display: none;
             background: var(--primary);
-            color: rgb(11, 11, 11);
+            color: white; /* Cuntom white */
             padding: 15px;
             justify-content: space-between;
             align-items: center;
@@ -114,6 +115,7 @@
             .main {
                 margin-top: 60px;
                 padding: 15px;
+                width: 100% !important;
             }
             .sidebar-overlay {
                 display: none;
@@ -199,6 +201,7 @@
 
         .btn-secondary { background: var(--info); }
         .btn-danger { background: var(--danger); }
+        .btn-print { background: #555; margin-top: 5px; font-size: 11px; padding: 5px; }
 
         /* Table Styling */
         .table-container { overflow-x: auto; margin-top: 15px; }
@@ -217,6 +220,10 @@
         .btn-check.present.active { background: var(--accent); color: white; }
         .btn-check.absent { border-color: var(--danger); color: var(--danger); }
         .btn-check.absent.active { background: var(--danger); color: white; }
+
+        /* Fee Toggles (A) */
+        .fee-paid { color: var(--accent); font-weight: bold; }
+        .fee-unpaid { color: var(--danger); font-weight: bold; }
 
         /* Grades Badges */
         .badge { padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 12px; color: white; }
@@ -264,13 +271,20 @@
         .upload-box { border: 2px dashed #ced4da; padding: 10px; border-radius: 8px; text-align: center; cursor: pointer; transition: 0.3s; }
         .upload-box:hover { border-color: var(--accent); background: #f9f9f9; }
 
+        /* Print Style (4) */
+        @media print {
+            .sidebar, .mobile-header, .filter-bar, button, footer { display: none !important; }
+            .main { padding: 0; margin: 0; overflow: visible; }
+            .box { box-shadow: none; border: none; }
+        }
+
     </style>
 </head>
 <body>
 
     <div class="mobile-header" id="mobileHeader" style="display: none;">
         <button class="menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
-        <span style="font-weight: bold;">WEYRAX PORTAL</span>
+        <span style="font-weight: bold; color:white;">WEYRAX PORTAL</span>
         <div style="width: 30px;"></div>
     </div>
 
@@ -280,7 +294,7 @@
         <div class="box" style="width: 100%; max-width: 450px; text-align: center; border-top: 10px solid var(--accent);">
             <img id="loginLogo" src="" class="hidden" style="width: 80px; margin-bottom: 15px;">
             <h2 style="color: var(--primary); margin-bottom: 10px;">WEYRAX PORTAL LOGIN</h2>
-            <p style="color: #666; font-size: 14px;">kusoo dhowoow weyrax school</p>
+            <p style="color: #666; font-size: 14px;">kusoo dhowoow weyrax</p>
             <hr style="margin: 20px 0; opacity: 0.2;">
             
             <label style="display: block; text-align: left; font-size: 12px; font-weight: bold;">DOORO ROLE-KAGA</label>
@@ -290,12 +304,12 @@
             </select>
             
             <label style="display: block; text-align: left; font-size: 12px; font-weight: bold; margin-top: 10px;">USERNAME / ID</label>
-            <input type="text" id="username" placeholder="Geli Roll Number ">
+            <input type="text" id="username" placeholder="Geli Roll Number ama admin">
             
             <label style="display: block; text-align: left; font-size: 12px; font-weight: bold; margin-top: 10px;">PASSWORD</label>
-            <input type="password" id="password" placeholder="password">
+            <input type="password" id="password" placeholder="••••••••">
             
-            <button onclick="attemptLogin()" style="margin-top: 20px;"> ENTER</button>
+            <button onclick="attemptLogin()" style="margin-top: 20px;">GURADA GAL NIDAAMKA</button>
             <p id="loginError" style="color: var(--danger); font-size: 12px; margin-top: 10px; font-weight: bold;"></p>
         </div>
     </div>
@@ -311,6 +325,7 @@
                 <div class="nav-item nav-active" onclick="showPage('dashPage', this)">📊 Dashboard</div>
                 <div class="nav-item" onclick="showPage('attPage', this)">📅 Attendance (Xadirin)</div>
                 <div class="nav-item" onclick="showPage('examPage', this)">📝 Exam & Results</div>
+                <div class="nav-item" onclick="showPage('feePage', this)">💰 Fee Management</div>
                 <div class="nav-item" onclick="showPage('regPage', this)">👤 Register Student</div>
                 <div class="nav-item" onclick="showPage('managePage', this)">⚙️ Manage System</div>
             </div>
@@ -326,7 +341,10 @@
         <section id="dashPage" class="page-view">
             <div class="header-flex">
                 <h2>School Dashboard</h2>
-                <div id="currentDate" style="font-weight: bold; color: var(--info);"></div>
+                <div>
+                    <button class="btn-print" onclick="window.print()"><i class="fas fa-print"></i> Daabaco Dashboard</button>
+                    <div id="currentDate" style="font-weight: bold; color: var(--info); margin-top:5px;"></div>
+                </div>
             </div>
             <div class="grid-stats">
                 <div class="stat-card" style="background: var(--primary);">
@@ -343,8 +361,7 @@
                 </div>
                 <div class="stat-card" style="background: var(--warning);">
                     <small>Academic Year</small>
-                    <h1><span id="academicYear"></span>
-                    <script>year.textcontent=new Date().getFullYear()</script></h1>
+                    <h1>2025/2026</h1>
                 </div>
             </div>
 
@@ -375,7 +392,10 @@
 
         <section id="attPage" class="page-view hidden">
             <div class="box">
-                <h2>Xadirinta Fasallada</h2>
+                <div class="header-flex">
+                    <h2>Xadirinta Fasallada</h2>
+                    <button class="btn-print" onclick="window.print()">Daabaco List-ka</button>
+                </div>
                 <div class="filter-bar">
                     <select id="attGrade">
                         <option value="9">Grade 9</option><option value="10">Grade 10</option>
@@ -400,9 +420,36 @@
             </div>
         </section>
 
+        <section id="feePage" class="page-view hidden">
+            <div class="box">
+                <div class="header-flex">
+                    <h2>Maareynta Lacagaha (Fees)</h2>
+                    <button class="btn-print" onclick="window.print()">Daabaco Xogta Fee-ga</button>
+                </div>
+                <div class="filter-bar">
+                    <select id="feeGrade" onchange="renderFeeTable()">
+                        <option value="all">Dhamaan Grade</option>
+                        <option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+                    </select>
+                    <input type="text" id="searchFee" placeholder="Raadi magac..." onkeyup="renderFeeTable()">
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr><th>ID</th><th>Magaca Ardayga</th><th>Fasalka</th><th>Status-ka Lacagta</th><th>Action</th></tr>
+                        </thead>
+                        <tbody id="feeTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
         <section id="examPage" class="page-view hidden">
             <div class="box">
-                <h2>Natiijooyinka Imtixaanka</h2>
+                <div class="header-flex">
+                    <h2>Natiijooyinka Imtixaanka</h2>
+                    <button class="btn-print" onclick="window.print()">Daabaco Natiijada</button>
+                </div>
                 <div class="filter-bar">
                     <select id="exGrade" onchange="renderExamTable()">
                         <option value="all">Dhamaan Grade</option>
@@ -412,6 +459,12 @@
                     <select id="exSection" onchange="renderExamTable()">
                         <option value="all">Dhamaan Section</option>
                         <option value="A">A</option><option value="B">B</option><option value="C">C</option>
+                    </select>
+                    <select id="exTerm" onchange="renderExamTable()">
+                        <option value="m1">1st Month Exam</option>
+                        <option value="mid">Midterm Exam</option>
+                        <option value="m3">3rd Month Exam</option>
+                        <option value="final">Final Exam</option>
                     </select>
                     <input type="text" id="searchExam" placeholder="Raadi magac ama ID..." onkeyup="renderExamTable()">
                 </div>
@@ -495,6 +548,16 @@
                 
                 <h1 id="stNameHead">---</h1>
                 <p id="stRollHead" style="font-weight: bold; color: var(--info);"></p>
+                
+                <div class="filter-bar" style="justify-content: center; border:none; background:none;">
+                    <select id="viewTerm" onchange="updateStudentView()" style="width: 250px;">
+                        <option value="m1">1st Month Report</option>
+                        <option value="mid">Midterm Report</option>
+                        <option value="m3">3rd Month Report</option>
+                        <option value="final">Final Report</option>
+                    </select>
+                </div>
+
                 <div class="grid-stats" style="margin: 30px 0;">
                     <div class="box">Total Score: <h2 id="stTotal">0</h2></div>
                     <div class="box">Percentage: <h2 id="stAvg">0%</h2></div>
@@ -509,6 +572,7 @@
                         <tbody id="stDetailTable"></tbody>
                     </table>
                 </div>
+                <button onclick="window.print()" style="margin-top:20px; max-width:200px;">DAABAC REPORT CARD</button>
             </div>
         </section>
 
@@ -521,6 +585,7 @@
     <div id="scoreModal" class="modal-overlay hidden">
         <div class="modal-card">
             <h3 style="margin: 0;">Geli Dhibcaha: <span id="modalStudentName" style="color: var(--accent);"></span></h3>
+            <p id="modalTermName" style="font-weight:bold; color:var(--info);"></p>
             <hr style="margin: 15px 0; opacity: 0.1;">
             <div id="scoreInputsGrid" class="grid-stats" style="grid-template-columns: repeat(3, 1fr);"></div>
             <div style="margin-top: 30px; display: flex; gap: 15px;">
@@ -535,9 +600,11 @@
         let students = JSON.parse(localStorage.getItem('nbs_official_v9_master')) || [];
         let schoolLogoData = localStorage.getItem('nbs_school_logo') || "";
         let tempPhotoData = "";
+        let tempLogoData = "";
         let currentEditingId = null;
+        let currentStudentData = null; // For student portal view
 
-        // --- NEW: LOGO & PHOTO HANDLING ---
+        // --- LOGO & PHOTO HANDLING ---
         function handleLogoUpload(event) {
             const file = event.target.files[0];
             const reader = new FileReader();
@@ -571,15 +638,13 @@
             if (schoolLogoData) {
                 const loginLogo = document.getElementById('loginLogo');
                 const sidebarLogo = document.getElementById('sidebarLogo');
-                loginLogo.src = schoolLogoData;
-                loginLogo.classList.remove('hidden');
-                sidebarLogo.src = schoolLogoData;
-                sidebarLogo.classList.remove('hidden');
-                document.getElementById('logoPreviewImg').src = schoolLogoData;
+                if(loginLogo) { loginLogo.src = schoolLogoData; loginLogo.classList.remove('hidden'); }
+                if(sidebarLogo) { sidebarLogo.src = schoolLogoData; sidebarLogo.classList.remove('hidden'); }
+                const prev = document.getElementById('logoPreviewImg');
+                if(prev) prev.src = schoolLogoData;
             }
         }
 
-        // Toggle Sidebar Function
         function toggleSidebar() {
             const sidebar = document.getElementById('mainSidebar');
             const overlay = document.getElementById('sidebarOverlay');
@@ -587,7 +652,7 @@
             overlay.classList.toggle('show');
         }
 
-        // --- AUTHENTICATION LOGIC ---
+        // --- AUTHENTICATION ---
         function attemptLogin() {
             const role = document.getElementById('loginRole').value;
             const user = document.getElementById('username').value;
@@ -604,6 +669,7 @@
             else {
                 const found = students.find(s => s.roll === user && s.password === pass);
                 if (found) {
+                    currentStudentData = found;
                     startSystem("student", found);
                 } else {
                     errorP.innerText = "Roll Number-ka ama Password-ka waa khalad!";
@@ -618,16 +684,16 @@
             document.getElementById('mainContent').style.display = 'block';
             document.getElementById('userRoleDisplay').innerText = role.toUpperCase();
             
-            // Show Mobile Header if on mobile
             if (window.innerWidth <= 768) {
                 document.getElementById('mobileHeader').style.display = 'flex';
             }
 
             if (role === "admin") {
                 document.getElementById('adminLinks').classList.remove('hidden');
+                document.getElementById('studentLinks').classList.add('hidden');
                 showPage('dashPage');
             } else {
-                document.getElementById('adminLinks').classList.add('hidden'); // Clear admin links
+                document.getElementById('adminLinks').classList.add('hidden');
                 document.getElementById('studentLinks').classList.remove('hidden');
                 renderStudentPortal(data);
                 showPage('resultPage');
@@ -644,7 +710,6 @@
                 element.classList.add('nav-active');
             }
 
-            // Close sidebar on mobile after clicking link
             if (window.innerWidth <= 768) {
                 const sidebar = document.getElementById('mainSidebar');
                 const overlay = document.getElementById('sidebarOverlay');
@@ -654,6 +719,7 @@
 
             if (pageId === 'examPage') renderExamTable();
             if (pageId === 'managePage') renderManageTable();
+            if (pageId === 'feePage') renderFeeTable();
             if (pageId === 'dashPage') updateDashContacts();
         }
 
@@ -672,23 +738,27 @@
                 fullName: name,
                 motherName: mother,
                 roll: roll,
-                photo: tempPhotoData, // SAVE GALLERY PHOTO
+                photo: tempPhotoData,
                 password: document.getElementById('regPass').value,
                 grade: document.getElementById('regGrade').value,
                 section: document.getElementById('regSection').value,
                 phones: [p1, p2],
-                scores: {},
+                scores: { m1: {}, mid: {}, m3: {}, final: {} }, // Afar qaybood
+                feePaid: false, // A: Fee status
                 presentToday: false,
                 attendancePoints: 0
             };
 
-            SUBJECTS.forEach(s => newStudent.scores[s] = 0);
+            // Initialize all terms
+            ["m1", "mid", "m3", "final"].forEach(t => {
+                SUBJECTS.forEach(s => newStudent.scores[t][s] = 0);
+            });
+
             students.push(newStudent);
             saveData();
             alert("Ardayga si guul leh ayaa loo diiwaangeliyay!");
             updateStats();
             
-            // Clear inputs
             document.getElementById('regName').value = "";
             document.getElementById('regRoll').value = "";
             document.getElementById('regMother').value = "";
@@ -699,14 +769,43 @@
             showPage('dashPage');
         }
 
+        // --- FEE MANAGEMENT (A) ---
+        function renderFeeTable() {
+            const g = document.getElementById('feeGrade').value;
+            const q = document.getElementById('searchFee').value.toLowerCase();
+            const tbody = document.getElementById('feeTableBody');
+            
+            const filtered = students.filter(st => (g === 'all' || st.grade === g) && st.fullName.toLowerCase().includes(q));
+            
+            tbody.innerHTML = filtered.map(st => `
+                <tr>
+                    <td>${st.roll}</td>
+                    <td>${st.fullName}</td>
+                    <td>Grade ${st.grade}</td>
+                    <td><span class="${st.feePaid ? 'fee-paid' : 'fee-unpaid'}">${st.feePaid ? 'PAID (SAX)' : 'UNPAID (KHALAD)'}</span></td>
+                    <td>
+                        <button onclick="toggleFee('${st.id}')" style="width:auto; padding:5px 10px; background:${st.feePaid ? 'var(--danger)' : 'var(--accent)'}">
+                            ${st.feePaid ? 'KA DHIG UNPAID' : 'KA DHIG PAID'}
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function toggleFee(id) {
+            const st = students.find(x => x.id === id);
+            st.feePaid = !st.feePaid;
+            saveData();
+            renderFeeTable();
+        }
+
+        // --- ATTENDANCE ---
         function fetchAttendanceList() {
             const g = document.getElementById('attGrade').value;
             const s = document.getElementById('attSection').value;
-            
-            const filtered = students.filter(st => st.grade === g && st.section === s)
-                            .sort((a, b) => a.fullName.localeCompare(b.fullName));
-            
+            const filtered = students.filter(st => st.grade === g && st.section === s).sort((a, b) => a.fullName.localeCompare(b.fullName));
             const tbody = document.getElementById('attendanceTableBody');
+            
             if (filtered.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Arday looma hayo fasalkaas.</td></tr>';
                 return;
@@ -738,10 +837,11 @@
 
         function submitAttendance() { alert("Xadirinta waa la keydiyay!"); renderExamTable(); }
 
-        // --- CALCULATIONS & TABLES ---
-        function calculateSummary(st) {
+        // --- EXAM & CALCULATIONS (C) ---
+        function calculateSummary(st, term) {
             let examSum = 0;
-            SUBJECTS.forEach(s => examSum += (st.scores[s] || 0));
+            const termScores = st.scores[term] || {};
+            SUBJECTS.forEach(s => examSum += (termScores[s] || 0));
             const finalTotal = examSum + (st.attendancePoints || 0);
             const avg = Math.round((finalTotal / (SUBJECTS.length * 100)) * 100);
             let grade = "F";
@@ -753,14 +853,14 @@
         function renderExamTable() {
             const g = document.getElementById('exGrade').value;
             const s = document.getElementById('exSection').value;
+            const term = document.getElementById('exTerm').value;
             const q = document.getElementById('searchExam').value.toLowerCase();
-            
-            const filtered = students.filter(st => (g === 'all' || st.grade === g) && (s === 'all' || st.section === s) && st.fullName.toLowerCase().includes(q))
-                            .sort((a, b) => a.fullName.localeCompare(b.fullName));
-
             const tbody = document.getElementById('examTableBody');
+
+            const filtered = students.filter(st => (g === 'all' || st.grade === g) && (s === 'all' || st.section === s) && st.fullName.toLowerCase().includes(q));
+
             tbody.innerHTML = filtered.map(st => {
-                const res = calculateSummary(st);
+                const res = calculateSummary(st, term);
                 return `
                     <tr>
                         <td>${st.roll}</td>
@@ -769,41 +869,77 @@
                         <td>+${st.attendancePoints || 0}</td>
                         <td><b>${res.average}%</b></td>
                         <td><span class="badge ${res.grade === 'F' ? 'bg-f' : 'bg-a'}">${res.grade}</span></td>
-                        <td><button style="width:auto; padding:5px 10px;" onclick="openScoreModal('${st.id}')">GELI DHIBCAHA</button></td>
+                        <td><button style="width:auto; padding:5px 10px;" onclick="openScoreModal('${st.id}', '${term}')">GELI DHIBCAHA</button></td>
                     </tr>
                 `;
             }).join('');
         }
 
-        function openScoreModal(id) {
+        function openScoreModal(id, term) {
             currentEditingId = id;
             const st = students.find(x => x.id === id);
             document.getElementById('modalStudentName').innerText = st.fullName;
+            document.getElementById('modalTermName').innerText = term.toUpperCase() + " CATEGORY";
             const grid = document.getElementById('scoreInputsGrid');
+            const termScores = st.scores[term] || {};
+            
             grid.innerHTML = SUBJECTS.map(s => `
                 <div style="margin-bottom:10px;">
                     <label style="font-size:11px; font-weight:bold;">${s}</label>
-                    <input type="number" class="score-input-val" data-subj="${s}" value="${st.scores[s] || 0}" max="100">
+                    <input type="number" class="score-input-val" data-subj="${s}" data-term="${term}" value="${termScores[s] || 0}" max="100">
                 </div>
             `).join('');
             document.getElementById('scoreModal').classList.remove('hidden');
         }
 
         function saveStudentScores() {
+            const firstInput = document.querySelector('.score-input-val');
+            const term = firstInput.getAttribute('data-term');
             const st = students.find(x => x.id === currentEditingId);
+            
             document.querySelectorAll('.score-input-val').forEach(input => {
-                st.scores[input.getAttribute('data-subj')] = parseInt(input.value) || 0;
+                st.scores[term][input.getAttribute('data-subj')] = parseInt(input.value) || 0;
             });
-            saveData(); closeScoreModal(); renderExamTable(); alert("Natiijada waa la cusboonaysiiyay!");
+            saveData(); closeScoreModal(); renderExamTable(); alert("Natiijada qaybta " + term + " waa la keydiyay!");
         }
 
         function closeScoreModal() { document.getElementById('scoreModal').classList.add('hidden'); }
 
+        // --- STUDENT PORTAL ---
+        function renderStudentPortal(st) {
+            const stPhoto = document.getElementById('stPhotoCard');
+            if (st.photo) { stPhoto.src = st.photo; stPhoto.classList.remove('hidden'); }
+            document.getElementById('stNameHead').innerText = st.fullName;
+            document.getElementById('stRollHead').innerText = `ID: ${st.roll} | FASALKA: ${st.grade}${st.section}`;
+            updateStudentView();
+        }
+
+        function updateStudentView() {
+            const term = document.getElementById('viewTerm').value;
+            const st = currentStudentData;
+            const res = calculateSummary(st, term);
+            const termScores = st.scores[term] || {};
+
+            document.getElementById('stTotal').innerText = res.total;
+            document.getElementById('stAvg').innerText = res.average + "%";
+            document.getElementById('stRank').innerText = res.average >= 50 ? "PASS" : "FAIL";
+            
+            document.getElementById('stDetailTable').innerHTML = SUBJECTS.map(s => `
+                <tr>
+                    <td>${s}</td>
+                    <td>${termScores[s] || 0}</td>
+                    <td style="color:${termScores[s] >= 50 ? 'var(--accent)' : 'var(--danger)'}; font-weight:bold;">
+                        ${termScores[s] >= 50 ? 'Pass' : 'Fail'}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // --- MANAGEMENT ---
         function renderManageTable() {
             const g = document.getElementById('mGrade').value;
             const s = document.getElementById('mSection').value;
-            const filtered = students.filter(st => (g === 'all' || st.grade === g) && (s === 'all' || st.section === s))
-                            .sort((a, b) => a.fullName.localeCompare(b.fullName));
+            const filtered = students.filter(st => (g === 'all' || st.grade === g) && (s === 'all' || st.section === s));
 
             document.getElementById('manageTableBody').innerHTML = filtered.map(st => `
                 <tr>
@@ -818,29 +954,8 @@
             `).join('');
         }
 
-        function deleteStudent(id) { if (confirm("Ma hubtaa inaad tirtirto ardaygan iyo dhammaan xogtiisa?")) { students = students.filter(s => s.id !== id); saveData(); renderManageTable(); updateStats(); } }
+        function deleteStudent(id) { if (confirm("Ma hubtaa inaad tirtirto ardaygan?")) { students = students.filter(s => s.id !== id); saveData(); renderManageTable(); updateStats(); } }
 
-        function renderStudentPortal(st) {
-            const res = calculateSummary(st);
-            
-            // DISPLAY STUDENT PHOTO
-            const stPhoto = document.getElementById('stPhotoCard');
-            if (st.photo) {
-                stPhoto.src = st.photo;
-                stPhoto.classList.remove('hidden');
-            } else {
-                stPhoto.classList.add('hidden');
-            }
-
-            document.getElementById('stNameHead').innerText = st.fullName;
-            document.getElementById('stRollHead').innerText = `ID: ${st.roll} | FASALKA: ${st.grade}${st.section}`;
-            document.getElementById('stTotal').innerText = res.total;
-            document.getElementById('stAvg').innerText = res.average + "%";
-            document.getElementById('stRank').innerText = res.average >= 50 ? "PASS" : "FAIL";
-            document.getElementById('stDetailTable').innerHTML = SUBJECTS.map(s => `<tr><td>${s}</td><td>${st.scores[s] || 0}</td><td style="color:${st.scores[s] >= 50 ? 'var(--accent)' : 'var(--danger)'}; font-weight:bold;">${st.scores[s] >= 50 ? 'Pass' : 'Fail'}</td></tr>`).join('');
-        }
-
-        // --- UTILITIES ---
         function updateStats() {
             document.getElementById('countStudents').innerText = students.length;
             document.getElementById('currentDate').innerText = new Date().toDateString();
@@ -853,7 +968,6 @@
 
         function saveData() { localStorage.setItem('nbs_official_v9_master', JSON.stringify(students)); }
 
-        // Initial Load
         window.onload = applyBranding;
     </script>
 </body>
