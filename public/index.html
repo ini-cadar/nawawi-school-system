@@ -2,219 +2,423 @@
 <html lang="so">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WEYRAX PORTAL | Professional School Management System v10.5</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WEYRAX PORTAL | Weyrax School Management System </title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* ============================================================================
-           CSS STYLING - ENTERPRISE GRADE 
-           ============================================================================
-        */
         :root { 
-            --primary: #2c3e50; --accent: #27ae60; --danger: #e74c3c; 
-            --warning: #f39c12; --info: #3498db; --text: #333; 
-            --light: #f4f7f6; --white: #ffffff; --sidebar-w: 280px;
+            --primary: #2c3e50; 
+            --accent: #27ae60; 
+            --danger: #e74c3c; 
+            --warning: #f39c12;
+            --info: #3498db;
+            --text: #333; 
+            --light: #f4f7f6;
+            --white: #ffffff;
         }
 
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            margin: 0; display: flex; height: 100vh; background: var(--light); 
-            color: var(--text); overflow: hidden; 
+            margin: 0; 
+            display: flex; 
+            height: 100vh; 
+            background: var(--light); 
+            color: var(--text); 
+            overflow: hidden; 
         }
 
+        /* Sidebar Styling */
         .sidebar { 
-            width: var(--sidebar-w); background: var(--primary); color: var(--white); 
-            display: flex; flex-direction: column; box-shadow: 4px 0 15px rgba(0,0,0,0.2); 
-            flex-shrink: 0; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1100;
+            width: 280px; 
+            background: var(--primary); 
+            color: var(--white); 
+            display: flex; 
+            flex-direction: column; 
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1); 
+            flex-shrink: 0; 
+            transition: all 0.3s ease;
+            z-index: 1001;
         }
 
         .sidebar-header { 
-            padding: 35px 20px; text-align: center; border-bottom: 1px solid #34495e; 
-            background: #1a252f;
+            padding: 30px 20px; 
+            text-align: center; 
+            border-bottom: 1px solid #34495e; 
+            background: #1a252f; 
         }
 
-        .sidebar-header h3 { margin: 0; letter-spacing: 2px; color: var(--accent); font-size: 1.2rem; }
-        .nav-menu { flex: 1; margin-top: 20px; overflow-y: auto; }
+        .sidebar-header h3 { margin: 0; letter-spacing: 2px; color: var(--accent); }
+
+        .nav-menu { flex: 1; margin-top: 20px; }
 
         .nav-item { 
-            padding: 16px 25px; cursor: pointer; border-bottom: 1px solid #34495e; 
-            transition: 0.3s; display: flex; align-items: center; gap: 15px; font-size: 14px;
+            padding: 15px 25px; 
+            cursor: pointer; 
+            border-bottom: 1px solid #34495e; 
+            transition: 0.3s; 
+            display: flex; 
+            align-items: center; 
+            gap: 15px;
+            font-size: 15px;
         }
 
-        .nav-item:hover { background: #34495e; border-left: 6px solid var(--accent); padding-left: 35px; }
-        .nav-active { background: #34495e; border-left: 6px solid var(--accent); font-weight: bold; }
+        .nav-item:hover { 
+            background: #34495e; 
+            border-left: 6px solid var(--accent); 
+            padding-left: 30px; 
+        }
 
+        .nav-active { 
+            background: #34495e; 
+            border-left: 6px solid var(--accent); 
+        }
+
+        /* Mobile Menu Button */
         .mobile-header {
-            display: none; background: var(--primary); color: white; padding: 15px;
-            justify-content: space-between; align-items: center; position: fixed;
-            top: 0; width: 100%; z-index: 1050;
+            display: none;
+            background: var(--primary);
+            color: rgb(11, 11, 11);
+            padding: 15px;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
         }
 
+        .menu-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            width: auto;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Responsive Sidebar */
         @media (max-width: 768px) {
-            .sidebar { position: fixed; left: calc(-1 * var(--sidebar-w)); height: 100%; }
-            .sidebar.open { left: 0; }
-            .mobile-header { display: flex; }
-            .main { margin-top: 60px; padding: 15px; width: 100%; }
-            .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1090; }
-            .sidebar-overlay.show { display: block; }
+            .sidebar {
+                position: fixed;
+                left: -280px;
+                height: 100%;
+            }
+            .sidebar.open {
+                left: 0;
+            }
+            .mobile-header {
+                display: flex;
+            }
+            .main {
+                margin-top: 60px;
+                padding: 15px;
+            }
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(0,0,0,0.5);
+                z-index: 1000;
+            }
+            .sidebar-overlay.show {
+                display: block;
+            }
         }
 
-        .main { flex: 1; padding: 30px; overflow-y: auto; position: relative; }
+        /* Main Content Area */
+        .main { 
+            flex: 1; 
+            padding: 25px; 
+            overflow-y: auto; 
+            position: relative; 
+            background-image: linear-gradient(to bottom right, #f4f7f6, #e9ecef);
+        }
 
         .box { 
-            background: var(--white); padding: 25px; border-radius: 18px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 25px; 
-            border: 1px solid rgba(0,0,0,0.05);
+            background: var(--white); 
+            padding: 25px; 
+            border-radius: 15px; 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06); 
+            margin-bottom: 25px; 
+            border: 1px solid #e1e8ed; 
         }
 
-        .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        .header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .grid-stats { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+            gap: 20px; 
+        }
 
         .stat-card {
-            padding: 25px; border-radius: 15px; color: white; display: flex;
-            flex-direction: column; justify-content: center; position: relative;
-            overflow: hidden; min-height: 100px;
+            padding: 20px;
+            border-radius: 12px;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: transform 0.3s;
         }
+        .stat-card:hover { transform: scale(1.03); }
 
-        .fee-status { padding: 4px 12px; border-radius: 50px; font-size: 11px; font-weight: 800; cursor: pointer; }
-        .fee-paid { background: #dcfce7; color: #166534; }
-        .fee-unpaid { background: #fee2e2; color: #991b1b; }
-
+        /* Forms and Controls */
         input, select, button { 
-            width: 100%; padding: 14px; margin: 10px 0; border-radius: 8px; 
-            border: 1px solid #ced4da; font-size: 14px; outline: none; 
+            width: 100%; 
+            padding: 14px; 
+            margin: 10px 0; 
+            border-radius: 8px; 
+            border: 1px solid #ced4da; 
+            box-sizing: border-box; 
+            font-size: 14px; 
+            outline: none;
         }
 
-        button { background: var(--accent); color: white; font-weight: bold; cursor: pointer; border: none; transition: 0.3s; }
-        button:hover { background: #219150; transform: translateY(-2px); }
+        button { 
+            background: var(--accent); 
+            color: white; 
+            font-weight: bold; 
+            cursor: pointer; 
+            border: none; 
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
 
-        .table-container { overflow-x: auto; margin-top: 20px; border-radius: 12px; }
-        table { width: 100%; border-collapse: collapse; min-width: 900px; }
-        th, td { padding: 18px; text-align: left; border-bottom: 1px solid #edf2f7; }
-        th { background: #f7fafc; color: var(--primary); font-size: 12px; text-transform: uppercase; }
+        button:hover { 
+            background: #219150; 
+            transform: translateY(-2px); 
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+        }
 
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 2500; padding: 20px; }
-        .modal-card { background: white; width: 100%; max-width: 900px; border-radius: 20px; padding: 40px; max-height: 90vh; overflow-y: auto; }
+        .btn-secondary { background: var(--info); }
+        .btn-danger { background: var(--danger); }
+
+        /* Table Styling */
+        .table-container { overflow-x: auto; margin-top: 15px; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #f1f3f5; }
+        th { background: #f8f9fa; color: var(--primary); font-weight: 600; text-transform: uppercase; font-size: 13px; }
+        tr:hover { background-color: #fcfcfc; }
+
+        /* Attendance Toggles */
+        .att-toggle { display: flex; gap: 5px; }
+        .btn-check { 
+            width: auto; padding: 8px 15px; margin: 0; font-size: 12px; border-radius: 20px; 
+            border: 2px solid #ddd; background: white; color: #555;
+        }
+        .btn-check.present { border-color: var(--accent); color: var(--accent); }
+        .btn-check.present.active { background: var(--accent); color: white; }
+        .btn-check.absent { border-color: var(--danger); color: var(--danger); }
+        .btn-check.absent.active { background: var(--danger); color: white; }
+
+        /* Grades Badges */
+        .badge { padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 12px; color: white; }
+        .bg-a { background: #2ecc71; } .bg-b { background: #3498db; } .bg-c { background: #f1c40f; } .bg-f { background: #e74c3c; }
+
+        /* Modal Overlay */
+        .modal-overlay { 
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7); 
+            display: flex; align-items: center; justify-content: center; z-index: 2000; padding: 20px; 
+        }
+        .modal-card { 
+            background: white; width: 100%; max-width: 900px; max-height: 90vh; 
+            border-radius: 15px; overflow-y: auto; padding: 30px; 
+        }
 
         .hidden { display: none !important; }
 
-        /* ID Card Style */
-        .id-card {
-            width: 350px; height: 220px; background: linear-gradient(45deg, var(--primary), #34495e);
-            border-radius: 15px; color: white; padding: 20px; position: relative; margin: 20px auto;
-            border: 4px solid var(--accent); text-align: left;
+        /* Advanced Filter Bars */
+        .filter-bar {
+            display: flex;
+            gap: 15px;
+            background: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #eee;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .filter-bar select, .filter-bar input {
+            margin: 0;
+            width: auto;
+            min-width: 150px;
         }
 
-        /* Attendance Report View */
-        .att-report-header { text-align: center; border-bottom: 2px solid #333; margin-bottom: 20px; padding-bottom: 10px; }
+        /* Custom Scrollbar for better UX */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #bbb; }
 
-        @media print {
-            .sidebar, .mobile-header, .no-print, button, .filter-bar { display: none !important; }
-            .main { padding: 0; }
-            .page-view { display: block !important; }
-            body { overflow: visible; }
-        }
+        /* --- NEW LOGO & GALLERY STYLES --- */
+        .logo-preview { width: 100px; height: 100px; border-radius: 10px; object-fit: contain; margin-bottom: 10px; background: #eee; border: 2px dashed #ccc; }
+        .student-photo-preview { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid var(--accent); margin: 0 auto 15px auto; display: block; background: #f0f0f0; }
+        .upload-box { border: 2px dashed #ced4da; padding: 10px; border-radius: 8px; text-align: center; cursor: pointer; transition: 0.3s; }
+        .upload-box:hover { border-color: var(--accent); background: #f9f9f9; }
+
     </style>
 </head>
 <body>
 
-    <div class="mobile-header" id="mobileHeader">
-        <button class="menu-btn" onclick="toggleSidebar()" style="background:none; width:auto;"><i class="fas fa-bars"></i></button>
-        <span style="font-weight: 800;">WEYRAX ENTERPRISE</span>
+    <div class="mobile-header" id="mobileHeader" style="display: none;">
+        <button class="menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+        <span style="font-weight: bold;">WEYRAX PORTAL</span>
         <div style="width: 30px;"></div>
     </div>
 
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
     <div id="loginSection" class="modal-overlay">
-        <div class="box" style="width: 100%; max-width: 400px; text-align: center;">
+        <div class="box" style="width: 100%; max-width: 450px; text-align: center; border-top: 10px solid var(--accent);">
             <img id="loginLogo" src="" class="hidden" style="width: 80px; margin-bottom: 15px;">
-            <h2>WEYRAX PORTAL</h2>
+            <h2 style="color: var(--primary); margin-bottom: 10px;">WEYRAX PORTAL LOGIN</h2>
+            <p style="color: #666; font-size: 14px;">kusoo dhowoow</p>
+            <hr style="margin: 20px 0; opacity: 0.2;">
+            
+            <label style="display: block; text-align: left; font-size: 12px; font-weight: bold;">DOORO ROLE-KAGA</label>
             <select id="loginRole">
-                <option value="admin">Maamulka (Admin)</option>
-                <option value="student">Ardayga (Student)</option>
+                <option value="admin">Maamul (Admin)</option>
+                <option value="student">Arday (Student)</option>
             </select>
-            <input type="text" id="username" placeholder="Username / ID">
-            <input type="password" id="password" placeholder="Password">
-            <button onclick="attemptLogin()">LOGIN</button>
-            <p id="loginError" style="color: var(--danger); font-size: 12px;"></p>
+            
+            <label style="display: block; text-align: left; font-size: 12px; font-weight: bold; margin-top: 10px;">USERNAME / ID</label>
+            <input type="text" id="username" placeholder="Geli Roll Number ama admin">
+            
+            <label style="display: block; text-align: left; font-size: 12px; font-weight: bold; margin-top: 10px;">PASSWORD</label>
+            <input type="password" id="password" placeholder="••••••••">
+            
+            <button onclick="attemptLogin()" style="margin-top: 20px;">GURADA GAL NIDAAMKA</button>
+            <p id="loginError" style="color: var(--danger); font-size: 12px; margin-top: 10px; font-weight: bold;"></p>
         </div>
     </div>
 
-    <aside class="sidebar" id="mainSidebar" style="display: none;">
+    <div class="sidebar" id="mainSidebar" style="display: none;">
         <div class="sidebar-header">
             <img id="sidebarLogo" src="" class="hidden" style="width: 50px; margin-bottom: 10px;">
             <h3>WEYRAX PORTAL</h3>
-            <div id="userRoleDisplay"></div>
+            <small id="userRoleDisplay" style="color: #bdc3c7; font-weight: bold;"></small>
         </div>
-        <nav class="nav-menu">
+        <div class="nav-menu">
             <div id="adminLinks" class="hidden">
-                <div class="nav-item nav-active" onclick="showPage('dashPage', this)"><i class="fas fa-home"></i> Dashboard</div>
-                <div class="nav-item" onclick="showPage('attPage', this)"><i class="fas fa-check-circle"></i> Xadirinta (Attendance)</div>
-                <div class="nav-item" onclick="showPage('examPage', this)"><i class="fas fa-edit"></i> Exams & Results</div>
-                <div class="nav-item" onclick="showPage('regPage', this)"><i class="fas fa-user-plus"></i> Register Student</div>
-                <div class="nav-item" onclick="showPage('managePage', this)"><i class="fas fa-users-cog"></i> Manage Students</div>
+                <div class="nav-item nav-active" onclick="showPage('dashPage', this)">📊 Dashboard</div>
+                <div class="nav-item" onclick="showPage('attPage', this)">📅 Attendance (Xadirin)</div>
+                <div class="nav-item" onclick="showPage('examPage', this)">📝 Exam & Results</div>
+                <div class="nav-item" onclick="showPage('regPage', this)">👤 Register Student</div>
+                <div class="nav-item" onclick="showPage('managePage', this)">⚙️ Manage System</div>
             </div>
             <div id="studentLinks" class="hidden">
-                <div class="nav-item nav-active" onclick="showPage('resultPage', this)"><i class="fas fa-file-alt"></i> My Report Card</div>
-                <div id="studentAttBtn" class="nav-item" onclick="showPage('stAttPage', this)"><i class="fas fa-calendar-alt"></i> My Attendance</div>
+                <div class="nav-item nav-active" onclick="showPage('resultPage', this)">👤 My Report Card</div>
             </div>
-        </nav>
+        </div>
         <button onclick="location.reload()" style="margin: 20px; background: var(--danger);">LOGOUT</button>
-    </aside>
+    </div>
 
     <main class="main" id="mainContent" style="display: none;">
         
         <section id="dashPage" class="page-view">
-            <h2>School Dashboard</h2>
+            <div class="header-flex">
+                <h2>School Dashboard</h2>
+                <div id="currentDate" style="font-weight: bold; color: var(--info);"></div>
+            </div>
             <div class="grid-stats">
-                <div class="stat-card" style="background: #4834d4;">
-                    <small>Total Students</small>
+                <div class="stat-card" style="background: var(--primary);">
+                    <small>Ardayda Wadarta</small>
                     <h1 id="countStudents">0</h1>
                 </div>
                 <div class="stat-card" style="background: var(--accent);">
-                    <small>Active Status</small>
-                    <h1>OFFICIAL</h1>
+                    <small>Maadooyinka (Subjects)</small>
+                    <h1>11</h1>
                 </div>
                 <div class="stat-card" style="background: var(--info);">
-                    <small>System Date</small>
-                    <h1 id="currentDateDisp">--</h1>
+                    <small>System Status</small>
+                    <h1>OFFICIAL LIVE</h1>
+                </div>
+                <div class="stat-card" style="background: var(--warning);">
+                    <small>Academic Year</small>
+                    <h1>2025/2026</h1>
                 </div>
             </div>
 
             <div class="box" style="margin-top: 30px;">
-                <h3><i class="fas fa-image"></i> School Branding</h3>
-                <input type="file" id="logoInput" accept="image/*" onchange="handleLogoUpload(event)">
-                <button onclick="saveLogo()" style="width: auto; padding: 10px 20px;">KEYDI LOGO-GA</button>
+                <h3>System Branding (School Logo)</h3>
+                <div style="display: flex; align-items: center; gap: 20px;">
+                    <img id="logoPreviewImg" src="" class="logo-preview">
+                    <div style="flex: 1;">
+                        <label>Dooro Logo-ga Dugsiga (Gallery)</label>
+                        <input type="file" id="logoInput" accept="image/*" onchange="handleLogoUpload(event)">
+                        <button onclick="saveLogo()" style="width: auto; padding: 10px 20px;">KEYDI LOGO-GA</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="box" style="margin-top: 30px;">
+                <h3>Xiriirka Waalidka (Parental Contacts)</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr><th>Ardayga</th><th>Fasalka</th><th>Section</th><th>Lanbarada Waalidka</th></tr>
+                        </thead>
+                        <tbody id="dashContactList"></tbody>
+                    </table>
+                </div>
             </div>
         </section>
 
         <section id="attPage" class="page-view hidden">
             <div class="box">
-                <h2>Daily Attendance</h2>
-                <div class="filter-bar" style="display: flex; gap: 10px;">
-                    <select id="attGrade"><option value="9">Grade 9</option><option value="10">Grade 10</option><option value="11">Grade 11</option><option value="12">Grade 12</option></select>
-                    <select id="attSection"><option value="A">A</option><option value="B">B</option><option value="C">C</option></select>
-                    <button onclick="fetchAttendanceList()" style="width: auto;">SOO BANDHIG</button>
+                <h2>Xadirinta Fasallada</h2>
+                <div class="filter-bar">
+                    <select id="attGrade">
+                        <option value="9">Grade 9</option><option value="10">Grade 10</option>
+                        <option value="11">Grade 11</option><option value="12">Grade 12</option>
+                    </select>
+                    <select id="attSection">
+                        <option value="A">Section A</option><option value="B">Section B</option><option value="C">Section C</option>
+                    </select>
+                    <button onclick="fetchAttendanceList()" style="width: auto;">SOO BANDHIG LIST-KA</button>
                 </div>
                 <div class="table-container">
                     <table>
-                        <thead><tr><th>Student</th><th>ID Number</th><th>Action</th></tr></thead>
-                        <tbody id="attendanceTableBody"></tbody>
+                        <thead>
+                            <tr><th>Ardayga (A-Z)</th><th>Roll Number</th><th>Status</th></tr>
+                        </thead>
+                        <tbody id="attendanceTableBody">
+                            <tr><td colspan="3" style="text-align:center;">Fadlan dooro fasal</td></tr>
+                        </tbody>
                     </table>
                 </div>
-                <button onclick="alert('Xogta waa la xereeyey!')" style="margin-top: 20px;">SAVE ATTENDANCE</button>
+                <button onclick="submitAttendance()" style="margin-top: 20px; max-width: 250px;">KEYDI XADIRINTA MAANTA</button>
             </div>
         </section>
 
         <section id="examPage" class="page-view hidden">
             <div class="box">
-                <h2>Student Results</h2>
+                <h2>Natiijooyinka Imtixaanka</h2>
                 <div class="filter-bar">
-                    <input type="text" id="searchExam" placeholder="Search by name..." onkeyup="renderExamTable()">
+                    <select id="exGrade" onchange="renderExamTable()">
+                        <option value="all">Dhamaan Grade</option>
+                        <option value="9">Grade 9</option><option value="10">Grade 10</option>
+                        <option value="11">Grade 11</option><option value="12">Grade 12</option>
+                    </select>
+                    <select id="exSection" onchange="renderExamTable()">
+                        <option value="all">Dhamaan Section</option>
+                        <option value="A">A</option><option value="B">B</option><option value="C">C</option>
+                    </select>
+                    <input type="text" id="searchExam" placeholder="Raadi magac ama ID..." onkeyup="renderExamTable()">
                 </div>
                 <div class="table-container">
                     <table>
-                        <thead><tr><th>ID</th><th>FullName</th><th>Total</th><th>Avg</th><th>Action</th></tr></thead>
+                        <thead>
+                            <tr><th>Roll No</th><th>Full Name</th><th>Exam Total</th><th>Bonus</th><th>Average</th><th>Grade</th><th>Action</th></tr>
+                        </thead>
                         <tbody id="examTableBody"></tbody>
                     </table>
                 </div>
@@ -223,25 +427,61 @@
 
         <section id="regPage" class="page-view hidden">
             <div class="box">
-                <h2>Diiwaangeli Arday</h2>
-                <div class="grid-stats">
-                    <input type="text" id="regName" placeholder="Full Name">
-                    <input type="text" id="regRoll" placeholder="Roll No (ID)">
-                    <input type="text" id="regMother" placeholder="Mother's Name">
-                    <select id="regGrade"><option value="9">Grade 9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select>
-                    <select id="regSection"><option value="A">A</option><option value="B">B</option><option value="C">C</option></select>
-                    <input type="text" id="regPass" value="123456">
+                <h2>Diiwaangeli Arday Cusub</h2>
+                
+                <div style="text-align: center; margin-bottom: 25px;">
+                    <img id="regPhotoPreview" src="https://via.placeholder.com/120" class="student-photo-preview">
+                    <label class="upload-box" style="display: inline-block; width: 200px;">
+                        <i class="fas fa-image"></i> Dooro Sawirka Gallery-ga
+                        <input type="file" id="regPhotoInput" accept="image/*" style="display: none;" onchange="handleStudentPhoto(event)">
+                    </label>
                 </div>
-                <button onclick="registerNewStudent()">SAVE STUDENT</button>
+
+                <div class="grid-stats">
+                    <div>
+                        <label>Magaca Ardayga (Full Name)</label>
+                        <input type="text" id="regName" placeholder="Tus: Ahmed Ali Mohamed">
+                    </div>
+                    <div>
+                        <label>Magaca Hooyada (Mother's Name)</label>
+                        <input type="text" id="regMother" placeholder="Tus: Maryam Ali Islow">
+                    </div>
+                    <div>
+                        <label>Roll Number (ID)</label>
+                        <input type="text" id="regRoll" placeholder="NBS/2026/001">
+                    </div>
+                </div>
+                <div class="grid-stats" style="margin-top: 15px;">
+                    <div><label>Fasalka (Grade)</label><select id="regGrade"><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select></div>
+                    <div><label>Qaybta (Section)</label><select id="regSection"><option value="A">A</option><option value="B">B</option><option value="C">C</option></select></div>
+                    <div><label>Password-ka Ardayga</label><input type="text" id="regPass" value="123456"></div>
+                </div>
+                <div class="grid-stats" style="margin-top: 15px;">
+                    <div><label>Lanbar Waalid 1 (Primary)</label><input type="text" id="regP1" placeholder="061xxxxxxx"></div>
+                    <div><label>Lanbar Waalid 2 (Secondary)</label><input type="text" id="regP2" placeholder="061xxxxxxx"></div>
+                </div>
+                <button onclick="registerNewStudent()" style="margin-top: 25px; max-width: 350px;">KEYDI XOGTA OFFICIAL-KA AH</button>
             </div>
         </section>
 
         <section id="managePage" class="page-view hidden">
             <div class="box">
-                <h2>Student Database</h2>
+                <h2>Maareynta Nidaamka</h2>
+                <div class="filter-bar">
+                    <select id="mGrade" onchange="renderManageTable()">
+                        <option value="all">Dhamaan Grade</option>
+                        <option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+                    </select>
+                    <select id="mSection" onchange="renderManageTable()">
+                        <option value="all">Dhamaan Section</option>
+                        <option value="A">A</option><option value="B">B</option><option value="C">C</option>
+                    </select>
+                </div>
                 <div class="table-container">
                     <table>
-                        <thead><tr><th>ID</th><th>Name</th><th>Grade</th><th>Section</th><th>Action</th></tr></thead>
+                        <thead>
+                            <tr><th>Sawir</th><th>Magaca</th><th>Hooyada</th><th>ID Number</th><th>Fasalka</th><th>Section</th><th>Action</th></tr>
+                        </thead>
                         <tbody id="manageTableBody"></tbody>
                     </table>
                 </div>
@@ -249,186 +489,286 @@
         </section>
 
         <section id="resultPage" class="page-view hidden">
-            <div id="printableReport" class="box" style="border: 2px solid #333;">
-                <div style="text-align: center; border-bottom: 3px double #333; padding-bottom: 15px;">
-                    <h1 id="repSchoolName">WEYRAX SECONDARY SCHOOL</h1>
-                    <p>OFFICIAL ACADEMIC REPORT CARD</p>
+            <div class="box" style="text-align: center; border-bottom: 5px solid var(--accent);">
+                <img id="stPhotoCard" src="" class="student-photo-preview hidden">
+                
+                <h1 id="stNameHead">---</h1>
+                <p id="stRollHead" style="font-weight: bold; color: var(--info);"></p>
+                <div class="grid-stats" style="margin: 30px 0;">
+                    <div class="box">Total Score: <h2 id="stTotal">0</h2></div>
+                    <div class="box">Percentage: <h2 id="stAvg">0%</h2></div>
+                    <div class="box">Result: <h2 id="stRank">Pass</h2></div>
                 </div>
-                <div style="display: flex; justify-content: space-between; margin-top: 20px;">
-                    <div>
-                        <p><strong>NAME:</strong> <span id="stNameHead"></span></p>
-                        <p><strong>ID:</strong> <span id="stRollHead"></span></p>
-                    </div>
-                    <div style="text-align: right;">
-                        <p><strong>YEAR:</strong> 2025/2026</p>
-                    </div>
-                </div>
+                <h3>Dhibcaha Maado kasta</h3>
                 <div class="table-container">
-                    <table style="border: 1px solid #333;">
-                        <thead><tr><th>Subject</th><th>Max</th><th>Obtained</th><th>Status</th></tr></thead>
+                    <table>
+                        <thead>
+                            <tr><th>Maadada</th><th>Dhibcaha</th><th>Status</th></tr>
+                        </thead>
                         <tbody id="stDetailTable"></tbody>
                     </table>
                 </div>
-                <div style="margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; text-align: center;">
-                    <div class="box" style="border: 1px solid #ddd;">Average: <h2 id="reportAvg">0%</h2></div>
-                    <div class="box" style="border: 1px solid #ddd;">Result: <h2 id="reportStatus">--</h2></div>
-                </div>
-                <div style="margin-top: 50px; display: flex; justify-content: space-between;">
-                    <p style="border-top: 1px solid #333; width: 150px; text-align: center;">Teacher</p>
-                    <p style="border-top: 1px solid #333; width: 150px; text-align: center;">Principal</p>
-                </div>
             </div>
-            <button onclick="window.print()" class="no-print">PRINT REPORT CARD</button>
         </section>
 
-        <section id="stAttPage" class="page-view hidden">
-            <div id="printableAtt" class="box">
-                <div class="att-report-header">
-                    <h2>ATTENDANCE REPORT</h2>
-                    <p id="stAttName"></p>
-                </div>
-                <div style="display: flex; justify-content: space-around; margin: 20px 0;">
-                    <div style="text-align: center;"><h3>Days Present</h3><h1 id="countPresent" style="color: green;">0</h1></div>
-                    <div style="text-align: center;"><h3>Attendance %</h3><h1 id="countAttPer">0%</h1></div>
-                </div>
-                <p style="text-align: center; color: #666;">This is an official attendance log from Weyrax Portal.</p>
-            </div>
-            <button onclick="window.print()" class="no-print">PRINT ATTENDANCE</button>
-        </section>
+        <footer style="text-align: center; padding: 20px; color: #888; font-size: 13px;">
+            <p>Designed and Developed by <b>Weyrax</b> | &copy; 2026</p>
+        </footer>
 
     </main>
 
     <div id="scoreModal" class="modal-overlay hidden">
         <div class="modal-card">
-            <h3>Enter Marks: <span id="modalStName"></span></h3>
-            <div id="scoreInputsGrid" class="grid-stats"></div>
-            <div style="margin-top: 20px; display: flex; gap: 10px;">
-                <button class="btn-danger" onclick="closeScoreModal()" style="background: var(--danger);">CANCEL</button>
-                <button onclick="saveScores()">SAVE MARKS</button>
+            <h3 style="margin: 0;">Geli Dhibcaha: <span id="modalStudentName" style="color: var(--accent);"></span></h3>
+            <hr style="margin: 15px 0; opacity: 0.1;">
+            <div id="scoreInputsGrid" class="grid-stats" style="grid-template-columns: repeat(3, 1fr);"></div>
+            <div style="margin-top: 30px; display: flex; gap: 15px;">
+                <button class="btn-danger" onclick="closeScoreModal()">KA NOQO</button>
+                <button onclick="saveStudentScores()">KEYDI DHIBCAHA</button>
             </div>
         </div>
     </div>
 
     <script>
-        const SUBJECTS = ["Math", "English", "Arabic", "Somali", "Physics", "Chemistry", "Biology", "History", "Geography", "ICT", "Tarbiya"];
-        let students = JSON.parse(localStorage.getItem('weyrax_pro_db')) || [];
-        let schoolLogo = localStorage.getItem('weyrax_logo') || "";
+        const SUBJECTS = ["Math", "English", "Arabic", "Tarbiya", "Chemistry", "Physics", "History", "Geography", "Somali", "ICT", "Biology"];
+        let students = JSON.parse(localStorage.getItem('nbs_official_v9_master')) || [];
+        let schoolLogoData = localStorage.getItem('nbs_school_logo') || "";
+        let tempPhotoData = "";
         let currentEditingId = null;
-        let loggedInStudent = null;
 
-        // --- AUTH ---
+        // --- NEW: LOGO & PHOTO HANDLING ---
+        function handleLogoUpload(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.getElementById('logoPreviewImg').src = e.target.result;
+                tempLogoData = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function saveLogo() {
+            if (tempLogoData) {
+                localStorage.setItem('nbs_school_logo', tempLogoData);
+                schoolLogoData = tempLogoData;
+                applyBranding();
+                alert("Logo-ga waa la keydiyay!");
+            }
+        }
+
+        function handleStudentPhoto(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.getElementById('regPhotoPreview').src = e.target.result;
+                tempPhotoData = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function applyBranding() {
+            if (schoolLogoData) {
+                const loginLogo = document.getElementById('loginLogo');
+                const sidebarLogo = document.getElementById('sidebarLogo');
+                loginLogo.src = schoolLogoData;
+                loginLogo.classList.remove('hidden');
+                sidebarLogo.src = schoolLogoData;
+                sidebarLogo.classList.remove('hidden');
+                document.getElementById('logoPreviewImg').src = schoolLogoData;
+            }
+        }
+
+        // Toggle Sidebar Function
+        function toggleSidebar() {
+            const sidebar = document.getElementById('mainSidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('show');
+        }
+
+        // --- AUTHENTICATION LOGIC ---
         function attemptLogin() {
             const role = document.getElementById('loginRole').value;
             const user = document.getElementById('username').value;
             const pass = document.getElementById('password').value;
+            const errorP = document.getElementById('loginError');
 
-            if(role === 'admin' && user === 'admin' && pass === 'admin123') {
-                startSystem('admin');
-            } else {
-                const st = students.find(s => s.roll === user && s.password === pass);
-                if(st) {
-                    loggedInStudent = st;
-                    startSystem('student', st);
+            if (role === "admin") {
+                if (user === "admin" && pass === "admin123") {
+                    startSystem("admin");
                 } else {
-                    document.getElementById('loginError').innerText = "Kala dooro role-ka saxda ah ama password-ka hubi!";
+                    errorP.innerText = "Admin Username ama Password waa khalad!";
+                }
+            } 
+            else {
+                const found = students.find(s => s.roll === user && s.password === pass);
+                if (found) {
+                    startSystem("student", found);
+                } else {
+                    errorP.innerText = "Roll Number-ka ama Password-ka waa khalad!";
                 }
             }
         }
 
-        function startSystem(role, st = null) {
+        function startSystem(role, data = null) {
+            applyBranding();
             document.getElementById('loginSection').classList.add('hidden');
             document.getElementById('mainSidebar').style.display = 'flex';
             document.getElementById('mainContent').style.display = 'block';
             document.getElementById('userRoleDisplay').innerText = role.toUpperCase();
             
-            if(role === 'admin') {
+            // Show Mobile Header if on mobile
+            if (window.innerWidth <= 768) {
+                document.getElementById('mobileHeader').style.display = 'flex';
+            }
+
+            if (role === "admin") {
                 document.getElementById('adminLinks').classList.remove('hidden');
                 showPage('dashPage');
             } else {
+                document.getElementById('adminLinks').classList.add('hidden'); // Clear admin links
                 document.getElementById('studentLinks').classList.remove('hidden');
-                renderStudentPortal(st);
+                renderStudentPortal(data);
                 showPage('resultPage');
             }
-            applyBranding();
             updateStats();
         }
 
-        // --- BRANDING ---
-        function handleLogoUpload(e) {
-            const reader = new FileReader();
-            reader.onload = (event) => { schoolLogo = event.target.result; };
-            reader.readAsDataURL(e.target.files[0]);
-        }
-
-        function saveLogo() {
-            localStorage.setItem('weyrax_logo', schoolLogo);
-            applyBranding();
-            alert("Branding Updated!");
-        }
-
-        function applyBranding() {
-            if(schoolLogo) {
-                document.getElementById('loginLogo').src = schoolLogo;
-                document.getElementById('loginLogo').classList.remove('hidden');
-                document.getElementById('sidebarLogo').src = schoolLogo;
-                document.getElementById('sidebarLogo').classList.remove('hidden');
+        function showPage(pageId, element = null) {
+            document.querySelectorAll('.page-view').forEach(p => p.classList.add('hidden'));
+            document.getElementById(pageId).classList.remove('hidden');
+            
+            if (element) {
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('nav-active'));
+                element.classList.add('nav-active');
             }
+
+            // Close sidebar on mobile after clicking link
+            if (window.innerWidth <= 768) {
+                const sidebar = document.getElementById('mainSidebar');
+                const overlay = document.getElementById('sidebarOverlay');
+                sidebar.classList.remove('open');
+                overlay.classList.remove('show');
+            }
+
+            if (pageId === 'examPage') renderExamTable();
+            if (pageId === 'managePage') renderManageTable();
+            if (pageId === 'dashPage') updateDashContacts();
         }
 
-        // --- STUDENT LOGIC ---
+        // --- CORE STUDENT MANAGEMENT ---
         function registerNewStudent() {
             const name = document.getElementById('regName').value;
             const roll = document.getElementById('regRoll').value;
-            if(!name || !roll) return alert("Magaca iyo Roll-ka waa qasab!");
+            const mother = document.getElementById('regMother').value;
+            const p1 = document.getElementById('regP1').value;
+            const p2 = document.getElementById('regP2').value;
 
-            const st = {
-                id: Date.now(),
+            if (!name || !roll) return alert("Fadlan buuxi magaca iyo Roll-ka!");
+
+            const newStudent = {
+                id: "ST-" + Date.now(),
                 fullName: name,
+                motherName: mother,
                 roll: roll,
-                mother: document.getElementById('regMother').value,
+                photo: tempPhotoData, // SAVE GALLERY PHOTO
+                password: document.getElementById('regPass').value,
                 grade: document.getElementById('regGrade').value,
                 section: document.getElementById('regSection').value,
-                password: document.getElementById('regPass').value,
+                phones: [p1, p2],
                 scores: {},
-                presentDays: Math.floor(Math.random() * 20) + 80 // Mock attendance data for official look
+                presentToday: false,
+                attendancePoints: 0
             };
-            SUBJECTS.forEach(s => st.scores[s] = 0);
-            students.push(st);
+
+            SUBJECTS.forEach(s => newStudent.scores[s] = 0);
+            students.push(newStudent);
             saveData();
-            alert("Ardayga waa la keydiyey!");
+            alert("Ardayga si guul leh ayaa loo diiwaangeliyay!");
             updateStats();
-            showPage('managePage');
+            
+            // Clear inputs
+            document.getElementById('regName').value = "";
+            document.getElementById('regRoll').value = "";
+            document.getElementById('regMother').value = "";
+            document.getElementById('regP1').value = "";
+            document.getElementById('regP2').value = "";
+            document.getElementById('regPhotoPreview').src = "https://via.placeholder.com/120";
+            tempPhotoData = "";
+            showPage('dashPage');
         }
 
         function fetchAttendanceList() {
             const g = document.getElementById('attGrade').value;
             const s = document.getElementById('attSection').value;
-            const filtered = students.filter(st => st.grade === g && st.section === s);
             
-            document.getElementById('attendanceTableBody').innerHTML = filtered.map(st => `
+            const filtered = students.filter(st => st.grade === g && st.section === s)
+                            .sort((a, b) => a.fullName.localeCompare(b.fullName));
+            
+            const tbody = document.getElementById('attendanceTableBody');
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Arday looma hayo fasalkaas.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(st => `
                 <tr>
                     <td>${st.fullName}</td>
                     <td>${st.roll}</td>
                     <td>
-                        <button onclick="this.innerText='JOOGA'; this.style.background='green';" style="width:auto; padding:5px 10px;">MARK PRESENT</button>
+                        <div class="att-toggle">
+                            <button class="btn-check present ${st.presentToday ? 'active' : ''}" onclick="setAttendance('${st.id}', true, this)">JOOGA</button>
+                            <button class="btn-check absent ${!st.presentToday ? 'active' : ''}" onclick="setAttendance('${st.id}', false, this)">MA JOOGO</button>
+                        </div>
                     </td>
                 </tr>
             `).join('');
         }
 
+        function setAttendance(id, isPresent, btn) {
+            const st = students.find(x => x.id === id);
+            st.presentToday = isPresent;
+            st.attendancePoints = isPresent ? 10 : 0;
+            const parent = btn.parentElement;
+            parent.querySelectorAll('.btn-check').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            saveData();
+        }
+
+        function submitAttendance() { alert("Xadirinta waa la keydiyay!"); renderExamTable(); }
+
+        // --- CALCULATIONS & TABLES ---
+        function calculateSummary(st) {
+            let examSum = 0;
+            SUBJECTS.forEach(s => examSum += (st.scores[s] || 0));
+            const finalTotal = examSum + (st.attendancePoints || 0);
+            const avg = Math.round((finalTotal / (SUBJECTS.length * 100)) * 100);
+            let grade = "F";
+            if (avg >= 90) grade = "A"; else if (avg >= 80) grade = "B";
+            else if (avg >= 70) grade = "C"; else if (avg >= 50) grade = "D";
+            return { total: finalTotal, average: avg, grade: grade, examOnly: examSum };
+        }
+
         function renderExamTable() {
+            const g = document.getElementById('exGrade').value;
+            const s = document.getElementById('exSection').value;
             const q = document.getElementById('searchExam').value.toLowerCase();
-            const filtered = students.filter(st => st.fullName.toLowerCase().includes(q));
             
-            document.getElementById('examTableBody').innerHTML = filtered.map(st => {
-                const res = calculateRes(st);
+            const filtered = students.filter(st => (g === 'all' || st.grade === g) && (s === 'all' || st.section === s) && st.fullName.toLowerCase().includes(q))
+                            .sort((a, b) => a.fullName.localeCompare(b.fullName));
+
+            const tbody = document.getElementById('examTableBody');
+            tbody.innerHTML = filtered.map(st => {
+                const res = calculateSummary(st);
                 return `
                     <tr>
                         <td>${st.roll}</td>
                         <td>${st.fullName}</td>
-                        <td>${res.total}</td>
-                        <td>${res.avg}%</td>
-                        <td><button onclick="openScoreModal(${st.id})" style="width:auto; padding:5px;">GELI DHIBCAHA</button></td>
+                        <td>${res.examOnly}</td>
+                        <td>+${st.attendancePoints || 0}</td>
+                        <td><b>${res.average}%</b></td>
+                        <td><span class="badge ${res.grade === 'F' ? 'bg-f' : 'bg-a'}">${res.grade}</span></td>
+                        <td><button style="width:auto; padding:5px 10px;" onclick="openScoreModal('${st.id}')">GELI DHIBCAHA</button></td>
                     </tr>
                 `;
             }).join('');
@@ -436,102 +776,83 @@
 
         function openScoreModal(id) {
             currentEditingId = id;
-            const st = students.find(s => s.id === id);
-            document.getElementById('modalStName').innerText = st.fullName;
-            document.getElementById('scoreInputsGrid').innerHTML = SUBJECTS.map(s => `
-                <div>
+            const st = students.find(x => x.id === id);
+            document.getElementById('modalStudentName').innerText = st.fullName;
+            const grid = document.getElementById('scoreInputsGrid');
+            grid.innerHTML = SUBJECTS.map(s => `
+                <div style="margin-bottom:10px;">
                     <label style="font-size:11px; font-weight:bold;">${s}</label>
-                    <input type="number" class="mark-in" data-subj="${s}" value="${st.scores[s] || 0}">
+                    <input type="number" class="score-input-val" data-subj="${s}" value="${st.scores[s] || 0}" max="100">
                 </div>
             `).join('');
             document.getElementById('scoreModal').classList.remove('hidden');
         }
 
-        function saveScores() {
-            const st = students.find(s => s.id === currentEditingId);
-            document.querySelectorAll('.mark-in').forEach(inp => {
-                st.scores[inp.dataset.subj] = parseInt(inp.value) || 0;
+        function saveStudentScores() {
+            const st = students.find(x => x.id === currentEditingId);
+            document.querySelectorAll('.score-input-val').forEach(input => {
+                st.scores[input.getAttribute('data-subj')] = parseInt(input.value) || 0;
             });
-            saveData();
-            closeScoreModal();
-            renderExamTable();
-            alert("Natiijada waa la keydiyey!");
-        }
-
-        function renderStudentPortal(st) {
-            const res = calculateRes(st);
-            document.getElementById('stNameHead').innerText = st.fullName;
-            document.getElementById('stRollHead').innerText = st.roll;
-            document.getElementById('reportAvg').innerText = res.avg + "%";
-            document.getElementById('reportStatus').innerText = res.avg >= 50 ? "PASS" : "FAIL";
-            
-            document.getElementById('stDetailTable').innerHTML = SUBJECTS.map(s => `
-                <tr>
-                    <td>${s}</td>
-                    <td>100</td>
-                    <td>${st.scores[s] || 0}</td>
-                    <td style="color:${st.scores[s] >= 50 ? 'green' : 'red'}">${st.scores[s] >= 50 ? 'P' : 'F'}</td>
-                </tr>
-            `).join('');
-
-            // Attendance Section
-            document.getElementById('stAttName').innerText = st.fullName + " (ID: " + st.roll + ")";
-            document.getElementById('countPresent').innerText = st.presentDays;
-            document.getElementById('countAttPer').innerText = Math.round((st.presentDays / 100) * 100) + "%";
-        }
-
-        // --- UTILS ---
-        function calculateRes(st) {
-            let total = 0;
-            SUBJECTS.forEach(s => total += (st.scores[s] || 0));
-            let avg = Math.round(total / SUBJECTS.length);
-            return { total, avg };
-        }
-
-        function showPage(id, el = null) {
-            document.querySelectorAll('.page-view').forEach(p => p.classList.add('hidden'));
-            document.getElementById(id).classList.remove('hidden');
-            if(el) {
-                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('nav-active'));
-                el.classList.add('nav-active');
-            }
-            if(id === 'examPage') renderExamTable();
-            if(id === 'managePage') renderManageTable();
-            if(window.innerWidth < 768) toggleSidebar();
-        }
-
-        function renderManageTable() {
-            document.getElementById('manageTableBody').innerHTML = students.map(st => `
-                <tr>
-                    <td>${st.roll}</td>
-                    <td>${st.fullName}</td>
-                    <td>${st.grade}</td>
-                    <td>${st.section}</td>
-                    <td><button onclick="deleteSt(${st.id})" style="background:var(--danger); width:auto; padding:5px 10px;">Tirtir</button></td>
-                </tr>
-            `).join('');
-        }
-
-        function deleteSt(id) {
-            if(confirm("Ma hubtaa?")) {
-                students = students.filter(s => s.id !== id);
-                saveData(); renderManageTable(); updateStats();
-            }
-        }
-
-        function updateStats() {
-            document.getElementById('countStudents').innerText = students.length;
-            document.getElementById('currentDateDisp').innerText = new Date().toLocaleDateString();
-        }
-
-        function toggleSidebar() {
-            document.getElementById('mainSidebar').classList.toggle('open');
-            document.getElementById('sidebarOverlay').classList.toggle('show');
+            saveData(); closeScoreModal(); renderExamTable(); alert("Natiijada waa la cusboonaysiiyay!");
         }
 
         function closeScoreModal() { document.getElementById('scoreModal').classList.add('hidden'); }
-        function saveData() { localStorage.setItem('weyrax_pro_db', JSON.stringify(students)); }
 
+        function renderManageTable() {
+            const g = document.getElementById('mGrade').value;
+            const s = document.getElementById('mSection').value;
+            const filtered = students.filter(st => (g === 'all' || st.grade === g) && (s === 'all' || st.section === s))
+                            .sort((a, b) => a.fullName.localeCompare(b.fullName));
+
+            document.getElementById('manageTableBody').innerHTML = filtered.map(st => `
+                <tr>
+                    <td><img src="${st.photo || 'https://via.placeholder.com/40'}" style="width:35px; height:35px; border-radius:50%; object-fit:cover;"></td>
+                    <td>${st.fullName}</td>
+                    <td>${st.motherName || '---'}</td>
+                    <td>${st.roll}</td>
+                    <td>Grade ${st.grade}</td>
+                    <td>Section ${st.section}</td>
+                    <td><button class="btn-danger" style="width:auto; padding:5px;" onclick="deleteStudent('${st.id}')">Tirtir</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function deleteStudent(id) { if (confirm("Ma hubtaa inaad tirtirto ardaygan iyo dhammaan xogtiisa?")) { students = students.filter(s => s.id !== id); saveData(); renderManageTable(); updateStats(); } }
+
+        function renderStudentPortal(st) {
+            const res = calculateSummary(st);
+            
+            // DISPLAY STUDENT PHOTO
+            const stPhoto = document.getElementById('stPhotoCard');
+            if (st.photo) {
+                stPhoto.src = st.photo;
+                stPhoto.classList.remove('hidden');
+            } else {
+                stPhoto.classList.add('hidden');
+            }
+
+            document.getElementById('stNameHead').innerText = st.fullName;
+            document.getElementById('stRollHead').innerText = `ID: ${st.roll} | FASALKA: ${st.grade}${st.section}`;
+            document.getElementById('stTotal').innerText = res.total;
+            document.getElementById('stAvg').innerText = res.average + "%";
+            document.getElementById('stRank').innerText = res.average >= 50 ? "PASS" : "FAIL";
+            document.getElementById('stDetailTable').innerHTML = SUBJECTS.map(s => `<tr><td>${s}</td><td>${st.scores[s] || 0}</td><td style="color:${st.scores[s] >= 50 ? 'var(--accent)' : 'var(--danger)'}; font-weight:bold;">${st.scores[s] >= 50 ? 'Pass' : 'Fail'}</td></tr>`).join('');
+        }
+
+        // --- UTILITIES ---
+        function updateStats() {
+            document.getElementById('countStudents').innerText = students.length;
+            document.getElementById('currentDate').innerText = new Date().toDateString();
+        }
+
+        function updateDashContacts() {
+            const recent = [...students].reverse().slice(0, 10);
+            document.getElementById('dashContactList').innerHTML = recent.map(st => `<tr><td>${st.fullName}</td><td>Grade ${st.grade}</td><td>${st.section}</td><td>${(st.phones || []).filter(p => p).join(', ') || 'N/A'}</td></tr>`).join('');
+        }
+
+        function saveData() { localStorage.setItem('nbs_official_v9_master', JSON.stringify(students)); }
+
+        // Initial Load
         window.onload = applyBranding;
     </script>
 </body>
